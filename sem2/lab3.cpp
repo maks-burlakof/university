@@ -12,7 +12,7 @@ struct Stack {
 Stack *add (Stack*, int);
 void view (Stack*);
 void del(Stack**);
-void task(Stack*);
+void task(Stack*&);
 
 int main() {
 	Stack *begin = NULL;
@@ -36,7 +36,7 @@ int main() {
 			cout << " >>> [a, b] = ";
 			cin >> a >> b;
 			srand(time(0));
-			for (int i = 1; i <= n; i++) {
+			for (int i = 0; i < n; i++) {
 				in = rand() % (b + 1 - a) + a;
 				begin = add(begin, in); // вершину стека ставим на новый элемент
 			}
@@ -56,6 +56,7 @@ int main() {
 				break;
 			}
 			task(begin);
+			cout << "Success!\n";
 			break;
 		case 5:
 			del(&begin);
@@ -93,22 +94,11 @@ void del(Stack **p) {
 	}
 }
 
-//void task(Stack *p) {
-//	Stack *t = p;
-//	Stack *t2;
-//	while (t) {
-//		if (t->info % 2 == 0) {
-//			t2 = t;
-//			delete t;
-//			t = t2;
-//		}
-//		t = t->next;
-//	}
-//}
-
-void task(Stack *p) {
+void task(Stack *&p) {
+	p = add(p, 1);
 	Stack* t = p;
 	Stack* t1 = p;
+	t = t->next;
 	while (t) {
 		if (t->info % 2 != 0) {
 			t1 = t;
@@ -120,6 +110,9 @@ void task(Stack *p) {
 			t = t1->next;
 		}
 	}
+	t = p;
+	p = p->next;
+	delete t;
 }
 
 //Stack* task(Stack* p) {
