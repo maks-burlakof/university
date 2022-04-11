@@ -1,7 +1,6 @@
-// Обязательно добавить проверки
-
 #include <iostream>
 #include <stdio.h>
+#include<conio.h> 
 using namespace std;
 
 struct Stack {
@@ -9,6 +8,7 @@ struct Stack {
 	Stack *next, *begin;
 };
 
+int input();
 Stack *add (Stack*, int);
 void view (Stack*);
 void del(Stack**);
@@ -22,7 +22,7 @@ int main() {
 		cout << "1 - Create\n2 - Add\n3 - View\n"
 			"4 - Individual task\n5 - Delete\n0 - EXIT\n";
 		cout << "-------------------------\n >>> ";
-		cin >> choice;
+		choice = input();
 		system("cls");
 		switch (choice) {
 		case 1:
@@ -32,9 +32,12 @@ int main() {
 				break;
 			}
 			cout << " >>> Amount of elements = ";
-			cin >> n;
-			cout << " >>> [a, b] = ";
-			cin >> a >> b;
+			n = input();
+			cout << "\n >>> [a, b] = ";
+			a = input();
+			cout << " ";
+			b = input();
+			cout << endl;
 			srand(time(0));
 			for (int i = 0; i < n; i++) {
 				in = rand() % (b + 1 - a) + a;
@@ -69,6 +72,24 @@ int main() {
 		}
 	}
 }
+
+int input() {
+	char s[20];
+	int i = 0;
+	while (true) {
+		s[i] = _getch();
+		if (s[i] == 13 || s[i] == ' ') {
+			if (i == 0) continue;
+			else break;
+		}
+		if (!(s[i] >= '0' && s[i] <= '9' || s[i] == '-')) continue;
+		cout << s[i];
+		i++;
+	}
+	s[i] = '\0';
+	return atoi(s);
+}
+
 
 Stack *add(Stack *p, int element) {
 	Stack *t = new Stack;
