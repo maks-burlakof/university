@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <conio.h> 
+#include <conio.h>
 using namespace std;
 
 struct list {
@@ -108,7 +108,7 @@ int main() {
 			return 0;
 		}
 	}
-    return 0;
+    return 0; //?
 }
 
 int input() {

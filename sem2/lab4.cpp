@@ -1,3 +1,4 @@
+// Возможно добавить ввод с клавиатуры и тестовые значения
 #include <iostream>
 #include <stdio.h>
 #include<conio.h> 
@@ -5,7 +6,7 @@ using namespace std;
 
 struct Stack {
 	int info;
-	Stack *next, *begin;
+	Stack *next, *begin; //Удалить begin
 };
 
 int input();
@@ -27,7 +28,7 @@ int main() {
 		switch (choice) {
 		case 1:
 		case 2:
-			if (begin != NULL && choice == 1) {
+			if (begin != NULL && choice == 1) {						//if begin
 				cout << "The stack is not empty!\nClear memory!\n";
 				break;
 			}
@@ -41,7 +42,7 @@ int main() {
 			srand(time(0));
 			for (int i = 0; i < n; i++) {
 				in = rand() % (b + 1 - a) + a;
-				begin = add(begin, in); // вершину стека ставим на новый элемент
+				begin = add(begin, in); // вершину стека ставим на новый элемент, можно через указатели
 			}
 			cout << "Success!\n";
 			break;
@@ -66,14 +67,14 @@ int main() {
 			cout << "Stack deleted!\n";
 			break;
 		case 0:
-			if (begin != NULL)
+			if (begin)
 				del(&begin);
 			return 0;
 		}
 	}
 }
 
-int input() {
+int input() { // Взять новую из lab4.cpp
 	char s[20];
 	int i = 0;
 	while (true) {
@@ -90,7 +91,6 @@ int input() {
 	return atoi(s);
 }
 
-
 Stack *add(Stack *p, int element) {
 	Stack *t = new Stack;
 	t->info = element;
@@ -106,7 +106,7 @@ void view(Stack *p) {
 	}
 }
 
-void del(Stack **p) {
+void del(Stack **p) { // p = begin поменять
 	Stack *t;
 	while (*p) {
 		t = *p; // Устанавливаем текущий указатель на вершину
@@ -115,7 +115,7 @@ void del(Stack **p) {
 	}
 }
 
-void task(Stack *&p) {
+void task(Stack *&p) { // p = begin можно поменять
 	p = add(p, 1);
 	Stack* t = p;
 	Stack* t1 = p;
