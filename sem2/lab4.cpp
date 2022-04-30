@@ -1,4 +1,3 @@
-// Возможно добавить ввод с клавиатуры и тестовые значения
 #include <iostream>
 #include <stdio.h>
 #include<conio.h> 
@@ -6,7 +5,7 @@ using namespace std;
 
 struct Stack {
 	int info;
-	Stack *next, *begin; //Удалить begin
+	Stack *next;
 };
 
 int input();
@@ -17,7 +16,7 @@ void task(Stack*&);
 
 int main() {
 	Stack *begin = NULL;
-	int choice, n, a, b, in;
+	int choice, n, a, b, in, stack_code;
 	while (true) {
 		cout << "--------- MENU ---------\n";
 		cout << "1 - Create\n2 - Add\n3 - View\n"
@@ -28,23 +27,41 @@ int main() {
 		switch (choice) {
 		case 1:
 		case 2:
-			if (begin != NULL && choice == 1) {						//if begin
+			if (begin && choice == 1) {
 				cout << "The stack is not empty!\nClear memory!\n";
+				break;
+			}
+			cout << "1 - Random\n2 - Test values\n3 - Keyboard\n >>> ";
+			do {
+				stack_code = input();
+				cout << endl;
+			} while (stack_code < 1 || stack_code > 3);
+			if (stack_code == 2) { //test
+				int arr[10] = { 4, 8, 1, -10, 2, 12, 5, 7, 0, 10 };
+				for (int i = 0; i < 10; i++) begin = add(begin, arr[i]);
+				cout << "Success!\n";
 				break;
 			}
 			cout << " >>> Amount of elements = ";
 			n = input();
-			cout << "\n >>> [a, b] = ";
-			a = input();
-			cout << " ";
-			b = input();
-			cout << endl;
-			srand(time(0));
-			for (int i = 0; i < n; i++) {
-				in = rand() % (b + 1 - a) + a;
-				begin = add(begin, in); // вершину стека ставим на новый элемент, можно через указатели
+			if (stack_code == 3) { //keyboard
+				for (int i = 1; i <= n; i++) {
+					cout << "\nEnter value # " << i << ": ";
+					begin = add(begin, input());
+				}
 			}
-			cout << "Success!\n";
+			else { //random
+				cout << "\n >>> [a, b] = ";
+				a = input();
+				cout << " ";
+				b = input();
+				srand(time(0));
+				for (int i = 0; i < n; i++) {
+					in = rand() % (b + 1 - a) + a;
+					begin = add(begin, in);
+				}
+			}
+			cout << "\nSuccess!\n";
 			break;
 		case 3:
 			if (!begin) {
@@ -59,7 +76,12 @@ int main() {
 				cout << "Stack is empty!\n";
 				break;
 			}
+			cout << "TASK: Remove elements with even numbers from the created list.\n";
+			cout << "--- STACK BEFORE ---\n";
+			view(begin);
 			task(begin);
+			cout << "--- STACK AFTER ---\n";
+			view(begin);
 			cout << "Success!\n";
 			break;
 		case 5:
@@ -74,14 +96,22 @@ int main() {
 	}
 }
 
-int input() { // Взять новую из lab4.cpp
+int input() {
 	char s[20];
 	int i = 0;
 	while (true) {
 		s[i] = _getch();
-		if (s[i] == 13 || s[i] == ' ') {
+		if (s[i] == 13 || s[i] == ' ') { // enter
 			if (i == 0) continue;
 			else break;
+		}
+		if (s[i] == 8) { // backspace
+			if (i == 0) continue;
+			for (int j = 0; j <= i; j++) {
+				s[j] = '\0';
+			}
+			i = 0;
+			cout << "--del\n";
 		}
 		if (!(s[i] >= '0' && s[i] <= '9' || s[i] == '-')) continue;
 		cout << s[i];
@@ -94,7 +124,7 @@ int input() { // Взять новую из lab4.cpp
 Stack *add(Stack *p, int element) {
 	Stack *t = new Stack;
 	t->info = element;
-	t->next = p; // записываем адрес предыдущего элемента
+	t->next = p;
 	return t;
 }
 
@@ -102,20 +132,20 @@ void view(Stack *p) {
 	Stack *t = p;
 	while (t) {
 		cout << t->info << endl;
-		t = t->next; // Переставляем текущий указатель t на следующий за ним элемент
+		t = t->next;
 	}
 }
 
-void del(Stack **p) { // p = begin поменять
+void del(Stack **p) {
 	Stack *t;
 	while (*p) {
-		t = *p; // Устанавливаем текущий указатель на вершину
-		*p = (*p)->next; // Вершину переставляем на следующий элемент
-		delete t; // Освобождаем память бывшей вершины
+		t = *p;
+		*p = (*p)->next;
+		delete t;
 	}
 }
 
-void task(Stack *&p) { // p = begin можно поменять
+void task(Stack *&p) {
 	p = add(p, 1);
 	Stack* t = p;
 	Stack* t1 = p;
