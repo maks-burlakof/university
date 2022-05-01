@@ -39,9 +39,10 @@ double solve(double x0, double eps) {
 }
 
 void poisk(double a, double b, double eps) {
+	cout << "~~~~~~~ TABLE ~~~~~~~\n";
 	for (double x = a; x <= b; x += eps)
 		cout << "x = " << x << "\ty = " << fun(x) << endl;
-	cout << "~~~~~~~~~~~~~~~~~~~~\n";
+	cout << "~~~~~~~ ROOTS ~~~~~~~\n";
 	for (double x = a; x <= b; x += eps) {
 		if (fun(x) * fun(x + eps) < 0) {
 			cout << "Root = " << solve(x, eps) << endl;
