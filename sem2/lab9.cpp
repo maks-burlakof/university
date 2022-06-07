@@ -1,46 +1,64 @@
-#include <iostream>
-#include <string>
+п»ї#include <iostream>
 using namespace std;
 
 struct Stack {
 	char s;
-	Stack *next;
+	Stack* next;
 };
 
 int getPrioritet(char);
+void push(Stack*&, char);
+void out(Stack*&, char&);
+double Result(char*);
+bool expressionCheck(char *);
+double input();
 
-
-bool isNumberNumeric()
-{
-	if (cin.get() == '\n')
-		return true;
-	else
-	{
-		cin.clear();
-		cin.ignore(numeric_limits<streamsize>::max(), '\n');
-		return false;
+int main() {
+	char formula[81], final[81], ss_buff;
+	int final_len = 0;
+	Stack *begin = NULL;
+	do {
+		cout << " Input formula: ";
+		cin >> formula;
+	} while(!expressionCheck(formula));
+	for (int i = 0; formula[i] != '\0'; i++) {
+		char ss = formula[i];
+		if (ss >= 'a' && ss <= 'z') final[final_len++] = ss;
+		if (ss == '(') push(begin, ss);
+		if (ss == ')') {
+			while (begin->s != '(') {
+				out(begin, ss_buff);
+				final[final_len++] = ss_buff;
+			}
+			out(begin, ss_buff);
+		}
+		if (ss == '-' || ss == '+' || ss == '*' || ss == '/') {
+			while (begin != NULL && getPrioritet(begin->s) >= getPrioritet(ss)) {
+				out(begin, ss_buff);
+				final[final_len++] = ss_buff;
+			}
+			push(begin, ss);
+		}
 	}
+	while (begin != NULL) {
+		out(begin, ss_buff);
+		final[final_len++] = ss_buff;
+	}
+	final[final_len] = '\0';
+	cout << endl << "Polish notation of the formula: " << final << endl;
+	cout << "Result: " << Result(final);
+	return 0;
 }
 
-double inputNumber()
-{
-	double number;
-	while (true)
-	{
-		cin >> number;
-		if (isNumberNumeric())
-		{
-			return number;
-		}
-		else
-		{
-			cout << "Incorrect input!\nTry again: ";
-		}
-	}
+int getPrioritet(char s) {
+	if (s == '*' || s == '/') return 2;
+	if (s == '+' || s == '-') return 1;
+	if (s == '(') return 0;
+	return NULL;
 }
 
-void pushInStack(Stack *&top, char s) {
-	Stack *t = new Stack;
+void push(Stack*& top, char s) {
+	Stack* t = new Stack;
 	t->s = s;
 	if (t == NULL) {
 		top = t;
@@ -51,7 +69,7 @@ void pushInStack(Stack *&top, char s) {
 	}
 }
 
-void out(Stack *&top, char& buff) {
+void out(Stack*& top, char& buff) {
 	Stack* q = top;
 	buff = q->s;
 	if (q == top)
@@ -64,159 +82,117 @@ void out(Stack *&top, char& buff) {
 	q = q->next;
 }
 
-int getPrioritet(char s) {
-	if (s == '*' || s == '/') return 2;
-	if (s == '+' || s == '-') return 1;
-	if (s == '(') return 0;
-	return NULL;
-}
-
-
-double countingInPolishNotation(Stack*& begin, string final, double a, double b, double c, double d, double e)
-{
-	char ss, comp1, comp2;
-	double op1, op2, rez = 0;
-
-	double mas[201]; // Массив для вычисления 
-
-	// Работаем с символами 
-	mas[int('a')] = a; // в ячейку (a --> код ASCII) заполняем введенное значение a 
-	mas[int('b')] = b;
-	mas[int('c')] = c;
-	mas[int('d')] = d;
-	mas[int('e')] = e;
-
-
-	char chr = 'z' + 1; // chr --> ячейка с элементом после табличного z 
-
-	for (int i = 0; i < final.length(); i++) // Цикл для перебора всех символов в финальной строке (преобразованной) 
-	{
-		ss = final[i]; // По очереди символ из строки final заносим в ss для обработки 
-
-		if (ss >= 'a' && ss <= 'z')  // Заносим в стек если НЕ оператор
-			pushInStack(begin, ss);
-		else
-		{
-			out(begin, comp1);  // Выносим 2 переменные из стека
-			out(begin, comp2);
-
-			op1 = mas[int(comp1)];
-			op2 = mas[int(comp2)];
-
-			switch (ss)
-			{
-			case '*':
-				rez = op2 * op1;
-				break;
-			case '/':
-				rez = op2 / op1;
-				break;
-			case '+':
-				rez = op2 + op1;
-				break;
-			case '-':
-				rez = op2 - op1;
-				break;
-			case '^':
-				rez = pow(op2, op1);
-			}
-
-			mas[int(chr)] = rez; // Ячейка с символом следующим после z в таблице ASCII --> результат вычисления
-			pushInStack(begin, chr);
-			chr++;
-		}
-	}
-
-	return rez;
-}
-
-
-int main() {
-	string formulaString, final;
-
-	char ss_buff;
+double Result(char* str) {
 	Stack* begin = NULL;
-
-
-	cout << "Enter formula: ";
-	cin >> formulaString;
-	//formulaString = "a/b-((c+d)*e)";
-	int length = formulaString.length();
-
-	for (int i = 0; i < length; i++)
-	{
-		char ss = formulaString[i];
-
-		if (ss >= 'a' && ss <= 'z') //выгружаем в final 
-			final += ss;
-
-		if (ss == '(')
-			pushInStack(begin, ss);
-
-		if (ss == ')') //Выталкиваем все до открывающейся скобки
-		{
-			while (begin->s != '(')
-			{
-				out(begin, ss_buff);
-				final += ss_buff;
-			}
-			out(begin, ss_buff); // Удаляем )
-		}
-
-
-
-		if (ss == '-' || ss == '+' || ss == '*' || ss == '/')
-		{
-			while (begin != NULL && getPrioritet(begin->s) >= getPrioritet(ss))
-			{
-				out(begin, ss_buff);
-				final += ss_buff;
-			}
-			pushInStack(begin, ss);
+	char ss, ss1, ss2, ssR = 'z' + 1;
+	double op1, op2, res, mas[50];
+	cout << "Input data: ";
+	for (int i = 0; str[i] != '\0'; i++) {
+		ss = str[i];
+		if (ss >= 'a' && ss <= 'z') {
+			cout << ss << " = ";
+			mas[int(ss - 'a')] = input();
 		}
 	}
-
-	while (begin != NULL)
-	{
-		out(begin, ss_buff);
-		final += ss_buff;
+	for (int i = 0; str[i] != '\0'; i++) {
+		ss = str[i];
+		if (!(ss == '+' || ss == '-' || ss == '*' || ss == '/' || ss == '^'))
+			push(begin, ss);
+		else {
+			out(begin, ss2);
+			out(begin, ss1);
+			op2 = mas[int(ss2 - 'a')];
+			op1 = mas[int(ss1 - 'a')];
+			switch (ss) {
+			case '+': res = op1 + op2;  break;
+			case '-': res = op1 - op2;  break;
+			case '*': res = op1 * op2;  break;
+			case '/': res = op1 / op2;  break;
+			}
+			mas[int(ssR - 'a')] = res;
+			push(begin, ssR);
+			ssR++;
+		}
 	}
-	// Окончание строки
-	cout << endl << "Polish notation of the formula: " << final << endl;
+	return res;
+}
 
+bool expressionCheck(char* In) {
+	int errors = 0, bracket = 0;
+	if (In[0] == '+' || In[0] == '-' || In[0] == '*' || In[0] == '/' || (In[0] == ')')) {
+		cout << "You can't put signs and closing bracket at the beginning\n";
+		errors++;
+	}
+	if (In[1] == '\0' || In[2] == '\0') {
+		cout << "Expression is not complete\n";
+		errors++;
+	}
+	for (int i = 0; In[i] != '\0'; i++) {
+		if (!(In[i] >= 'a' && In[i] <= 'z') && In[i] != '+' && In[i] != '-' && In[i] != '*' && In[i] != '/' && In[i] != '(' && In[i] != ')') {
+			cout << "Unresolved character: " << In[i] << endl;
+			errors++;
+		}
+		if (In[i] == '(') {
+			if (In[i + 1] == '+' || In[i + 1] == '-' || In[i + 1] == '*' || In[i + 1] == '/' || In[i + 1] == ')') {
+				cout << "You can't put signs and closing bracket after opening bracket\n";
+				errors++;
+			}
+			if (In[i + 1] == NULL) {
+				cout << "Expression is not complete\n";
+				errors++;
+			}
+			if (In[i + 2] == ')') {
+				cout << "Expression in brackets is not complete\n";
+				errors++;
+			}
+			bracket++;
+		}
+		if (In[i] == ')') {
+			if ((In[i + 1] >= 'a' && In[i + 1] <= 'z') || In[i + 1] == '(') {
+				cout << "You must put a sign after the closing bracket\n";
+				errors++;
+			}
+			bracket--;
+		}
+		if (In[i] >= 'a' && In[i] <= 'z') {
+			if (In[i + 1] >= 'a' && In[i + 1] <= 'z') {
+				cout << "Enter two letters in a row is unavailable\n";
+				errors++;
+			}
+			if (In[i + 1] == '(') {
+				cout << "You can't put open bracket after letters\n";
+				errors++;
+			}
+		}
+		if (In[i] == '+' || In[i] == '-' || In[i] == '*' || In[i] == '/') {
+			if (In[i + 1] == '+' || In[i + 1] == '-' || In[i + 1] == '*' || In[i + 1] == '/') {
+				cout << "Enter two signs in a row is unavailable\n";
+				errors++;
+			}
+			if (In[i + 1] == ')') {
+				cout << "You can't put closing bracket after signs\n";
+				errors++;
+			}
+			if (In[i + 1] == NULL) {
+				cout << "Expression is not completed\n";
+				errors++;
+			}
+		}
+	}
+	if (bracket != 0) {
+		cout << "Check brackets and try one more time.. \n";
+		errors++;
+	}
+	if (!errors) return 1;
+	else return 0;
+}
 
-	double a, b, c, d, e;
-	cout << "Enter a: ";
-	do {
-		a = inputNumber();
-		if (a > 100 || a < -100)
-			cout << "You can use only -100 - 100. Try again: ";
-	} while (a > 100 || a < -100);
-	cout << "Enter b: ";
-	do {
-		b = inputNumber();
-		if (b > 100 || b < -100)
-			cout << "You can use only -100 - 100. Try again: ";
-	} while (b > 100 || b < -100);
-	cout << "Enter c: ";
-	do {
-		c = inputNumber();
-		if (c > 100 || c < -100)
-			cout << "You can use only -100 - 100. Try again: ";
-	} while (c > 100 || c < -100);
-	cout << "Enter d: ";
-	do {
-		d = inputNumber();
-		if (d > 100 || d < -100)
-			cout << "You can use only -100 - 100. Try again: ";
-	} while (d > 100 || d < -100);
-	cout << "Enter e: ";
-	do {
-		e = inputNumber();
-		if (e > 100 || e < -100)
-			cout << "You can use only -100 - 100. Try again: ";
-	} while (e > 100 || e < -100);
-
-	cout << "Result: " << countingInPolishNotation(begin, final, a, b, c, d, e) << endl;
-	return 0;
+double input() {
+	double in;
+	while (!(cin >> in) or cin.get() != '\n') {
+		cout << "Invalid input! Try again:\n >>> ";
+		cin.clear();
+		while (cin.get() != '\n');
+	}
+	return in;
 }
