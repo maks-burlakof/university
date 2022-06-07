@@ -10,7 +10,7 @@ double input();
 
 int main() {
 	double a, b, eps;
-	cout << "Function: x^2 - 10sin(x)^2 + 2\n";
+	cout << "Function: x^2 - 10sin(x)^2 + 2\na = -1 b = 3\nNewton's method\n\n";
 	cout << "Enter a value:\n >>> ";
 	a = input();
 	cout << "Enter b value:\n >>> ";
@@ -41,7 +41,8 @@ double solve(double x0, double eps) {
 void poisk(double a, double b, double eps) {
 	cout << "~~~~~~~ TABLE ~~~~~~~\n";
 	for (double x = a; x <= b; x += eps)
-		cout << "x = " << x << "\ty = " << fun(x) << endl;
+		//cout << "x = " << x << "\ty = " << fun(x) << endl;
+		printf("x = %.4f\t y = %.4f\n", x, fun(x));
 	cout << "~~~~~~~ ROOTS ~~~~~~~\n";
 	for (double x = a; x <= b; x += eps) {
 		if (fun(x) * fun(x + eps) < 0) {

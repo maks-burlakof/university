@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdio.h>
-#include<conio.h> 
+#include <conio.h> 
 using namespace std;
 
 struct Stack {
@@ -8,11 +8,11 @@ struct Stack {
 	Stack *next;
 };
 
-int input();
 Stack *add (Stack*, int);
 void view (Stack*);
 void del(Stack**);
 void task(Stack*&);
+int input();
 
 int main() {
 	Stack *begin = NULL;
@@ -96,31 +96,6 @@ int main() {
 	}
 }
 
-int input() {
-	char s[20];
-	int i = 0;
-	while (true) {
-		s[i] = _getch();
-		if (s[i] == 13 || s[i] == ' ') { // enter
-			if (i == 0) continue;
-			else break;
-		}
-		if (s[i] == 8) { // backspace
-			if (i == 0) continue;
-			for (int j = 0; j <= i; j++) {
-				s[j] = '\0';
-			}
-			i = 0;
-			cout << "--del\n";
-		}
-		if (!(s[i] >= '0' && s[i] <= '9' || s[i] == '-')) continue;
-		cout << s[i];
-		i++;
-	}
-	s[i] = '\0';
-	return atoi(s);
-}
-
 Stack *add(Stack *p, int element) {
 	Stack *t = new Stack;
 	t->info = element;
@@ -147,8 +122,8 @@ void del(Stack **p) {
 
 void task(Stack *&p) {
 	p = add(p, 1);
-	Stack* t = p;
-	Stack* t1 = p;
+	Stack *t = p;
+	Stack *t1 = p;
 	t = t->next;
 	while (t) {
 		if (t->info % 2 != 0) {
@@ -166,25 +141,27 @@ void task(Stack *&p) {
 	delete t;
 }
 
-//Stack* task(Stack* p) {
-//	Stack* t = p;
-//	Stack* t1 = p;
-//	while (t) {
-//		if (t->info % 2 != 0) {
-//			t1 = t;
-//			t = t->next;
-//		}
-//		else {
-//			if (t == p) {
-//				p = p->next;
-//				delete t;
-//				return p;
-//			}
-//			else {
-//				t1->next = t->next;
-//				delete t;
-//				t = t1->next;
-//			}
-//		}
-//	}
-//}
+int input() {
+	char s[20];
+	int i = 0;
+	while (true) {
+		s[i] = _getch();
+		if (s[i] == 13 || s[i] == ' ') { // enter
+			if (i == 0) continue;
+			else break;
+		}
+		if (s[i] == 8) { // backspace
+			if (i == 0) continue;
+			for (int j = 0; j <= i; j++) {
+				s[j] = '\0';
+			}
+			i = 0;
+			cout << "--del\n";
+		}
+		if (!(s[i] >= '0' && s[i] <= '9' || s[i] == '-')) continue;
+		cout << s[i];
+		i++;
+	}
+	s[i] = '\0';
+	return atoi(s);
+}

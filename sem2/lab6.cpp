@@ -1,5 +1,5 @@
 ﻿#include <iostream>
-#include <conio.h>  // balanced
+#include <conio.h>
 using namespace std;
 
 struct Tree {
@@ -99,6 +99,7 @@ int main() {
                 cout << "Tree not created!\nCreate it by pressing 1\n";
                 break;
             }
+            cout << "~ Find the numbers of leaves in a tree ~\n";
             amount = 0;
             task(root, amount);
             cout << "Number of leaves in a tree: " << amount << ".\nSuccess!\n";
@@ -109,7 +110,6 @@ int main() {
                 cout << "Tree not created!\nCreate it by pressing 1\n";
                 break;
             }
-            cout << "~ Find the numbers of leaves in a tree ~\n";
             cout << " >>> Enter key value: ";
             cin >> key;
             cout << "Before:\n";

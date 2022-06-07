@@ -7,12 +7,12 @@ struct list {
 	list *prev, *next;
 };
 
-int input();
 void create(list**, list**, int);
 void add(int, list**, list**, int);
 void view(int, list*);
 void del(list**);
 void task(list*&, list *&);
+int input();
 
 int main() {
 	list *begin = NULL, *end = NULL, *t;
@@ -95,7 +95,12 @@ int main() {
 				cout << "List is empty!\nCreate a list by pressing 1\n";
 				break;
 			}
+			cout << "TASK: Remove elements with even numbers from the created list.\n";
+			cout << "--- LIST BEFORE ---\n";
+			view(1, begin);
 			task(begin, end);
+			cout << "--- LIST AFTER ---\n";
+			view(1, begin);
 			cout << "Success!\n";
 			break;
 		case 5:
@@ -108,32 +113,7 @@ int main() {
 			return 0;
 		}
 	}
-    return 0; //?
-}
-
-int input() {
-	char s[20];
-	int i = 0;
-	while (true) {
-		s[i] = _getch();
-		if (s[i] == 13 || s[i] == ' ') { // enter
-			if (i == 0) continue;
-			else break;
-		}
-		if (s[i] == 8) { // backspace
-			if (i == 0) continue;
-			for (int j = 0; j <= i; j++) {
-				s[j] = '\0';
-			}
-			i = 0;
-			cout << "--del\n";
-		}
-		if (!(s[i] >= '0' && s[i] <= '9' || s[i] == '-')) continue;
-		cout << s[i];
-		i++;
-	}
-	s[i] = '\0';
-	return atoi(s);
+    return 0;
 }
 
 void create(list **begin, list **end, int in) {
@@ -203,4 +183,29 @@ void task(list *&begin, list *&end) {
 			t = t->next;
 		}
 	}
+}
+
+int input() {
+	char s[20];
+	int i = 0;
+	while (true) {
+		s[i] = _getch();
+		if (s[i] == 13 || s[i] == ' ') { // enter
+			if (i == 0) continue;
+			else break;
+		}
+		if (s[i] == 8) { // backspace
+			if (i == 0) continue;
+			for (int j = 0; j <= i; j++) {
+				s[j] = '\0';
+			}
+			i = 0;
+			cout << "--del\n";
+		}
+		if (!(s[i] >= '0' && s[i] <= '9' || s[i] == '-')) continue;
+		cout << s[i];
+		i++;
+	}
+	s[i] = '\0';
+	return atoi(s);
 }

@@ -10,6 +10,7 @@ struct TZap {
 	int m_phys, m_math, m_inf, m_chem;
 	double s_b;
 } Zap;
+
 FILE *inp, *out, *indiv;
 char File_In[] = "zapisi.dat", File_Out[] = "rezult.txt", File_Indiv[] = "zadanie.txt";
 void Out(TZap &, FILE *);
