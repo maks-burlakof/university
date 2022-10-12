@@ -69,34 +69,43 @@ void push(Stack*& top, char s) {
 	}
 }
 
+//void out(Stack*& top, char& buff) {
+//	Stack* q = top;
+//	buff = q->s;
+//	if (q == top)
+//	{
+//		top = q->next;
+//		free(q);
+//	}
+//	else
+//		free(q);
+//	q = q->next;
+//}
+
 void out(Stack*& top, char& buff) {
 	Stack* q = top;
 	buff = q->s;
-	if (q == top)
-	{
-		top = q->next;
-		free(q);
-	}
-	else
-		free(q);
-	q = q->next;
+	top = q->next;
+	delete q;
 }
 
 double Result(char* str) {
 	Stack* begin = NULL;
-	char ss, ss1, ss2, ssR = 'z' + 1;
+	char ss, ss1, ss2, ssNext = 'z' + 1;
 	double op1, op2, res, mas[50];
 	cout << "Input data: ";
 	for (int i = 0; str[i] != '\0'; i++) {
 		ss = str[i];
 		if (ss >= 'a' && ss <= 'z') {
-			cout << ss << " = ";
-			mas[int(ss - 'a')] = input();
+			if (!(mas[int(ss - 'a')] >= -1000 && mas[int(ss - 'a')] <= 1000)) {
+				cout << ss << " = ";
+				mas[int(ss - 'a')] = input();
+			}
 		}
 	}
 	for (int i = 0; str[i] != '\0'; i++) {
 		ss = str[i];
-		if (!(ss == '+' || ss == '-' || ss == '*' || ss == '/' || ss == '^'))
+		if (!(ss == '+' || ss == '-' || ss == '*' || ss == '/'))
 			push(begin, ss);
 		else {
 			out(begin, ss2);
@@ -109,9 +118,9 @@ double Result(char* str) {
 			case '*': res = op1 * op2;  break;
 			case '/': res = op1 / op2;  break;
 			}
-			mas[int(ssR - 'a')] = res;
-			push(begin, ssR);
-			ssR++;
+			mas[int(ssNext - 'a')] = res;
+			push(begin, ssNext);
+			ssNext++;
 		}
 	}
 	return res;
@@ -177,6 +186,10 @@ bool expressionCheck(char* In) {
 				cout << "Expression is not completed\n";
 				errors++;
 			}
+		}
+		if (In[i] == '/' && In[i + 1] == '0') {
+			cout << "Division by 0 is not allowed\n";
+			errors++;
 		}
 	}
 	if (bracket != 0) {
