@@ -69,19 +69,6 @@ void push(Stack*& top, char s) {
 	}
 }
 
-//void out(Stack*& top, char& buff) {
-//	Stack* q = top;
-//	buff = q->s;
-//	if (q == top)
-//	{
-//		top = q->next;
-//		free(q);
-//	}
-//	else
-//		free(q);
-//	q = q->next;
-//}
-
 void out(Stack*& top, char& buff) {
 	Stack* q = top;
 	buff = q->s;

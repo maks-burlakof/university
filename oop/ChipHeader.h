@@ -55,8 +55,6 @@ public:
 		strcpy_s(factory_name, f);
 	}
 
-	// Метод инициализации текущего состояния объектов??
-
 	virtual void print() {
 		cout << "Наименование: " << name << "\n"
 			"Тип памяти: " << type << "\n"

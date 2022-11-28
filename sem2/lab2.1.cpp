@@ -1,6 +1,6 @@
 ﻿#include <iostream>
-#include <conio.h>      // При вводе числа, которого нет в массиве, результат проги будет каким-то числом, но не 0
-using namespace std;   //// - нужна проверка
+#include <conio.h>
+using namespace std;
 
 int recurs(int &a, int &b, int elem, int arr[]) {
     int c = (a + b) / 2;
@@ -36,7 +36,7 @@ int main() {
     switch (_getch()) {
     case '1':
         cout << "Заполните массив из " << n << " элементов:\n";
-        for (int i = 0; i < n; i++) cin >> arr[i]; ////
+        for (int i = 0; i < n; i++) cin >> arr[i];
         break;
     default:
         arr[0] = rand() % 10 + 1;    // от 1 до 11
@@ -48,7 +48,7 @@ int main() {
         break;
     }
     cout << "\n\nЧисло: ";
-    cin >> elem; ////
+    cin >> elem;
     cout << "\n1 - Использовать рекурсивную функцию\n2 - Использовать обычную функцию\n\n";
     int a = 0, b = n - 1;
     switch (_getch()) {
