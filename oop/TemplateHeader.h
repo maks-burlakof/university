@@ -1,35 +1,28 @@
 #pragma once
 using namespace std;
 
+double input(bool, int);
 
-double input(bool);
-
-
-template <class Templ>
+template <class Type, class ResultType>
 class List {
 private:
 	int n;
-	Templ* arr;
-	Templ* task_arr;
+	Type* arr;
+	ResultType* task_arr;
 public:
 	List() {
-		// int MAX = 5;
-		// arr = new Templ[MAX];
+		arr = new Type[0];
 		n = 0;
 	}
 
 	List(int num) {
-		arr = new Templ[num];
+		arr = new Type[num];
 		n = num;
 	}
 	
 	~List() {
 		delete[] arr;
 		delete[] task_arr;
-	}
-
-	Templ& operator[](int i) {
-		return arr[i];
 	}
 
 	void set() {
@@ -41,24 +34,40 @@ public:
 
 	void set(int num) {
 		if (num > n) {
-			cout << "Введенное значение превышает общее число элементов массива!\n";
-			return;
+			cout << "Массив будет расширен, так как введенное значение превышает исходный размер.\n";
+			arr = addElement(num);
+			int n_old = n;
+			n = num;
+			cout << "#" << num << ":\n >> ";
+			cin >> arr[num - 1];
+			if (num - n_old > 1) {
+				cout << "Инициализировать также элемент(-ы)";
+				for (int i = n_old + 1; i < num; i++)
+					cout << " #" << i;
+				cout << "?\n (y/n)\n";
+				if (_getch() == 'y')
+					for (int i = n_old + 1; i < num; i++)
+						set(i);
+			}
 		}
-		cout << "#" << num << ":\n >> ";
-		cin >> arr[num - 1];
+		else {
+			cout << "#" << num << ":\n >> ";
+			cin >> arr[num - 1];
+		}
 	}
 
-	bool remove(int num) {
-		if (num > n) {
-			cout << "Введенное значение превышает общее число элементов массива!\n";
-			return false;
-		}
+	Type* addElement(int num) {
+		Type* tempArr = new Type[num];
+		for (int i = 0; i < n; i++) tempArr[i] = arr[i];
+		return tempArr;
+	}
+
+	void remove(int num) {
+		cout << "Элемент " << arr[num - 1] << " с индексом " << num << " удалён.";
 		for (int i = num - 1; i < n-1; i++) {
 			arr[i] = arr[i + 1];
 		}
 		n--;
-		cout << "Элемент с номером " << num << " удалён.";
-		return true;
 	}
 
 	void print() {
@@ -68,12 +77,12 @@ public:
 	}
 	
 	void task() {
-		task_arr = new Templ[n];
+		task_arr = new ResultType[n];
 
 		cout << "     Исходный\t\tМассив, созданный\n массив объектов\t  по алгоритму\n\n";
 
 		for (int i = 0; i < n; i++) {
-			int sum = 0;
+			ResultType sum = 0;
 			for (int j = 0; j <= i; j++)
 				sum += arr[j];
 			task_arr[i] = abs(sum);
@@ -83,11 +92,12 @@ public:
 	}
 };
 
-
-double input(bool positive=false) {
+double input(bool is_positive=false, int max_val=0) {
+	// При is_positive = True отрицательные элементы и 0 вводить нельзя
+	// При заданном max_val больше этого значения вводить нельзя
 	double in;
-	while (!(cin >> in) || (positive && in < 0)) {
-		cout << "Введенное значение должно быть числом! Повторите попытку.\n >> ";
+	while (!(cin >> in) || (is_positive && in <= 0) || (max_val && in > max_val)) {
+		cout << "Недействительное значение! Повторите попытку.\n >> ";
 		cin.clear();
 		while (cin.get() != '\n');
 	}

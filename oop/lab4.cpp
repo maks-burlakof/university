@@ -9,16 +9,18 @@ int main() {
 	SetConsoleOutputCP(1251);
 	setlocale(LC_ALL, "Russian");
 	
-	int n;
+	int n, num;
 	cout << "Введите число элементов N:\n >> ";
 	n = input(true);
-	List <int> arr(n);
+	
+	// Здесь можно изменять типы данных (Type | ResultType)
+	List <bool, double> arr(n);
 
 	while (true) {
-		cout << "\n~~~~~~~~~~ МЕНЮ ~~~~~~~~~~\n "
+		cout << "\n~~~~~~~~~~~~~~~~~~~~ МЕНЮ ~~~~~~~~~~~~~~~~~~~~\n "
 			"1 - Просмотр текущего состояния объектов\n "
-			"2 - Создание объектов с начала массива\n "
-			"3 - Создание объектов с запросом номера\n "
+			"2 - Инициализация n объектов с начала массива\n "
+			"3 - Инициализация объекта с запросом номера\n "
 			"4 - Удаление заданного объекта\n "
 			"5 - Формирование массива по алгоритму\n "
 			"0 - ВЫХОД\n";
@@ -35,14 +37,20 @@ int main() {
 			break;
 		case '3':
 			system("cls");
-			cout << "Введите номер элемента: \n >> ";
-			arr.set(input(true));
+			cout << "Исходный массив:\n";
+			arr.print();
+			cout << "Введите номер элемента для инициализации: \n >> ";
+			num = input(true);
+			arr.set(num);
+			n = max(n, num);
 			break;
 		case '4':
 			system("cls");
-			cout << "Введите номер элемента: \n >> ";
-			if (arr.remove(input(true)))
-				n--;
+			cout << "Исходный массив:\n";
+			arr.print();
+			cout << "Введите номер элемента для удаления: \n >> ";
+			arr.remove(input(true, n));
+			n--;
 			break;
 		case '5':
 			system("cls");
