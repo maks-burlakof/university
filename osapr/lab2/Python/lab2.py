@@ -1,7 +1,8 @@
 from tkinter import Tk, Label, Entry, Button, messagebox, filedialog
 from tkinter.constants import END
+from math import radians
 
-from pyautocad import Autocad
+from pyautocad import Autocad, APoint
 
 
 class AutoCAD:
@@ -135,6 +136,17 @@ def main():
     gui.setup().mainloop()
     print(acad.point)
     print(acad.solidity)
+
+    line1 = acad.acad.model.AddLine(APoint(0, 0), APoint(1, 0))
+    line2 = acad.acad.model.AddLine(APoint(1, 0), APoint(1, 1))
+    line3 = acad.acad.model.AddLine(APoint(1, 1), APoint(0, 1))
+    line4 = acad.acad.model.AddLine(APoint(0, 1), APoint(0, 0))
+
+    print(line1.ObjectID)
+
+    acad.acad.doc.SendCommand(f"_EDGESURF\nL {line1.ObjectID}\nL+ {line2.ObjectID}\n{line3.ObjectID}\n{line4.ObjectID}")
+
+    acad.acad.app.ZoomExtents()
 
 
 if __name__ == '__main__':

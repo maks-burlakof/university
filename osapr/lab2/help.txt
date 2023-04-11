@@ -1,0 +1,19 @@
+progn  # Evaluates each expression sequentially and returns the value of the last expression
+new_dialog  # shows a dialog
+set_tile  # set a value in a dialog window
+acad_colordlg  color  # Displays the standard AutoCAD color selection dialog box, color argument - initial color
+getpoint  # Pauses for user input of a point, and returns that point
+rtos  # Converts a number into a string:
+    args: (number)
+          (mode) - 2: Decimal
+          (precision)
+car  # Returns the first element of a list
+atoi  # Converts a string into an integer
+getvar  # Retrieves the value of an AutoCAD system variable
+entlast  # Returns the name of the last nondeleted main object (entity) in the drawing
+
+osmode  # Системная переменная - хранит тип объектной приввязки
+
+_a  # Arc: specify the center point, start angle, and end angle for an arc segment.
+    After that AutoCAD will add an arc segment to the polyline.
+_dir  # Specifying a direction when drawing an Arc
