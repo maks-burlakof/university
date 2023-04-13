@@ -1,4 +1,7 @@
-class Sweet:  # конфета
+class Sweet:
+    """
+    Basic parent class for all types of sweets.
+    """
     def __new__(cls, *args, **kwargs):
         return super(Sweet, cls).__new__(cls)
 
@@ -14,7 +17,7 @@ class Sweet:  # конфета
         return "Сладость {}, {} г.".format(self._name, self._weight)
 
 
-class Candy(Sweet):  # сосулька
+class Candy(Sweet):
     def __init__(self, name: str, weight: float, flavor: str):
         super().__init__(name, weight)
         self._flavor = flavor
@@ -24,10 +27,10 @@ class Candy(Sweet):  # сосулька
         return self._flavor
 
     def __str__(self):
-        return "Сладость {}, вкус {}, {} г.".format(self._name, self._flavor, self._weight)
+        return "Леденцовая конфета {}, вкус {}, {} г.".format(self._name, self._flavor, self._weight)
 
 
-class Chocolate(Sweet):  # шоколадная
+class Chocolate(Sweet):
     def __init__(self, name: str, weight: float, choco_type: str, cocoa_percent: float):
         super().__init__(name, weight)
         self._cocoa_percent = cocoa_percent
@@ -39,10 +42,10 @@ class Chocolate(Sweet):  # шоколадная
 
     def __str__(self):
         return 'Шоколад "{}" {}, какао {}%, {} г.'.format(self._name, self._choco_type, self._cocoa_percent,
-                                                         self._weight)
+                                                          self._weight)
 
 
-class CandyOnStick(Candy):  # сосулька на палочке
+class CandyOnStick(Candy):
     def __init__(self, name: str, weight: float, flavor: str, form: str):
         super().__init__(name, weight, flavor)
         self._form = form
@@ -52,9 +55,11 @@ class CandyOnStick(Candy):  # сосулька на палочке
         return self._form
 
     def __str__(self):
-        return "Сладость {}, вкус {}, форма {}, {} г.".format(self._name, self._flavor, self._form, self._weight)
+        return "Леденец на палочке {}, вкус {}, форма {}, {} г.".format(self._name, self._flavor, self._form,
+                                                                        self._weight)
 
-class CandyInWrapper(Candy):  # сосулька в обертке
+
+class CandyInWrapper(Candy):
     def __init__(self, name: str, weight: float, flavor: str, wrapper_type: str):
         super().__init__(name, weight, flavor)
         self._wrapper_type = wrapper_type
@@ -64,17 +69,24 @@ class CandyInWrapper(Candy):  # сосулька в обертке
         return self._wrapper_type
 
     def __str__(self):
-        return "Сладость {}, вкус {}, обертка {}, {} г.".format(self._name, self._flavor, self._wrapper_type,
-                                                                     self._weight)
+        return "Леденец в обертке {}, вкус {}, обертка {}, {} г.".format(self._name, self._flavor, self._wrapper_type,
+                                                                         self._weight)
 
 
 class Gift:
+    """
+    A class that manages candy objects.
+    """
     def __init__(self, recipient: str):
         self._sweets = []
         self._recipient = recipient
 
-    def add_sweet(self, sweet):
-        self._sweets.append(sweet)
+    def add_sweets(self, *sweets):
+        for sweet in sweets:
+            if isinstance(sweet, Sweet):
+                self._sweets.append(sweet)
+            else:
+                print('Traceback: Error in Gift.add_sweets: Given objects must be objects of class Sweet')
         return self
 
     @property
@@ -82,4 +94,4 @@ class Gift:
         return sum(sweet.weight for sweet in self._sweets)
 
     def __str__(self):
-        return "\n".join(f'{sweet_info}' for sweet_info in self._sweets)
+        return "\n".join(str(sweet) for sweet in self._sweets)
