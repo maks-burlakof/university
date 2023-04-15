@@ -62,7 +62,7 @@ def int_input(prompt: str, min_v: int, max_v: int = None) -> int:
 
 def main():
     choice = input('Выберите способ взаимодействия:\n1 - Заполнить массив значений с клавиатуры\n'
-                   '2 - Использовать тестовые\n >> ')
+                   '2 - Использовать тестовые\n- - Выход\n >> ')
     if choice.strip() == '1':
         books = []
         for i in range(1, 3):
