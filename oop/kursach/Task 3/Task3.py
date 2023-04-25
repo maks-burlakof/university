@@ -8,13 +8,12 @@ def main():
     print(st)
 
     db = Database('students.db')
-    db.create_conn()
-    db.create_table()
+    db.start()
 
     gui = GUI(db)
     gui.main_window().mainloop()
 
-    db.close_conn()
+    db.stop()
 
 
 if __name__ == '__main__':
