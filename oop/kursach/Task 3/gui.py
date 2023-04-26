@@ -4,15 +4,14 @@ from tkinter import ttk, filedialog
 from tkinter import messagebox
 from tksheet import Sheet
 
-from db import Database
+from db import LocalMemory
 from student import Student
 
 
 class GUI:
-    def __init__(self, db: Database):
-        self.db = db
+    def __init__(self):
+        self.memory = LocalMemory('students.db')
         self.root = tk.Tk()
-        self.raw_data = self.db.get_data()
         self.raw_sheet = None
         self.search_sheet = None
         self.columns_width = (210, 100, 30, 30, 30, 30, 30)
@@ -37,34 +36,80 @@ class GUI:
         text = text[:70] + "..." if len(text) >= 70 else text
         self.statusbar.config(text=text)
 
-    def update_raw_sheet(self):
+    def sort_data(self, data):
         sorting = "default"
         for sort_val in self.sort_list:
             if self.current_sorting.get() == sort_val[0]:
                 sorting = sort_val[1]
                 break
         if sorting == "name_inc":
-            self.raw_sheet.set_sheet_data(sorted(self.raw_data, key=lambda x: x[0]))
+            return sorted(data, key=lambda x: x[0])
         elif sorting == "name_dec":
-            self.raw_sheet.set_sheet_data(sorted(self.raw_data, key=lambda x: x[0], reverse=True))
+            return sorted(data, key=lambda x: x[0], reverse=True)
         elif sorting == "group_inc":
-            self.raw_sheet.set_sheet_data(sorted(self.raw_data, key=lambda x: x[1]))
+            return sorted(data, key=lambda x: x[1])
         elif sorting == "group_dec":
-            self.raw_sheet.set_sheet_data(sorted(self.raw_data, key=lambda x: x[1], reverse=True))
+            return sorted(data, key=lambda x: x[1], reverse=True)
         else:
-            self.raw_sheet.set_sheet_data(self.raw_data)
+            return data
+
+    def update_raw_sheet(self):
+        self.raw_sheet.set_sheet_data(self.sort_data(self.memory.data))
         for i, width in enumerate(self.columns_width):
             self.raw_sheet.column_width(column=i, width=width)
 
     def main_window(self):
         def search_submit():
-            search_entry.get()
+            phrase = search_entry.get()
+            if not phrase:
+                self.update_statusbar("Поисковая фраза пуста.")
+                return
+            results = self.memory.search(phrase)
+            self.search_sheet.set_sheet_data(self.sort_data(results))
+            for i, width in enumerate(self.columns_width):
+                self.search_sheet.column_width(column=i, width=width)
 
-        self.root.title("Student Records")
+        def without_scholarship():
+            results = self.memory.search_without_scholarship()
+            self.search_sheet.set_sheet_data(self.sort_data(results))
+            for i, width in enumerate(self.columns_width):
+                self.search_sheet.column_width(column=i, width=width)
+
+        def on_closing():
+            if self.memory.is_changed:
+                if messagebox.askokcancel("Выход", "Есть несохраненные изменения. Вы уверены, что хотите выйти без сохранения?"):
+                    self.root.destroy()
+            else:
+                self.root.destroy()
+
+        self.root.title("Студенты")
         self.root.iconbitmap('../img/people.ico')
+        self.root.protocol("WM_DELETE_WINDOW", on_closing)
 
         sheet_headers = ['Фамилия, инициалы', 'Группа', '1', '2', '3', '4', '5']
         sheet_width = 520
+
+        self.root.option_add("*tearOff", tk.FALSE)
+        main_menu = tk.Menu()
+        file_menu = tk.Menu()
+        file_menu.add_command(label="Создать", command=self.create_window)
+        file_menu.add_command(label="Открыть", command=self.open_window)
+        file_menu.add_command(label="Сохранить", command=self.save_window)
+        file_menu.add_separator()
+        file_menu.add_command(label="Выход", command=on_closing)
+        edit_menu = tk.Menu()
+        edit_menu.add_command(label="Добавить", command=self.add_student_window)
+        edit_menu.add_command(label="Удалить", command=self.delete_student_window)
+        view_menu = tk.Menu()
+        view_menu.add_command(label="Обновить", command=self.update_raw_sheet)
+        view_menu.add_command(label="Сортировать", command=self.sort_window)
+        info_menu = tk.Menu()
+        info_menu.add_command(label="О разработчике", command=self.about_developer_window)
+        main_menu.add_cascade(label="Файл", menu=file_menu)
+        main_menu.add_cascade(label="Редактировать", menu=edit_menu)
+        main_menu.add_cascade(label="Просмотр", menu=view_menu)
+        main_menu.add_cascade(label="Справка", menu=info_menu)
+        self.root.config(menu=main_menu)
 
         raw_table = ttk.Frame(borderwidth=1, relief=tk.SOLID, padding=[8, 10])
         # raw_table.grid_columnconfigure(0, weight=1)
@@ -85,6 +130,8 @@ class GUI:
 
         search_table = ttk.Frame(borderwidth=1, relief=tk.SOLID, padding=[8, 10])
         self.search_sheet = Sheet(search_table, width=sheet_width, height=100, headers=sheet_headers)
+        for i, width in enumerate(self.columns_width):
+            self.search_sheet.column_width(column=i, width=width)
         self.search_sheet.enable_bindings()
         search_table.grid(row=1, column=0, padx=5, pady=5)
         self.search_sheet.grid(row=0, column=0)
@@ -93,9 +140,10 @@ class GUI:
         search_entry = ttk.Entry(search_actions)
         search_entry.pack()
         ttk.Button(search_actions, text="Поиск", command=search_submit).pack()
+        ttk.Button(search_actions, text="Лишены стипендии", command=without_scholarship).pack()
         search_actions.grid(row=1, column=1, padx=5, pady=5)
 
-        self.update_statusbar("Готов к работе!")
+        self.update_statusbar("Готов к работе! Открыта база данных: students.db")
         self.statusbar.grid(row=2, column=0, columnspan=2, sticky="ew")
 
         self.center_window(self.root)
@@ -104,21 +152,27 @@ class GUI:
 
     def add_student_window(self):
         def submit(name_field, group_field, grades_fields):
-            # TODO: искать совпадения фамилии, убирать точки, проблемы, и сравнивать такие строки
             try:
                 student = Student(name_field.get(), group_field.get(), [grade.get() for grade in grades_fields])
             except Exception as err:
                 messagebox.showerror("Ошибка", str(err), parent=window)
                 return
             else:
-                self.raw_data.append([student.name, student.group_number, student.grades[0], student.grades[1],
-                                      student.grades[2], student.grades[3], student.grades[4]])
+                results = self.memory.search(student.name, only_name=True)
+                if results:
+                    is_save = messagebox.askyesno(title="Найдено совпадение",
+                                                  message="В базе данных уже есть сведения о следующих студентах:\n" +
+                                                  "\n".join(["{}, {}".format(result[0], result[1]) for result in results]) +
+                                                          "\nПродолжить добавление студента?", parent=window)
+                    if not is_save:
+                        return
+                self.memory.add_student(student)
                 self.update_raw_sheet()
-                self.update_statusbar(f"Добавлена запись: студент {student.name}")
+                self.update_statusbar(f"Добавлен студент {student.name}")
                 window.destroy()
 
         window = tk.Toplevel()
-        window.title("Добавление записи")
+        window.title("Добавление студента")
 
         frame = ttk.Frame(window, padding=[20, 20])
         frame.columnconfigure(0, weight=1)
@@ -154,48 +208,89 @@ class GUI:
         else:
             result = messagebox.askyesno(title="Подтвердите удаление",
                                          message="Вы действительно хотите удалить информацию о следующих студентах:\n" +
-                                                 "\n".join([self.raw_data[record][0] for record in selection]))
+                                                 "\n".join(["{}, {}".format(self.memory.data[record][0], self.memory.data[record][1]) for record in selection]))
             if result:
-                for record in sorted(selection, reverse=True):
-                    del self.raw_data[record]
+                self.update_statusbar("Удалены записи о студентах: " + ", ".join(["{}".format(self.memory.data[record][0]) for record in selection]))
+                self.memory.delete_students(selection)
                 self.update_raw_sheet()
-                self.update_statusbar("Удалены записи о студентах: " + "\n".join([self.raw_data[record][0] for record in selection]))
             else:
                 return
 
     def save_window(self):
-        if self.raw_data == self.db.get_data():
-            self.update_statusbar('Данные не изменены, сохранять не требуется')
-            return
-        result = messagebox.askyesno(title="Сохранить изменения?",
-                                     message="Вы действительно хотите перезаписать информацию в файле?")
-        if result:
-            self.db.update_data(self.raw_data)
-            self.update_statusbar("Успешно сохранено!")
-        else:
-            return
+        def submit():
+            is_error, message = self.memory.save(file_entry.get())
+            if is_error:
+                messagebox.showerror('Ошибка', message)
+            else:
+                self.update_statusbar(message)
+            window.destroy()
+
+        window = tk.Toplevel()
+        window.title("Сохранение")
+
+        frame = ttk.Frame(window, padding=[20, 20])
+
+        ttk.Label(frame, text='Название файла').grid(column=0, row=0, sticky=tk.W)
+
+        file_entry = ttk.Entry(frame, width=40)
+        file_entry.insert(0, self.memory.db_name)
+        file_entry.focus()
+        file_entry.grid(column=0, row=1, sticky=tk.W)
+
+        for widget in frame.winfo_children():
+            widget.grid(padx=5, pady=5)
+
+        ttk.Button(frame, text="Сохранить", command=submit).grid(column=0, row=2, sticky=tk.E)
+
+        frame.grid(column=0, row=0)
+        self.center_window(window)
 
     def open_window(self):
         filetypes = (
             ('SQLite database', '*.db'),
             ('SQLite database', '*.sqlite3'),
         )
-        filename = filedialog.askopenfilename(title='Открыть базу данных', initialdir=Path(__file__).parent.resolve(),
+        filepath = filedialog.askopenfilename(title='Открыть базу данных', initialdir=Path(__file__).parent.resolve(),
                                               filetypes=filetypes)
-        if not filename:
+        if not filepath:
             return
-        try:
-            db_new = Database(filename)
-            db_new.start()
-            raw_data_new = db_new.get_data()
-        except Exception:
-            messagebox.showerror("Ошибка открытия файла", "Ошибка при открытии базы данных.", parent=self.root)
+        is_error, message = self.memory.open(filepath)
+        if is_error:
+            messagebox.showerror("Ошибка открытия файла", message, parent=self.root)
         else:
-            self.db.stop()
-            self.db = db_new
-            self.raw_data = raw_data_new
             self.update_raw_sheet()
-            self.update_statusbar(f"Открыта база данных: {filename}")
+            self.update_statusbar(message)
+
+    def create_window(self):
+        def submit():
+            is_error, message = self.memory.open(file_entry.get())
+            if is_error:
+                messagebox.showerror('Ошибка', message, parent=window)
+                return
+            else:
+                self.update_raw_sheet()
+                self.update_statusbar(message)
+            window.destroy()
+
+        window = tk.Toplevel()
+        window.title("Создание базы данных")
+
+        frame = ttk.Frame(window, padding=[20, 20])
+
+        ttk.Label(frame, text='Текущая директория: {}'.format(Path(__file__).parent.resolve())).grid(column=0, row=0, sticky=tk.W)
+        ttk.Label(frame, text='Название файла:').grid(column=0, row=1, sticky=tk.W)
+        file_entry = ttk.Entry(frame, width=40)
+        file_entry.insert(0, '.db')
+        file_entry.focus()
+        file_entry.grid(column=0, row=2, sticky=tk.W)
+
+        for widget in frame.winfo_children():
+            widget.grid(padx=5, pady=5)
+
+        ttk.Button(frame, text="Создать", command=submit).grid(column=0, row=3, sticky=tk.E)
+
+        frame.grid(column=0, row=0)
+        self.center_window(window)
 
     def sort_window(self):
         def submit():
@@ -219,6 +314,22 @@ class GUI:
             widget.grid(padx=5, pady=5)
 
         ttk.Button(frame, text="Применить", command=submit).grid(column=0, row=2, sticky=tk.E)
+
+        frame.grid(column=0, row=0)
+        self.center_window(window)
+
+    def about_developer_window(self):
+        def open_github():
+            from webbrowser import open_new
+            open_new("https://github.com/maks-burlakof/university/")
+
+        window = tk.Toplevel()
+        window.title("О разработчике")
+
+        frame = ttk.Frame(window, padding=[20, 20])
+
+        ttk.Label(frame, text='Курсовой проект ООПвСУ, 3 часть\nРазработал: Бурлаков Максим, гр. 122402').grid(column=0, row=0, sticky=tk.W)
+        ttk.Button(frame, text='Исходный код на GitHub', cursor="hand2", command=open_github).grid(column=0, row=1, sticky=tk.W, ipady=1)
 
         frame.grid(column=0, row=0)
         self.center_window(window)
