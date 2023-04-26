@@ -23,9 +23,8 @@ class Database:
 
     def start(self):
         self.conn = sqlite3.connect(self.db_name, check_same_thread=False)
-        self.execute_command("CREATE TABLE IF NOT EXISTS students (id INTEGER PRIMARY KEY AUTOINCREMENT, "
-                             "name TEXT NOT NULL, group_number TEXT NOT NULL, grade1 INTEGER, grade2 INTEGER, "
-                             "grade3 INTEGER, grade4 INTEGER, grade5 INTEGER);", ())
+        self.execute_command("CREATE TABLE IF NOT EXISTS students (name TEXT NOT NULL, group_number TEXT NOT NULL, "
+                             "grade1 INTEGER, grade2 INTEGER, grade3 INTEGER, grade4 INTEGER, grade5 INTEGER);", ())
 
     def stop(self):
         self.conn.close()
@@ -36,6 +35,14 @@ class Database:
                              (student.name, student.group_number, student.grades[0], student.grades[1],
                               student.grades[2], student.grades[3], student.grades[4]))
 
-    def get_students(self):
+    def get_data(self):
         students = self.execute_command_select("SELECT * FROM students;")
-        return students
+        return [list(elem) for elem in students]
+
+    def update_data(self):
+        pass
+
+
+class LocalMemory:
+    def __init__(self, db: Database):
+        self.db = db
