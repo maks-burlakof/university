@@ -86,6 +86,7 @@ class GUI:
         self.root.iconbitmap('../img/people.ico')
         self.root.protocol("WM_DELETE_WINDOW", on_closing)
 
+        button_sizes = {'ipadx': 20, 'ipady': 5}
         sheet_headers = ['Фамилия, инициалы', 'Группа', '1', '2', '3', '4', '5']
         sheet_width = 520
 
@@ -121,12 +122,13 @@ class GUI:
         self.raw_sheet.grid(row=0, column=0)
 
         raw_actions = ttk.Frame(borderwidth=1, relief=tk.SOLID, padding=[8, 10])
-        ttk.Button(raw_actions, text="Добавить", command=self.add_student_window).pack()
-        ttk.Button(raw_actions, text="Удалить", command=self.delete_student_window).pack()
-        ttk.Button(raw_actions, text="Сохранить", command=self.save_window).pack()
-        ttk.Button(raw_actions, text="Открыть", command=self.open_window).pack()
-        ttk.Button(raw_actions, text="Сортировать", command=self.sort_window).pack()
-        raw_actions.grid(row=0, column=1, padx=5, pady=5)
+        ttk.Label(raw_actions, text="").pack(ipady=20)
+        ttk.Button(raw_actions, text="Добавить", command=self.add_student_window, width=10).pack(**button_sizes)
+        ttk.Button(raw_actions, text="Удалить", command=self.delete_student_window, width=10).pack(**button_sizes)
+        ttk.Button(raw_actions, text="Сохранить", command=self.save_window, width=10).pack(**button_sizes)
+        ttk.Button(raw_actions, text="Открыть", command=self.open_window, width=10).pack(**button_sizes)
+        ttk.Button(raw_actions, text="Сортировать", command=self.sort_window, width=10).pack(**button_sizes)
+        raw_actions.grid(row=0, column=1, padx=5, pady=5, sticky="NSWE")
 
         search_table = ttk.Frame(borderwidth=1, relief=tk.SOLID, padding=[8, 10])
         self.search_sheet = Sheet(search_table, width=sheet_width, height=100, headers=sheet_headers)
@@ -138,10 +140,10 @@ class GUI:
 
         search_actions = ttk.Frame(borderwidth=1, relief=tk.SOLID, padding=[8, 10])
         search_entry = ttk.Entry(search_actions)
-        search_entry.pack()
-        ttk.Button(search_actions, text="Поиск", command=search_submit).pack()
-        ttk.Button(search_actions, text="Лишены стипендии", command=without_scholarship).pack()
-        search_actions.grid(row=1, column=1, padx=5, pady=5)
+        search_entry.pack(pady=3)
+        ttk.Button(search_actions, text="Поиск", command=search_submit, width=10).pack(**button_sizes)
+        ttk.Button(search_actions, text="Без стипендии", command=without_scholarship, width=10).pack(**button_sizes)
+        search_actions.grid(row=1, column=1, padx=5, pady=5, sticky="NSWE")
 
         self.update_statusbar("Готов к работе! Открыта база данных: students.db")
         self.statusbar.grid(row=2, column=0, columnspan=2, sticky="ew")

@@ -5,7 +5,7 @@ class Student:
         if not group_number or not isinstance(group_number, str):
             raise ValueError('Номер группы не может быть пустой строкой.')
         if not isinstance(grades, list) or len(grades) != 5:
-            raise ValueError('Traceback: Student object creation error: The value of grades must be a list of 5 elements.')
+            raise ValueError('Оценки должны быть списком из 5 элементов')
         for grade in grades:
             try:
                 grade = int(grade)
