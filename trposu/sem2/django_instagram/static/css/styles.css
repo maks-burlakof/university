@@ -10,7 +10,20 @@ body a {
     color: unset;
     text-decoration: none;
 }
+.limit-str {
+    --num-lines: 2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: var(--num-lines); /* Number of lines to show */
+    -webkit-box-orient: vertical;
+}
+.text-bg-gray {
+    color: #000!important;
+    background-color: #EFEFEF !important;
+}
 
+/* Post */
 .post-card {
     border: none;
 }
@@ -28,15 +41,6 @@ body a {
     color: unset;
     text-decoration: none;
     font-size: 1.31rem!important;
-}
-
-.limit-str {
-    --num-lines: 2;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: -webkit-box;
-    -webkit-line-clamp: var(--num-lines); /* Number of lines to show */
-    -webkit-box-orient: vertical;
 }
 
 /* Login page */

@@ -2,19 +2,19 @@
 {% load static custom_tags %}
 {% block title %}{{ person.first_name }} {{ person.last_name }} (@{{ person.username }}) · Instagram{% endblock %}
 {% block content %}
-   <div class="row pt-3">
-      <div class="col-3">
-         <img src="{% static 'img/profile_default.jpg' %}" style="width: 150px; height: 150px; border-radius: 50%">
+   <div class="row pt-sm-3 mb-4">
+      <div class="col-3 col-lg-2 col-xl-2 offset-lg-1 pe-xl-4 me-2 me-sm-4">
+         <img src="{% static 'img/profile_default.jpg' %}" class="img-fluid" style="border-radius: 50%">
       </div>
-      <div class="col-9">
+      <div class="col-8 col-lg-8 col-xl-7">
          <div class="d-flex justify-content-between align-items-center mb-2">
             <span class="fs-3 fw-bold">{{ person.username }}</span>
             {% block profile_buttons %}{% endblock %}
          </div>
          <div class="d-flex align-items-center mb-3">
-            <span class="me-5"><strong>5</strong> публикаций</span>
-            <span class="me-5"><strong>123</strong> подписчика</span>
-            <span><strong>67</strong> подписок</span>
+            <span class="lh-sm me-5"><strong>5</strong> публикаций</span>
+            <span class="lh-sm me-5"><strong>123</strong> подписчика</span>
+            <span class="lh-sm"><strong>67</strong> подписок</span>
          </div>
          <div>
             <p class="fw-bold mb-1">{{ person.first_name }} {{ person.last_name }}</p>
@@ -23,5 +23,22 @@
             {% endif %}
          </div>
       </div>
+   </div>
+   <div class="row mb-2">
+      <div class="col-12 col-lg-10 offset-lg-1">
+         <span class="d-flex w-100 border-bottom"></span>
+      </div>
+   </div>
+   <div class="row mb-3">
+      <div class="col">
+         <div class="d-flex justify-content-evenly align-items-center small text-muted fw-bold">
+            <a href="#" class="common-link"><i class="fa-solid fa-table-cells me-1"></i> ПУБЛИКАЦИИ</a>
+            {% block post_links %}{% endblock %}
+         </div>
+      </div>
+   </div>
+   <div class="row">
+      {% block posts %}
+      {% endblock %}
    </div>
 {% endblock %}

@@ -3,7 +3,7 @@
 {% block title %}Вход в Instagram{% endblock %}
 {% block navbar %}{% endblock %}
 {% block content %}
-   <div class="row mb-5">
+   <div class="row">
       <div class="col-7 d-md-none d-lg-block">
          <div class="mobile-slider" style="background-image: url({% static 'img/home-phones.png' %})">
             <img class="mobile-slider-img1" src="{% static 'img/screenshot1.png' %}" />
@@ -53,8 +53,6 @@
          </div>
       </div>
    </div>
-
-   {% include 'includes/footer_with_links.html' %}
 {% endblock %}
 {% block extrajs %}
    <script>

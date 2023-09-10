@@ -15,7 +15,7 @@
 </head>
 <body>
 {% block navbar %}
-   <div class="navbar navbar-expand-sm border fixed-top" style="background-color: #ffffff; height: 54px">
+   <div class="d-none d-sm-inline-flex navbar navbar-expand-sm border fixed-top" style="background-color: #ffffff; height: 54px">
       <div class="container-fluid justify-content-evenly align-items-center">
          <div class="navbar-brand">
             <a href="{% url 'index' %}">
@@ -66,6 +66,7 @@
    </div>
 {% endblock %}
 <div class="container mt-5">
+   <div class="pt-sm-4"></div>
    {% block content %}{% endblock %}
 </div>
 {% if messages %}
@@ -85,6 +86,42 @@
       </div>
    </div>
 {% endif %}
+{% block footer %}
+   <footer class="mt-5 mb-4">
+      <ul class="d-flex flex-row list-unstyled justify-content-center flex-wrap small">
+         <li class="mx-3">
+            <a href="{% url 'docs-index' %}" target="_blank" class="text-decoration-none text-secondary">Информация</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://about.instagram.com/" target="_blank" class="text-decoration-none text-secondary">Блог</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://www.instagram.com/about/jobs/" target="_blank" class="text-decoration-none text-secondary">Помощь</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://developers.facebook.com/docs/instagram" target="_blank" class="text-decoration-none text-secondary">API</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://www.instagram.com/legal/terms/" target="_blank" class="text-decoration-none text-secondary">Конфиденциальность</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://www.instagram.com/legal/terms/" target="_blank" class="text-decoration-none text-secondary">Условия</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://www.instagram.com/directory/profiles/" target="_blank" class="text-decoration-none text-secondary">Рейтинг аккаунтов</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://www.instagram.com/directory/hashtags/" target="_blank" class="text-decoration-none text-secondary">Хэштэги</a>
+         </li>
+         <li class="mx-3">
+            <a href="https://www.instagram.com/explore/locations/" target="_blank" class="text-decoration-none text-secondary">Места</a>
+         </li>
+         <li class="mx-3 text-secondary">
+            <i class="fa-regular fa-copyright"></i> 2023 Instagram from BSUIR
+         </li>
+      </ul>
+   </footer>
+{% endblock %}
 {% block extrajs %}{% endblock %}
 </body>
 </html>
