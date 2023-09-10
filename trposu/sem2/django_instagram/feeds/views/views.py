@@ -3,15 +3,15 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 
-from feeds.models import UserProfile, Post
-from feeds.forms import UpdateProfileForm, UpdateUserForm
+from feeds.models import Profile, Post, Like
+from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm
 
 
 def index(request):
     if not request.user.is_authenticated:
         return redirect('login')
 
-    users_followed = request.user.userprofile.following.all()
+    users_followed = request.user.profile.following.all()
     posts = Post.objects.filter(user_profile__in=users_followed).order_by('-created')
 
     context = {
@@ -35,22 +35,22 @@ def profile(request, username):
     if not user:
         return redirect('index')
 
-    user_profile = UserProfile.objects.get(user=user)
+    user_profile = Profile.objects.get(user=user)
 
     context = {
-        'user': user,
-        'profile': user_profile,
+        'person': user,
+        'person_profile': user_profile,
     }
     return render(request, 'profile.html', context)
 
 
 def my_profile(request):
     user = request.user
-    user_profile = user.userprofile
+    user_profile = user.profile
 
     context = {
-        'user': user,
-        'profile': user_profile,
+        'person': user,
+        'person_profile': user_profile,
     }
     return render(request, 'my_profile.html', context)
 
@@ -61,7 +61,7 @@ def profile_settings(request):
 
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=user)
-        profile_form = UpdateProfileForm(request.POST, instance=user.userprofile, files=request.FILES)
+        profile_form = UpdateProfileForm(request.POST, instance=user.profile, files=request.FILES)
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -69,7 +69,7 @@ def profile_settings(request):
             return redirect(to='my-profile')
     else:
         user_form = UpdateUserForm(instance=user)
-        profile_form = UpdateProfileForm(instance=user.userprofile)
+        profile_form = UpdateProfileForm(instance=user.profile)
 
     context = {
         'user_form': user_form,
@@ -83,7 +83,7 @@ def followers(request, username):
     if not user:
         return redirect('index')
 
-    user_profile = user.userprofile
+    user_profile = user.profile
     users_followers = user_profile.followers.all
 
     context = {
@@ -99,7 +99,7 @@ def following(request, username):
     if not user:
         return redirect('index')
 
-    user_profile = user.userprofile
+    user_profile = user.profile
     users_following = user_profile.following.all
 
     context = {
@@ -111,6 +111,48 @@ def following(request, username):
 
 @login_required
 def post_picture(request):
-    pass
+    if request.method == 'POST':
+        form = PostPictureForm(data=request.POST, files=request.FILES)
+        if form.is_valid():
+            post = Post(
+                user_profile=request.user.profile,
+                title=form.cleaned_data.get('title'),
+                image=request.FILES.get('image'),
+            )
+            post.save()
+            return redirect('my-profile')
+    else:
+        form = PostPictureForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'post_picture.html', context)
 
 
+def post(request, pk):
+    post = Post.objects.get(pk=pk)
+    if not post:
+        return redirect('index')
+
+    liked = Like.objects.filter(post=post, user=request.user).exists()
+
+    context = {
+        'post': post,
+        'liked': liked,
+    }
+    return render(request, 'post.html', context)
+
+
+def likes(request, pk):
+    post = Post.objects.get(pk=pk)
+    if not post:
+        return redirect('index')
+
+    likes = Like.objects.filter(post=post)
+
+    context = {
+        'header': 'Лайки',
+        'likes': likes,
+    }
+    return render(request, 'follow_list.html', context)

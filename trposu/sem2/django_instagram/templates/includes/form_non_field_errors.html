@@ -1,0 +1,11 @@
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+   <ul class="fa-ul mb-0 ms-4">
+      {% for error in form.non_field_errors %}
+         <li>
+            <span class="fa-li text-danger"><i class="fa-solid fa-circle-exclamation fa-shake"></i></span>
+            <span class="small lh-sm">{{ error }}</span>
+         </li>
+      {% endfor %}
+   </ul>
+   <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Закрыть"></button>
+</div>

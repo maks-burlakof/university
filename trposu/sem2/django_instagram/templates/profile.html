@@ -1,0 +1,27 @@
+{% extends 'base_generic.html' %}
+{% load static custom_tags %}
+{% block title %}{{ person.first_name }} {{ person.last_name }} (@{{ person.username }}) · Instagram{% endblock %}
+{% block content %}
+   <div class="row pt-3">
+      <div class="col-3">
+         <img src="{% static 'img/profile_default.jpg' %}" style="width: 150px; height: 150px; border-radius: 50%">
+      </div>
+      <div class="col-9">
+         <div class="d-flex justify-content-between align-items-center mb-2">
+            <span class="fs-3 fw-bold">{{ person.username }}</span>
+            {% block profile_buttons %}{% endblock %}
+         </div>
+         <div class="d-flex align-items-center mb-3">
+            <span class="me-5"><strong>5</strong> публикаций</span>
+            <span class="me-5"><strong>123</strong> подписчика</span>
+            <span><strong>67</strong> подписок</span>
+         </div>
+         <div>
+            <p class="fw-bold mb-1">{{ person.first_name }} {{ person.last_name }}</p>
+            {% if person_profile.description %}
+               <p class="small">{{ person_profile.description }}</p>
+            {% endif %}
+         </div>
+      </div>
+   </div>
+{% endblock %}

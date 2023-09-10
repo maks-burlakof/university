@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 
-from .models import UserProfile, Comment
+from .models import Profile, Comment, Post
 
 
 class RegisterUserForm(UserCreationForm):
@@ -10,8 +10,7 @@ class RegisterUserForm(UserCreationForm):
         max_length=30,
         required=True,
         widget=forms.TextInput(attrs={'placeholder': 'Имя',
-                                      'class': 'form-control',
-                                      'autofocus': ''})
+                                      'class': 'form-control'})
     )
     last_name = forms.CharField(
         max_length=30,
@@ -28,7 +27,8 @@ class RegisterUserForm(UserCreationForm):
     email = forms.EmailField(
         required=True,
         widget=forms.TextInput(attrs={'placeholder': 'Email',
-                                      'class': 'form-control'})
+                                      'class': 'form-control',
+                                      'autofocus': ''})
     )
     password1 = forms.CharField(
         max_length=128,
@@ -103,7 +103,9 @@ class UpdateUserForm(forms.ModelForm):
 
 
 class UpdateProfileForm(forms.ModelForm):
-    # TODO: photo uploading
+    avatar = forms.ImageField(
+        widget=forms.FileInput(attrs={'class': 'form-control'})  # TODO: image uploader widget
+    )
     description = forms.CharField(
         max_length=200,
         required=False,
@@ -112,7 +114,7 @@ class UpdateProfileForm(forms.ModelForm):
     )
 
     class Meta:
-        model = UserProfile
+        model = Profile
         fields = ['description', 'profile_pic']
 
 
@@ -127,3 +129,19 @@ class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['comment']
+
+
+class PostPictureForm(forms.ModelForm):
+    title = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={'class': 'form-control',
+                                      'placeholder': 'Описание'})
+    )
+    image = forms.ImageField(
+        widget=forms.FileInput(attrs={'class': 'form-control'})  # TODO: image uploader widget
+    )
+
+    class Meta:
+        model = Post
+        fields = ['title', 'image']

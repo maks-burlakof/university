@@ -1,7 +1,9 @@
-from django.urls import path
+from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
-from .views import views, auth
+from .views import views, auth, docs
 from . import forms
 
 urlpatterns = [
@@ -21,4 +23,12 @@ urlpatterns = [
     ), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='auth/logout.html'), name='logout'),
     path('registration/', auth.register, name='register'),
+
+    # docs
+    path('docs/', docs.index, name='docs-index'),
+    path('docs/dev-tools/', docs.dev_tools, name='docs-dev-tools'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    urlpatterns += path("__debug__/", include("debug_toolbar.urls")),

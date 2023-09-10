@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
-class UserProfile(models.Model):
+class Profile(models.Model):
     def img_path(self, filename):
         return '%s/%s' % (self.user.username, filename)
 
@@ -11,13 +11,13 @@ class UserProfile(models.Model):
         on_delete=models.CASCADE,
     )
     followers = models.ManyToManyField(
-        to='UserProfile',
+        to='Profile',
         related_name="followers_profile",
         blank=True,
         verbose_name='Подписчики',
     )
     following = models.ManyToManyField(
-        to='UserProfile',
+        to='Profile',
         related_name="following_profile",
         blank=True,
         verbose_name='Подписки',
@@ -47,7 +47,7 @@ class Post(models.Model):
         return '%s/%s' % (self.user_profile.user.username, filename)
 
     user_profile = models.ForeignKey(
-        to=UserProfile,
+        to=Profile,
         on_delete=models.CASCADE,
     )
     title = models.CharField(
