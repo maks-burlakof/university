@@ -9,6 +9,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*', ]
 
 INSTALLED_APPS = [
+    'image_uploader_widget',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',

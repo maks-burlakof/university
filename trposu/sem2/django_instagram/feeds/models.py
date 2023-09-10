@@ -51,7 +51,7 @@ class Post(models.Model):
         on_delete=models.CASCADE,
     )
     title = models.CharField(
-        max_length=100,
+        max_length=256,
         blank=True,
         null=True,
         verbose_name='Описание',
@@ -68,6 +68,10 @@ class Post(models.Model):
     is_archived = models.BooleanField(
         default=True,
         verbose_name='В архиве',
+    )
+    is_allow_comments = models.BooleanField(
+        default=True,
+        verbose_name='Разрешить комментарии',
     )
 
     def get_number_of_likes(self):

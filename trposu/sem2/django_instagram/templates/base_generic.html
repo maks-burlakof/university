@@ -24,7 +24,10 @@
          </div>
          <div>
             <form>
-               <input class="form-control form-control-sm" type="search" placeholder="search" aria-label="Search"/>
+               <div class="d-flex align-items-center">
+                  <button class="btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
+                  <input class="form-control form-control-sm border-0" type="search" placeholder="Поиск..." aria-label="Поиск..."/>
+               </div>
             </form>
          </div>
          <div>
@@ -35,12 +38,12 @@
                   </a>
                </li>
                <li class="nav-item">
-                  <a class="nav-link fs-5 text-dark" href="#">
+                  <a class="nav-link fs-5 text-dark" href="{% url 'post-create' %}">
                      <i class="fa-solid fa-circle-plus"></i>
                   </a>
                </li>
                <li class="nav-item">
-                  <a class="nav-link fs-5 text-dark" href="#">
+                  <a class="nav-link fs-5 text-dark" href="{% url 'explore' %}">
                      <i class="fa-regular fa-compass"></i>
                   </a>
                </li>
@@ -65,7 +68,7 @@
       </div>
    </div>
 {% endblock %}
-<div class="container mt-5">
+<div class="container mt-5 mb-5">
    <div class="pt-sm-4"></div>
    {% block content %}{% endblock %}
 </div>
@@ -87,7 +90,7 @@
    </div>
 {% endif %}
 {% block footer %}
-   <footer class="mt-5 mb-4">
+   <footer class="mb-4">
       <ul class="d-flex flex-row list-unstyled justify-content-center flex-wrap small">
          <li class="mx-3">
             <a href="{% url 'docs-index' %}" target="_blank" class="text-decoration-none text-secondary">Информация</a>

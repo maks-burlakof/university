@@ -3,6 +3,11 @@
     --bs-toast-spacing: 0.8rem;
 }
 
+/* Override ImageUploaderWidget */
+.iuw-root {
+    min-width: unset!important;
+}
+
 body a {
     text-decoration: none;
 }
@@ -41,6 +46,23 @@ body a {
     color: unset;
     text-decoration: none;
     font-size: 1.31rem!important;
+}
+
+/* Create post */
+@media (min-width: 768px) {
+    /* >= md */
+    .create-post-form .post-upload-image {
+        height: 100%!important;
+    }
+    .create-post-form .post-upload-form {
+        height: 100%!important;
+    }
+}
+@media (max-width: 767px) {
+    /* <= md */
+    .create-post-form .post-upload-image {
+        height: 20rem;
+    }
 }
 
 /* Login page */

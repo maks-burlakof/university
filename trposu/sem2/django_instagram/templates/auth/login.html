@@ -34,8 +34,10 @@
                      </div>
                   </div>
                   <div class="mb-3">
-                     {{ form.remember_me }}
-                     <label for="id_remember_me" class="ms-1">Запомнить меня</label>
+                     <div class="form-check form-switch">
+                        {{ form.remember_me }}
+                        <label for="id_remember_me" class="ms-1">Запомнить меня</label>
+                     </div>
                   </div>
                   <button type="submit" class="btn btn-primary w-100">Войти</button>
                </form>

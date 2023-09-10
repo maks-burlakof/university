@@ -44,6 +44,7 @@ def profile(request, username):
     return render(request, 'profile.html', context)
 
 
+@login_required
 def my_profile(request):
     user = request.user
     user_profile = user.profile
@@ -127,7 +128,7 @@ def post_picture(request):
     context = {
         'form': form,
     }
-    return render(request, 'post_picture.html', context)
+    return render(request, 'post_create.html', context)
 
 
 def post(request, pk):

@@ -14,12 +14,13 @@ urlpatterns = [
     path('followers/<str:username>', views.followers, name='followers'),
     path('following/<str:username>', views.following, name='following'),
     path('profile-edit/', views.profile_settings, name='profile-settings'),
+    path('post-create/', views.post_picture, name='post-create'),
 
     # auth
     path('login/', auth.CustomLoginView.as_view(
         redirect_authenticated_user=True,
         template_name='auth/login.html',
-        authentication_form=forms.LoginForm
+        authentication_form=forms.LoginForm,
     ), name='login'),
     path('logout/', auth_views.LogoutView.as_view(template_name='auth/logout.html'), name='logout'),
     path('registration/', auth.register, name='register'),

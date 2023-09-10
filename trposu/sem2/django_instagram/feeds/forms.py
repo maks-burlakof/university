@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from image_uploader_widget.widgets import ImageUploaderWidget
 
 from .models import Profile, Comment, Post
 
@@ -133,15 +134,27 @@ class CommentForm(forms.ModelForm):
 
 class PostPictureForm(forms.ModelForm):
     title = forms.CharField(
-        max_length=100,
+        max_length=256,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control',
-                                      'placeholder': 'Описание'})
+        widget=forms.Textarea(attrs={'class': 'form-control',
+                                     'rows': 5,
+                                     'style': 'height: 10rem;',
+                                     'placeholder': 'Добавьте подпись...'})
     )
-    image = forms.ImageField(
-        widget=forms.FileInput(attrs={'class': 'form-control'})  # TODO: image uploader widget
+    image = forms.ImageField(widget=ImageUploaderWidget(
+        empty_text="Перетащите сюда фото",
+    ))
+    is_archived = forms.BooleanField(
+        required=False,
+        initial=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    is_allow_comments = forms.BooleanField(
+        required=False,
+        initial=True,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
     )
 
     class Meta:
         model = Post
-        fields = ['title', 'image']
+        fields = ['title', 'image', 'is_archived', 'is_allow_comments']
