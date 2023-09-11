@@ -1,14 +1,150 @@
 {% extends 'base_generic.html' %}
-{% block title %}Регистрация на Instagram{% endblock %}
+{% load static %}
+{% block title %}Справочный центр · Instagram{% endblock %}
 {% block extrastyle %}
-   <style>
-       a {
-           text-decoration: none;
-       }
-   </style>
+   <link rel="stylesheet" href="{% static 'css/docs.css' %}">
 {% endblock %}
 {% block content %}
-	<h1>Документация</h1>
-   <h4>Для разработчиков</h4>
-   <a href="{% url 'docs-dev-tools' %}">Компоненты</a>
+   <div class="d-flex">
+      <div class="flex-shrink-0 px-3 me-5 bg-white border-end border-2" style="width: 280px;">
+         <a href="/" class="d-flex align-items-center pb-3 mb-3 link-dark text-decoration-none border-bottom">
+            <i class="fa-solid fa-circle-info bi me-2 fs-5"></i>
+            <span class="fs-5 fw-semibold">Справочный центр</span>
+         </a>
+         <ul class="list-unstyled ps-0">
+            <li class="mb-1">
+               <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#about-collapse" aria-expanded="true">
+                  О проекте
+               </button>
+               <div class="collapse show" id="about-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                     <li><a href="{% url 'docs-index' %}" class="link-dark rounded"><i class="fa-solid fa-file-word align-self-center me-1"></i> Техническое задание</a></li>
+                     <li><a href="{% url 'docs-index' %}#technologies" class="link-dark rounded"><i class="fa-solid fa-microchip align-self-center me-1"></i> Технологии</a></li>
+                     <li><a href="{% url 'docs-index' %}#links" class="link-dark rounded"><i class="fa-solid fa-link align-self-center me-1"></i> Ссылки</a></li>
+                  </ul>
+               </div>
+            </li>
+            <li class="mb-1">
+               <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#terms-collapse" aria-expanded="true">
+                  Условия и правила
+               </button>
+               <div class="collapse show" id="terms-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                     <li><a href="#" class="link-dark rounded"><i class="fa-solid fa-shield-halved align-self-center me-1"></i> Конфиденциальность</a></li>
+                     <li><a href="#" class="link-dark rounded"><i class="fa-solid fa-gavel align-self-center me-1"></i> Условия использования</a></li>
+                  </ul>
+               </div>
+            </li>
+            <li class="border-top my-3"></li>
+            <li class="mb-1">
+               {% if user.is_authenticated %}
+                  <div class="ps-2 pb-2">
+                     <img src="{% static 'img/profile_default.jpg' %}" class="me-2" style="width: 30px; height: 30px; border-radius: 50%;">
+                     <span class="fw-bold">{{ user.username }}</span>
+                  </div>
+               {% endif %}
+               <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#account-collapse" aria-expanded="true">
+                  Аккаунт
+               </button>
+               <div class="collapse show" id="account-collapse">
+                  <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
+                     {% if user.is_authenticated %}
+                        <li><a href="{% url 'my-profile' %}" class="link-dark rounded"><i class="fa-solid fa-user align-self-center me-1"></i> Мой профиль</a></li>
+                        <li><a href="{% url 'profile-settings' %}" class="link-dark rounded"><i class="fa-solid fa-gear align-self-center me-1"></i> Настройки</a></li>
+                        <li><a href="{% url 'logout' %}" class="link-dark rounded"><i class="fa-solid fa-right-from-bracket align-self-center me-1"></i> Выйти</a></li>
+                     {% else %}
+                        <li><a href="{% url 'login' %}" class="link-dark rounded"><i class="fa-solid fa-right-to-bracket align-self-center me-1"></i> Войти</a></li>
+                        <li><a href="{% url 'register' %}" class="link-dark rounded"><i class="fa-solid fa-plus align-self-center me-1"></i> Создать</a></li>
+                     {% endif %}
+                  </ul>
+               </div>
+            </li>
+         </ul>
+      </div>
+
+      <div>
+         {% block docs-content %}
+            <h1 class="fw-bold">О проекте</h1>
+            <p class="mb-2">Социальная сеть для обмена фотографиями.</p>
+            <p>Проект создан в рамках курса "Технология разработки программного обеспечения систем управления", УО БГУИР, 2023 г.</p>
+            <hr>
+            <h3 id="technical-assignment" class="fw-bold"><i class="fa-solid fa-file-word align-self-center me-1"></i> Техническое задание</h3>
+            <p class="mb-2">Приложение должно предоставлять пользователям возможность делиться фотографиями, оставлять комментарии под ними и удалять их, создавать тематические группы, администрировать их, подписываться на обновления группы.</p>
+            <p>Реализовать следующие сущности: пользователь, пост, фотография, комментарий, группа.</p>
+            <div class="mt-4 mb-3">
+               <span class="p-2 rounded-pill text-bg-gray fw-bold">Пользователи</span>
+            </div>
+            <p>Пользователю принадлежат главное фото профиля, посты, комментарии и группы. Профиль пользователя содержит имя пользователя, фамилию, описание, главное фото профиля. Посты, созданные пользователем должны отображаться на его странице. Создание новых постов и загрузка фотографии профиля совершается также на странице пользователя.</p>
+            <div class="mt-4 mb-3">
+               <span class="p-2 rounded-pill text-bg-gray fw-bold">Фотографии</span>
+            </div>
+            <p>Фотографии содержат название, описание и место, где они были сделаны.</p>
+            <div class="mt-4 mb-3">
+               <span class="p-2 rounded-pill text-bg-gray fw-bold">Посты</span>
+            </div>
+            <p>Посты содержат фотографию, ее название, описание, место где фотография была сделана, лайки и комментарии.</p>
+            <div class="mt-4 mb-3">
+               <span class="p-2 rounded-pill text-bg-gray fw-bold">Группы</span>
+            </div>
+            <p class="mb-4">Группа содержит название, описание, посты и комментарии к ним, подписчиков, главное фото. Пользователь может подписываться на обновления группы, чтобы видеть все посты группы в своей новостной ленте. Пользователи могут создавать группы, в которых администратор может публиковать фотографии от имени группы, удалять посты, удалять подписчиков.</p>
+            <p class="mb-2">Реализовать новостную ленту, в которой в порядке от более нового до старого отображаются посты из групп, на которые подписан пользователь.</p>
+            <p class="mb-2">Шапка приложения содержит кнопки для перехода на главную страницу, на страницу с группами, кнопки для выхода из аккаунта и для открытия своего профиля.</p>
+            <p>На главное странице отображать все посты сайта и авторов постов.</p>
+            <hr>
+            <h3 id="technologies" class="fw-bold"><i class="fa-solid fa-microchip align-self-center me-1"></i> Технологии</h3>
+            <div class="row mt-3">
+               <div class="col">
+                  <div class="card border-0">
+                     <img src="{% static 'img/python.png' %}" class="card-img-top" style="width: 15rem;" alt="Python">
+                     <div class="card-body">
+                        <h5 class="card-title">Python</h5>
+                        <p class="card-text small mb-1">Мощный язык программирования с эффективными высокоуровневыми структурами данных и эффективным подходом к объектно-ориентированному программированию. Элегантный синтаксис, динамическая типизация и интерпретируемая природа Python делают его идеальным языком для быстрой разработки приложений во многих областях на большинстве платформ.</p>
+                        <p class="card-text">
+                           <span class="badge text-bg-primary">Open-source</span>
+                           <span class="badge text-bg-danger">Free</span>
+                        </p>
+                     </div>
+                  </div>
+               </div>
+               <div class="col">
+                  <div class="card border-0">
+                     <img src="{% static 'img/django.svg' %}" class="card-img-top" style="width: 11.7rem;" alt="Django">
+                     <div class="card-body">
+                        <h5 class="card-title">Django</h5>
+                        <p class="card-text small mb-1">Веб-фреймворк на Python, способствующий быстрой разработке и чистому дизайну. Большинство необходимого функционала доступно "из коробки", что позволяет сосредоточиться на написании приложения без необходимости изобретать велосипед.</p>
+                        <p class="card-text">
+                           <span class="badge text-bg-primary">Open-source</span>
+                           <span class="badge text-bg-danger">Free</span>
+                        </p>
+                     </div>
+                  </div>
+               </div>
+               <div class="col">
+                  <div class="card border-0">
+                     <img src="{% static 'img/bootstrap.png' %}" class="card-img-top" style="width: 18rem;" alt="Bootstrap">
+                     <div class="card-body">
+                        <h5 class="card-title">Bootstrap</h5>
+                        <p class="card-text small mb-1">Многофункциональный фреймворк для создания фронтенда. Готовая система сеток и компонентов, мощные JavaScript-плагины.</p>
+                        <p class="card-text">
+                           <span class="badge text-bg-primary">Open-source</span>
+                           <span class="badge text-bg-danger">Free</span>
+                        </p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+            <hr>
+            <h3 id="links" class="fw-bold"><i class="fa-solid fa-link align-self-center me-1"></i> Ссылки</h3>
+            <div class="d-flex align-items-center mt-3 mb-4">
+               <i class="fa-brands fa-github fs-4 me-2"></i>
+               <a href="https://github.com/maks-burlakof/university/tree/main/trposu/sem2">Исходный код на GitHub</a>
+            </div>
+            <div class="d-flex align-items-center">
+               <i class="fa-solid fa-paperclip fs-4 me-2"></i>
+               <a href="{% url 'docs-dev-tools' %}">Компоненты для разработки</a>
+            </div>
+         {% endblock %}
+      </div>
+   </div>
 {% endblock %}
+{% block footer %}{% endblock %}

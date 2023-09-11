@@ -27,6 +27,12 @@ body a {
     color: #000!important;
     background-color: #EFEFEF !important;
 }
+.bg-soft {
+    background-color: #f5f8fb !important;
+}
+.fw-semibold {
+    font-weight: 600;
+}
 
 /* Post */
 .post-card {
