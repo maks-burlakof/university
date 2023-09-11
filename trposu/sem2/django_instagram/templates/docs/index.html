@@ -30,8 +30,8 @@
                </button>
                <div class="collapse show" id="terms-collapse">
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                     <li><a href="#" class="link-dark rounded"><i class="fa-solid fa-shield-halved align-self-center me-1"></i> Конфиденциальность</a></li>
-                     <li><a href="#" class="link-dark rounded"><i class="fa-solid fa-gavel align-self-center me-1"></i> Условия использования</a></li>
+                     <li><a href="{% url 'docs-terms-and-rules' %}" class="link-dark rounded"><i class="fa-solid fa-shield-halved align-self-center me-1"></i> Конфиденциальность</a></li>
+                     <li><a href="{% url 'docs-terms-and-rules' %}#terms-of-use" class="link-dark rounded"><i class="fa-solid fa-gavel align-self-center me-1"></i> Условия использования</a></li>
                   </ul>
                </div>
             </li>
@@ -64,11 +64,11 @@
 
       <div>
          {% block docs-content %}
-            <h1 class="fw-bold">О проекте</h1>
+            <h1 class="fw-bold mb-3">О проекте</h1>
             <p class="mb-2">Социальная сеть для обмена фотографиями.</p>
-            <p>Проект создан в рамках курса "Технология разработки программного обеспечения систем управления", УО БГУИР, 2023 г.</p>
+            <p>Проект создан в рамках курса "Технология разработки программного обеспечения систем управления", УО БГУИР, 2023 г. Разработал: Бурлаков Максим Викторович, студент гр. 122402.</p>
             <hr>
-            <h3 id="technical-assignment" class="fw-bold"><i class="fa-solid fa-file-word align-self-center me-1"></i> Техническое задание</h3>
+            <h3 id="technical-assignment" class="fw-bold mb-3"><i class="fa-solid fa-file-word align-self-center me-1"></i> Техническое задание</h3>
             <p class="mb-2">Приложение должно предоставлять пользователям возможность делиться фотографиями, оставлять комментарии под ними и удалять их, создавать тематические группы, администрировать их, подписываться на обновления группы.</p>
             <p>Реализовать следующие сущности: пользователь, пост, фотография, комментарий, группа.</p>
             <div class="mt-4 mb-3">
@@ -91,7 +91,7 @@
             <p class="mb-2">Шапка приложения содержит кнопки для перехода на главную страницу, на страницу с группами, кнопки для выхода из аккаунта и для открытия своего профиля.</p>
             <p>На главное странице отображать все посты сайта и авторов постов.</p>
             <hr>
-            <h3 id="technologies" class="fw-bold"><i class="fa-solid fa-microchip align-self-center me-1"></i> Технологии</h3>
+            <h3 id="technologies" class="fw-bold mb-3"><i class="fa-solid fa-microchip align-self-center me-1"></i> Технологии</h3>
             <div class="row mt-3">
                <div class="col">
                   <div class="card border-0">
@@ -134,8 +134,8 @@
                </div>
             </div>
             <hr>
-            <h3 id="links" class="fw-bold"><i class="fa-solid fa-link align-self-center me-1"></i> Ссылки</h3>
-            <div class="d-flex align-items-center mt-3 mb-4">
+            <h3 id="links" class="fw-bold mb-3"><i class="fa-solid fa-link align-self-center me-1"></i> Ссылки</h3>
+            <div class="d-flex align-items-center mb-4">
                <i class="fa-brands fa-github fs-4 me-2"></i>
                <a href="https://github.com/maks-burlakof/university/tree/main/trposu/sem2">Исходный код на GitHub</a>
             </div>

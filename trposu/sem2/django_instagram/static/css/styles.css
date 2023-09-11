@@ -33,6 +33,24 @@ body a {
 .fw-semibold {
     font-weight: 600;
 }
+.form-input-description {
+    font-size: 0.8em;
+    line-height: 1;
+    color: rgba(33, 37, 41, 0.75)!important;
+    margin-top: .25rem;
+}
+.toast-notification {
+    position: fixed;
+    z-index: 1;
+    @media (min-width: 576px) {
+        top: 4.5rem;
+    }
+    @media (max-width: 575px) {
+        bottom: 1rem;
+    }
+    right: 1rem;
+    width: 300px;
+}
 
 /* Post */
 .post-card {

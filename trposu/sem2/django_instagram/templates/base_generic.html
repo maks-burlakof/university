@@ -44,7 +44,7 @@
                </li>
                <li class="nav-item">
                   <a class="nav-link fs-5 text-dark" href="{% url 'explore' %}">
-                     <i class="fa-regular fa-compass"></i>
+                     <i class="fa-regular fa-compass fa-spin"></i>
                   </a>
                </li>
                <li class="nav-item">
@@ -68,58 +68,41 @@
       </div>
    </div>
 {% endblock %}
+{% if messages %}
+   <div aria-live="polite" aria-atomic="true" class="toast-notification">
+      {% for message in messages %}
+         <div id="toast-msg-{{ forloop.counter }}" class="toast mb-1 text-bg-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %}" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="d-flex justify-content-between align-items-center">
+               <div class="toast-body">{{ message }}</div>
+               <button type="button" class="btn-close btn-close-white me-3" data-bs-dismiss="toast" aria-label="Закрыть"></button>
+            </div>
+         </div>
+         <script>
+             bootstrap.Toast.getOrCreateInstance(document.getElementById('toast-msg-{{ forloop.counter }}')).show();
+         </script>
+      {% endfor %}
+   </div>
+{% endif %}
 <div class="container mt-5 mb-5">
    <div class="pt-sm-4"></div>
    {% block content %}{% endblock %}
 </div>
-{% if messages %}
-   <div aria-live="polite" aria-atomic="true" class="position-relative">
-      <div class="toast-container top-100 end-0 p-3">
-         {% for message in messages %}
-            <div id="toast-msg-{{ forloop.counter }}" class="toast align-items-center text-bg-{% if message.tags == "error" %}danger{% else %}{{ message.tags }}{% endif %}" role="alert" aria-live="assertive" aria-atomic="true">
-               <div class="d-flex">
-                  <div class="toast-body">{{ message }}</div>
-                  <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Закрыть"></button>
-               </div>
-            </div>
-            <script>
-               bootstrap.Toast.getOrCreateInstance(document.getElementById('toast-msg-{{ forloop.counter }}')).show();
-            </script>
-         {% endfor %}
-      </div>
-   </div>
-{% endif %}
 {% block footer %}
    <footer class="mb-4">
       <ul class="d-flex flex-row list-unstyled justify-content-center flex-wrap small">
          <li class="mx-3">
             <a href="{% url 'docs-index' %}" target="_blank" class="text-decoration-none text-secondary">Информация</a>
          </li>
-         <li class="mx-3">
-            <a href="https://about.instagram.com/" target="_blank" class="text-decoration-none text-secondary">Блог</a>
+         <li class="mx-4">
+            <a href="#" target="_blank" class="text-decoration-none text-secondary">Рейтинг аккаунтов</a>
          </li>
-         <li class="mx-3">
-            <a href="https://www.instagram.com/about/jobs/" target="_blank" class="text-decoration-none text-secondary">Помощь</a>
+         <li class="mx-4">
+            <a href="#" target="_blank" class="text-decoration-none text-secondary">Хэштэги</a>
          </li>
-         <li class="mx-3">
-            <a href="https://developers.facebook.com/docs/instagram" target="_blank" class="text-decoration-none text-secondary">API</a>
+         <li class="mx-4">
+            <a href="#" target="_blank" class="text-decoration-none text-secondary">Места</a>
          </li>
-         <li class="mx-3">
-            <a href="https://www.instagram.com/legal/terms/" target="_blank" class="text-decoration-none text-secondary">Конфиденциальность</a>
-         </li>
-         <li class="mx-3">
-            <a href="https://www.instagram.com/legal/terms/" target="_blank" class="text-decoration-none text-secondary">Условия</a>
-         </li>
-         <li class="mx-3">
-            <a href="https://www.instagram.com/directory/profiles/" target="_blank" class="text-decoration-none text-secondary">Рейтинг аккаунтов</a>
-         </li>
-         <li class="mx-3">
-            <a href="https://www.instagram.com/directory/hashtags/" target="_blank" class="text-decoration-none text-secondary">Хэштэги</a>
-         </li>
-         <li class="mx-3">
-            <a href="https://www.instagram.com/explore/locations/" target="_blank" class="text-decoration-none text-secondary">Места</a>
-         </li>
-         <li class="mx-3 text-secondary">
+         <li class="mx-4 text-secondary">
             <i class="fa-regular fa-copyright"></i> 2023 Instagram from BSUIR
          </li>
       </ul>

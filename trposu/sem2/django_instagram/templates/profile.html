@@ -8,7 +8,10 @@
       </div>
       <div class="col-8 col-lg-8 col-xl-7">
          <div class="d-flex justify-content-between align-items-center mb-2">
-            <span class="fs-3 fw-bold">{{ person.username }}</span>
+            <div class="align-items-center fs-3 fw-bold">
+               <span><i class="fa-solid fa-at"></i></span>
+               <span>{{ person.username }}</span>
+            </div>
             {% block profile_buttons %}{% endblock %}
          </div>
          <div class="d-flex align-items-center mb-3">

@@ -57,7 +57,7 @@ def my_profile(request):
 
 
 @login_required
-def profile_settings(request):
+def profile_settings_info(request):
     user = request.user
 
     if request.method == 'POST':
@@ -66,8 +66,10 @@ def profile_settings(request):
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
-            messages.success(request, 'Изменения сохранены!')
+            messages.success(request, 'Профиль обновлен!')
             return redirect(to='my-profile')
+        else:
+            messages.error(request, 'Не удалось обновить профиль. Проверьте правильность введенных данных и повторите попытку.')
     else:
         user_form = UpdateUserForm(instance=user)
         profile_form = UpdateProfileForm(instance=user.profile)
@@ -77,6 +79,14 @@ def profile_settings(request):
         'profile_form': profile_form,
     }
     return render(request, 'profile_settings.html', context)
+
+
+@login_required
+def profile_settings_security(request):
+    context = {
+
+    }
+    return render(request, 'profile_settings_security.html', context)
 
 
 def followers(request, username):

@@ -27,9 +27,23 @@ class Profile(models.Model):
         verbose_name='Фото профиля',
     )
     description = models.CharField(
-        max_length=200,
+        max_length=128,
         null=True,
         blank=True,
+        verbose_name='О себе',
+    )
+    site_url = models.URLField(
+        max_length=128,
+        null=True,
+        blank=True,
+        verbose_name='Сайт',
+    )
+    gender = models.CharField(
+        max_length=1,
+        choices=[('m', 'Мужской'), ('w', 'Женский')],
+        null=True,
+        blank=True,
+        verbose_name='Пол',
     )
 
     def get_number_of_followers(self):

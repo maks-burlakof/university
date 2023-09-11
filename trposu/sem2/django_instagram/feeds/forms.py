@@ -86,12 +86,6 @@ class UpdateUserForm(forms.ModelForm):
         widget=forms.TextInput(attrs={'class': 'form-control',
                                       'placeholder': 'Фамилия'})
     )
-    username = forms.CharField(
-        max_length=20,
-        required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control',
-                                      'placeholder': 'Имя пользователя'})
-    )
     email = forms.EmailField(
         required=True,
         widget=forms.TextInput(attrs={'class': 'form-control',
@@ -100,23 +94,36 @@ class UpdateUserForm(forms.ModelForm):
 
     class Meta:
         model = User
-        fields = ['first_name', 'last_name', 'username', 'email']
+        fields = ['first_name', 'last_name', 'email']
 
 
 class UpdateProfileForm(forms.ModelForm):
-    avatar = forms.ImageField(
+    profile_pic = forms.ImageField(
+        required=False,
         widget=forms.FileInput(attrs={'class': 'form-control'})  # TODO: image uploader widget
     )
     description = forms.CharField(
-        max_length=200,
+        max_length=128,
         required=False,
-        widget=forms.TextInput(attrs={'class': 'form-control',
-                                      'placeholder': 'Описание профиля'})
+        widget=forms.Textarea(attrs={'class': 'form-control',
+                                     'style': 'height: 8rem;',
+                                     'placeholder': 'О себе'})
+    )
+    site_url = forms.URLField(
+        max_length=128,
+        required=False,
+        widget=forms.URLInput(attrs={'class': 'form-control',
+                                     'placeholder': 'Сайт'})
+    )
+    gender = forms.ChoiceField(
+        required=False,
+        choices=[('', 'Не указывать'), ('m', 'Мужской'), ('w', 'Женский')],
+        widget=forms.Select(attrs={'class': 'form-select'})
     )
 
     class Meta:
         model = Profile
-        fields = ['description', 'profile_pic']
+        fields = ['profile_pic', 'description', 'site_url', 'gender']
 
 
 class CommentForm(forms.ModelForm):
@@ -137,7 +144,6 @@ class PostPictureForm(forms.ModelForm):
         max_length=256,
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control',
-                                     'rows': 5,
                                      'style': 'height: 10rem;',
                                      'placeholder': 'Добавьте подпись...'})
     )

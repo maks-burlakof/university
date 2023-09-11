@@ -13,7 +13,8 @@ urlpatterns = [
     path('profile/<str:username>', views.profile, name='profile'),
     path('followers/<str:username>', views.followers, name='followers'),
     path('following/<str:username>', views.following, name='following'),
-    path('profile-edit/', views.profile_settings, name='profile-settings'),
+    path('profile-edit/info/', views.profile_settings_info, name='profile-settings'),
+    path('profile-edit/security/', views.profile_settings_security, name='profile-settings-security'),
     path('post-create/', views.post_picture, name='post-create'),
 
     # auth
@@ -27,6 +28,7 @@ urlpatterns = [
 
     # docs
     path('docs/', docs.index, name='docs-index'),
+    path('docs/terms-and-rules/', docs.terms_of_use, name='docs-terms-and-rules'),
     path('docs/dev-tools/', docs.dev_tools, name='docs-dev-tools'),
 ]
 
