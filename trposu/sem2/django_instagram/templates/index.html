@@ -4,46 +4,18 @@
 {% block content %}
    <div class="row g-5">
       <div class="col-12 col-sm-12 col-md-7 col-lg-7 col-xl-6 offset-lg-1 offset-xl-2">
-         <div class="card post-card">
-            <div class="card-header">
-               <div class="d-flex justify-content-between align-items-center">
-                  <div>
-                     <img src="{% static 'img/profile_default.jpg' %}" class="profile-photo me-2">
-                     <span class="fw-bold">maks.burlakof</span>
-                     <span class="text-muted small">· 1 нед.</span>
-                  </div>
-                  <div>
-                     <span class="fw-bold"><i class="fa-solid fa-ellipsis"></i></span>
-                  </div>
-               </div>
+         {% if posts %}
+            {% for post in posts %}
+               {% include 'includes/post.html' %}
+            {% endfor %}
+            {% include 'includes/post_modal.html' %}
+         {% else %}
+            <div class="text-muted opacity-50 p-4">
+               <h1 class="fw-bold" style="font-size: 4.5rem">Ой ой <i class="fa-regular fa-face-frown-open ms-1"></i></h1>
+               <h5 class="mb-4">Похоже, постов еще нет... Но ты можешь стать первым!</h5>
+               <a href="{% url 'post-create' %}" class="btn text-bg-gray rounded-pill">Запостить первым!</a>
             </div>
-            <img src="https://blog.biletbayi.com/wp-content/uploads/2019/12/rize.jpg" class="card-img-top rounded" alt="...">
-            <div class="post-buttons d-flex justify-content-between mt-2">
-               <div>
-                  <a class="me-2" href="#">
-                     <i class="fa-regular fa-heart"></i>
-                  </a>
-                  <a class="me-2" href="#">
-                     <i class="fa-regular fa-comment"></i>
-                  </a>
-                  <a href="#">
-                     <i class="fa-regular fa-paper-plane"></i>
-                  </a>
-               </div>
-               <a href="#">
-                  <i class="fa-regular fa-bookmark"></i>
-               </a>
-            </div>
-            <div class="small my-1">
-               <span class="fw-medium">20 отметок "Нравится"</span>
-            </div>
-            <div class="small">
-               <span class="limit-str">
-                  <span class="fw-bold me-1">maks.burlakof</span>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid cumque ducimus earum excepturi facere libero nisi nobis porro provident quas reiciendis rem, suscipit veniam, voluptas voluptatem? Consequatur dicta enim et eveniet exercitationem incidunt nesciunt nihil odit placeat similique! Maiores, sit.
-               </span>
-            </div>
-         </div>
+         {% endif %}
       </div>
 
       <div class="d-none d-md-block col-md-5 col-lg-4 col-xl-3">
@@ -51,7 +23,7 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                <div class="d-flex align-items-center">
                   <a href="{% url 'my-profile' %}">
-                     <img src="{% static 'img/profile_default.jpg' %}" class="me-3" style="width: 45px; height: 45px; border-radius: 50%;">
+                     <img src="{{ user.profile.get_profile_pic }}" class="me-3" style="width: 45px; height: 45px; border-radius: 50%;">
                   </a>
                   <div>
                      <a href="{% url 'my-profile' %}" class="fw-bold common-link mb-0">{{ user.username }}</a>

@@ -1,8 +1,13 @@
+from datetime import datetime
+
 from django.db import models
 from django.contrib.auth.models import User
+from django.contrib.staticfiles.storage import staticfiles_storage
 
 
 class Profile(models.Model):
+    is_update_image = False
+
     def img_path(self, filename):
         return '%s/%s' % (self.user.username, filename)
 
@@ -46,6 +51,17 @@ class Profile(models.Model):
         verbose_name='Пол',
     )
 
+    def save(self, *args, **kwargs):
+        super(Profile, self).save(*args, **kwargs)
+        if self.is_update_image:
+            # image_compressor.compress_image(self.image.path)
+            self.is_update_image = False
+
+    def get_profile_pic(self):
+        if self.profile_pic:
+            return self.profile_pic.url
+        return staticfiles_storage.url('img/profile_default.jpg')
+
     def get_number_of_followers(self):
         return self.followers.count()
 
@@ -87,6 +103,17 @@ class Post(models.Model):
         default=True,
         verbose_name='Разрешить комментарии',
     )
+
+    def get_str_time(self):
+        days = (datetime.now().astimezone() - self.created).days
+        if days == 0:
+            return 'Сегодня'
+        elif days == 1:
+            return 'Вчера'
+        elif days == 2:
+            return 'Позавчера'
+        else:
+            return f'{days} дн.'
 
     def get_number_of_likes(self):
         return self.like_set.count()

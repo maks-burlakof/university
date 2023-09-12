@@ -1,16 +1,19 @@
 {% extends 'base_generic.html' %}
 {% load static %}
 {% block title %}Редактировать профиль · Instagram{% endblock %}
+{% block extrastyle %}
+	{{ profile_form.media }}
+{% endblock %}
 {% block content %}
    <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-7 col-xl-5">
          <h3 class="fw-bold mb-4">Редактировать профиль</h3>
 
          <div class="d-flex align-items-center mb-4">
-            <img src="{% static 'img/profile_default.jpg' %}" class="me-3" style="width: 55px; height: 55px; border-radius: 50%;">
+            <img src="{{ user.profile.get_profile_pic }}" class="me-3" style="width: 55px; height: 55px; border-radius: 50%;">
             <div>
                <p class="mb-0">{{ user.username }}</p>
-               {% block set-profile-picture-link %}<a href="#">Изменить фото профиля</a>{% endblock %}
+               {% block set-profile-picture-link %}<a type="button" data-bs-toggle="modal" data-bs-target="#upload-photo-modal" class="link-primary">Изменить фото профиля</a>{% endblock %}
             </div>
          </div>
 
@@ -20,7 +23,7 @@
          </div>
 
          {% block profile-settings-form %}
-            <form method="post">
+            <form method="post" enctype="multipart/form-data">
                {% csrf_token %}
                {% if user_form.non_field_errors %}
                   {% include 'includes/form_non_field_errors.html' with form=user_form %}
@@ -84,6 +87,24 @@
                </div>
 
                <button type="submit" class="btn btn-primary rounded-pill">Сохранить</button>
+
+               <div class="modal fade" id="upload-photo-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                     <div class="modal-content">
+                        <div class="modal-body">
+                           <div class="d-flex justify-content-between mb-2">
+                              <h5><i class="fa-regular fa-image me-1"></i> Изменить фото профиля</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                           </div>
+                           {{ profile_form.profile_pic }}
+                           <div class="d-flex justify-content-between mt-4">
+                              <button type="submit" class="btn btn-sm btn-primary rounded-pill">Сохранить</button>
+                              <input type="submit" name="delete_current_photo" value="Удалить текущее фото" class="btn btn-sm btn-danger rounded-pill">
+                           </div>
+                        </div>
+                     </div>
+                  </div>
+               </div>
             </form>
          {% endblock %}
       </div>

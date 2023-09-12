@@ -7,6 +7,9 @@
 .iuw-root {
     min-width: unset!important;
 }
+#iuw-modal-element {
+    z-index: 1100!important;
+}
 
 body a {
     text-decoration: none;
@@ -14,6 +17,7 @@ body a {
 .common-link {
     color: unset;
     text-decoration: none;
+    cursor: pointer;
 }
 .limit-str {
     --num-lines: 2;

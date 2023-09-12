@@ -1,18 +1,25 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Q
 from django.shortcuts import render, redirect
+from django.utils.safestring import mark_safe
 
 from feeds.models import Profile, Post, Like
 from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm
 
 
 def index(request):
-    if not request.user.is_authenticated:
+    if request.user.is_authenticated:
+        user = request.user
+        users_followed = request.user.profile.following.all()
+        posts = Post.objects.filter(
+            Q(user_profile__in=users_followed) |
+            Q(user_profile=user.profile)
+        ).select_related('user_profile', 'user_profile__user').order_by('-created')
+    else:
+        # TODO: show random posts
         return redirect('login')
-
-    users_followed = request.user.profile.following.all()
-    posts = Post.objects.filter(user_profile__in=users_followed).order_by('-created')
 
     context = {
         'posts': posts,
@@ -63,6 +70,11 @@ def profile_settings_info(request):
     if request.method == 'POST':
         user_form = UpdateUserForm(request.POST, instance=user)
         profile_form = UpdateProfileForm(request.POST, instance=user.profile, files=request.FILES)
+
+        if request.POST.get('delete_current_photo') == 'Удалить текущее фото':
+            user.profile.profile_pic.delete()
+            messages.success(request, mark_safe('<i class="fa-regular fa-face-frown"></i> Фото профиля удалено. Давай загрузим новое!'))
+
         if user_form.is_valid() and profile_form.is_valid():
             user_form.save()
             profile_form.save()
@@ -70,6 +82,7 @@ def profile_settings_info(request):
             return redirect(to='my-profile')
         else:
             messages.error(request, 'Не удалось обновить профиль. Проверьте правильность введенных данных и повторите попытку.')
+
     else:
         user_form = UpdateUserForm(instance=user)
         profile_form = UpdateProfileForm(instance=user.profile)
@@ -123,7 +136,8 @@ def post_picture(request):
                 image=request.FILES.get('image'),
             )
             post.save()
-            return redirect('my-profile')
+            messages.success(request, mark_safe('<i class="fa-regular fa-images me-1"></i> Пост опубликован!'))
+            return redirect('index')
     else:
         form = PostPictureForm()
 

@@ -127,7 +127,7 @@ class UpdateUserForm(forms.ModelForm):
 class UpdateProfileForm(forms.ModelForm):
     profile_pic = forms.ImageField(
         required=False,
-        widget=forms.FileInput(attrs={'class': 'form-control'})  # TODO: image uploader widget
+        widget=ImageUploaderWidget(empty_text="Перетащите сюда фото"),
     )
     description = forms.CharField(
         max_length=128,
