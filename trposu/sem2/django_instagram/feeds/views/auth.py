@@ -1,10 +1,13 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.models import User
-from django.contrib.auth.views import LoginView
+from django.contrib.auth.views import LoginView, PasswordResetView, PasswordChangeView
+from django.contrib.messages.views import SuccessMessageMixin
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from django.utils.safestring import mark_safe
 
-from feeds.forms import RegisterUserForm, LoginForm
+from feeds.forms import RegisterUserForm, LoginForm, ResetPasswordForm
 from feeds.models import Profile
 
 
@@ -42,3 +45,21 @@ class CustomLoginView(LoginView):
             self.request.session.modified = True
 
         return super(CustomLoginView, self).form_valid(form)
+
+
+class ResetPasswordView(SuccessMessageMixin, PasswordResetView):
+    template_name = 'password_reset.html'
+    email_template_name = 'emails/reset_password.html'
+    subject_template_name = ''
+    from_email = settings.EMAIL_HOST_USER
+    form_class = ResetPasswordForm
+    success_message = "На указанный адрес электронной почты отправлена инструкция по сбросу пароля. " \
+                      "Если в течение нескольких минут вы не получили письмо, " \
+                      "пожалуйста, проверьте правильность вашего адреса электронной почты и проверьте папку Спам. "
+    success_url = reverse_lazy('login')
+
+
+class ChangePasswordView(SuccessMessageMixin, PasswordChangeView):
+    template_name = 'profile_settings_security.html'
+    success_message = "Пароль успешно изменён!"
+    success_url = reverse_lazy('profile-settings')

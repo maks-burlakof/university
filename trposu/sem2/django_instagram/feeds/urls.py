@@ -9,12 +9,12 @@ from . import forms
 urlpatterns = [
     path('', views.index, name='index'),
     path('explore/', views.explore, name='explore'),
-    path('profile/', views.my_profile, name='my-profile'),
+    path('profile/', views.profile, name='my-profile'),
     path('profile/<str:username>', views.profile, name='profile'),
     path('followers/<str:username>', views.followers, name='followers'),
     path('following/<str:username>', views.following, name='following'),
-    path('profile-edit/info/', views.profile_settings_info, name='profile-settings'),
-    path('profile-edit/security/', views.profile_settings_security, name='profile-settings-security'),
+    path('profile/edit/info/', views.profile_settings_info, name='profile-settings'),
+    path('profile/edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
     path('post-create/', views.post_picture, name='post-create'),
 
     # auth

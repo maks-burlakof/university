@@ -1,9 +1,10 @@
 from django import forms
 from django.contrib.auth.models import User
-from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm, PasswordResetForm
 from image_uploader_widget.widgets import ImageUploaderWidget
 
 from .models import Profile, Comment, Post
+from .scripts import send_email
 
 
 class RegisterUserForm(UserCreationForm):
@@ -71,6 +72,32 @@ class LoginForm(AuthenticationForm):
     class Meta:
         model = User
         fields = ['username', 'password']
+
+
+class ResetPasswordForm(PasswordResetForm):
+    email = forms.EmailField(
+        label="Email",
+        max_length=254,
+        widget=forms.EmailInput(attrs={'placeholder': 'Email',
+                                       'class': 'form-control'})
+    )
+
+    def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
+        subject = 'Сброс пароля на Instagram'
+
+        user = context['user']
+        del context['user']
+        context.update({
+            'first_name': user.first_name,
+            'username': user.username,
+        })
+
+        send_email(
+            subject=subject,
+            email_template=email_template_name,
+            to_email=to_email,
+            context=context,
+        )
 
 
 class UpdateUserForm(forms.ModelForm):

@@ -1,10 +1,15 @@
 from pathlib import Path
+from os import getenv
+from dotenv import load_dotenv
+
+load_dotenv(dotenv_path='.env')
+load_dotenv(dotenv_path='.env_prod')
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-!mei1vktt3@z&4hx3w$vqxv9^og-ezs3p7$&4n%u+1htb4)ic&'
+SECRET_KEY = getenv('SECRET_KEY')
 
-DEBUG = True
+DEBUG = True if getenv('DEBUG') == "True" else False
 
 ALLOWED_HOSTS = ['*', ]
 
@@ -72,9 +77,34 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# Levels: DEBUG, INFO, WARNING, ERROR, CRITICAL
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'class': 'logging.FileHandler',
+            'formatter': 'verbose',
+            'filename': BASE_DIR / 'logs/logs.log',
+        },
+    },
+    'loggers': {
+        'root': {
+            'handlers': ['file'],
+            'level': getenv('DJANGO_LOG_LEVEL', 'INFO'),
+        },
+    },
+}
+
 LANGUAGE_CODE = 'ru-ru'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Moscow'
 
 USE_I18N = True
 
@@ -87,6 +117,13 @@ MEDIA_URL = 'media/'
 MEDIA_ROOT = 'media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = getenv('EMAIL_HOST')
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = getenv('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = getenv('EMAIL_HOST_PASSWORD')
 
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True

@@ -30,30 +30,30 @@ def explore(request):
     return render(request, 'explore.html', context)
 
 
-def profile(request, username):
-    user = User.objects.get(username=username)
-    if not user:
-        return redirect('index')
+def profile(request, username=None):
+    if not username:
+        if request.user.is_authenticated:
+            user = request.user
+            user_profile = user.profile
+            template_name = 'my_profile.html'
+        else:
+            messages.info(request, 'Войдите в аккаунт, чтобы посмотреть свой профиль')
+            return redirect('login')
 
-    user_profile = Profile.objects.get(user=user)
-
-    context = {
-        'person': user,
-        'person_profile': user_profile,
-    }
-    return render(request, 'profile.html', context)
-
-
-@login_required
-def my_profile(request):
-    user = request.user
-    user_profile = user.profile
+    else:
+        user = User.objects.get(username=username)
+        if not user:
+            return redirect('index')
+        user_profile = Profile.objects.get(user=user)
+        template_name = 'profile.html'
 
     context = {
         'person': user,
         'person_profile': user_profile,
+        'num_of_followers': user_profile.get_number_of_followers(),
+        'num_of_following': user_profile.get_number_of_following(),
     }
-    return render(request, 'my_profile.html', context)
+    return render(request, template_name, context)
 
 
 @login_required
@@ -79,14 +79,6 @@ def profile_settings_info(request):
         'profile_form': profile_form,
     }
     return render(request, 'profile_settings.html', context)
-
-
-@login_required
-def profile_settings_security(request):
-    context = {
-
-    }
-    return render(request, 'profile_settings_security.html', context)
 
 
 def followers(request, username):

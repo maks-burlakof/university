@@ -15,8 +15,8 @@
          </div>
 
          <div class="mb-4">
-            <span><a href="{% url 'profile-settings' %}" class="btn btn-sm text-bg-gray rounded-pill me-2 mb-1"><i class="fa-solid fa-user mx-1"></i> Основная информация</a></span>
-            <span><a href="{% url 'profile-settings-security' %}" class="btn btn-sm text-bg-gray rounded-pill mb-1"><i class="fa-solid fa-lock mx-1"></i> Безопасность</a></span>
+            <span><a href="{% url 'profile-settings' %}" class="btn btn-sm text-bg-gray rounded-pill {% block border-info %}border border-secondary{% endblock %} me-2 mb-1"><i class="fa-solid fa-user mx-1"></i> Основная информация</a></span>
+            <span><a href="{% url 'profile-settings-security' %}" class="btn btn-sm text-bg-gray rounded-pill {% block border-security %}{% endblock %} mb-1"><i class="fa-solid fa-lock mx-1"></i> Безопасность</a></span>
          </div>
 
          {% block profile-settings-form %}

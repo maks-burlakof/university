@@ -19,7 +19,7 @@ def get_item(dictionary, keyword):
 @register.filter
 def ru_plural(value, variants):
     variants = variants.split(",")
-    if not value:
+    if not value and value != 0:
         return variants[0]
     value = abs(int(value))
     if value % 10 == 1 and value % 100 != 11:

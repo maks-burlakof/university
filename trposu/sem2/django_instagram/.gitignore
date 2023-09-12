@@ -1,5 +1,7 @@
 .idea/
 
 db.sqlite3
+.env_prod
 
 */migrations/
+logs/logs.log

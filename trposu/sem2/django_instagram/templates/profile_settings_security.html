@@ -1,9 +1,57 @@
 {% extends 'profile_settings.html' %}
 {% load static %}
 {% block set-profile-picture-link %}{% endblock %}
+{% block border-info %}{% endblock %}
+{% block border-security %}border border-secondary{% endblock %}
 {% block profile-settings-form %}
+   <div class="mb-1 row align-items-center">
+      <span class="fw-bold col-sm-4 col-form-label">Последний вход</span>
+      <div class="col-sm-8">
+         <span>{{ user.last_login }}</span>
+      </div>
+   </div>
+   <div class="mb-4 row align-items-center">
+      <span class="fw-bold col-sm-4 col-form-label">Дата регистрации</span>
+      <div class="col-sm-8">
+         <span>{{ user.date_joined }}</span>
+      </div>
+   </div>
+   <form method="post">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+         {% include 'includes/form_non_field_errors.html' %}
+      {% endif %}
+      <div class="mb-3 row">
+         <label for="id_old_password" class="fw-bold col-sm-4 col-form-label">Старый пароль</label>
+         <div class="col-sm-8">
+            <div>
+               <input type="password" name="old_password" autocomplete="new-password" class="form-control" required id="id_old_password" placeholder="Старый пароль">
+            </div>
+         </div>
+      </div>
+      <div class="mb-3 row">
+         <label for="id_new_password1" class="fw-bold col-sm-4 col-form-label">Новый пароль</label>
+         <div class="col-sm-8">
+            <div class="mb-2">
+               <div>
+                  <input type="password" name="new_password1" autocomplete="new-password" class="form-control" required id="id_new_password1" placeholder="Новый пароль"/>
+               </div>
+            </div>
+            <div>
+               <input type="password" name="new_password2" autocomplete="new-password" required id="id_new_password2" class="form-control" placeholder="Повторите новый пароль"/>
+            </div>
+         </div>
+      </div>
 
+      <button type="submit" class="btn btn-primary rounded-pill">Сохранить</button>
+   </form>
 {% endblock %}
 {% block extrajs %}
-
+   <script>
+       {% if form.errors %}{% for field in form %}
+       {% if field.errors %}
+           AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+       {% endif %}
+       {% endfor %}{% endif %}
+   </script>
 {% endblock %}

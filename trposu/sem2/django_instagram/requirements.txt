@@ -1,3 +1,4 @@
 Django~=4.2.5
 Pillow~=10.0.0
 django-image-uploader-widget~=0.3.0
+python-dotenv~=1.0.0
