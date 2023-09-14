@@ -1,0 +1,11 @@
+<div class="col-4">
+   <div class="post-image-only">
+      <a href="#">
+         <img class="post-image-only" src="{{ post.image.url }}">
+      </a>
+      <div class="post-overlay">
+         <i class="fa-solid fa-heart me-1"></i> {{ post.get_num_of_likes }}
+         <i class="fa-solid fa-comment ms-3 me-1"></i> {{ post.get_num_of_comments }}
+      </div>
+   </div>
+</div>

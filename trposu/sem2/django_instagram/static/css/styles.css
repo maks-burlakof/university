@@ -55,6 +55,45 @@ body a {
     right: 1rem;
     width: 300px;
 }
+.profile-photo {
+    border-radius: 50%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+.posts-link-active {
+    border-top: 1px solid black;
+}
+
+/* Post image only */
+.post-image-only {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    object-fit: cover;
+}
+.post-image-only .post-overlay {
+    opacity: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%);
+    text-align: center;
+    color: white;
+    font-weight: 800;
+    font-size: 1.2rem;
+}
+.post-image-only img {
+    opacity: 1;
+    transition: .2s ease;
+    display: block;
+}
+.post-image-only:hover img {
+    filter: brightness(0.6);
+}
+.post-image-only:hover .post-overlay {
+    opacity: 1;
+}
 
 /* Post */
 .post-card {
@@ -63,7 +102,6 @@ body a {
 .post-card .profile-photo {
     width: 30px;
     height: 30px;
-    border-radius: 50%;
 }
 .post-card .card-header {
     padding: 1rem 0rem;

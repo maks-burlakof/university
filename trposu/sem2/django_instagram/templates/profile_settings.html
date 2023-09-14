@@ -10,7 +10,7 @@
          <h3 class="fw-bold mb-4">Редактировать профиль</h3>
 
          <div class="d-flex align-items-center mb-4">
-            <img src="{{ user.profile.get_profile_pic }}" class="me-3" style="width: 55px; height: 55px; border-radius: 50%;">
+            <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-3" style="width: 55px; height: 55px;">
             <div>
                <p class="mb-0">{{ user.username }}</p>
                {% block set-profile-picture-link %}<a type="button" data-bs-toggle="modal" data-bs-target="#upload-photo-modal" class="link-primary">Изменить фото профиля</a>{% endblock %}

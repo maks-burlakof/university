@@ -20,8 +20,6 @@ def register(request):
         if form.is_valid():
             form.save()
             username = form.cleaned_data.get('username')
-            user = User.objects.get(username=username)
-            user_profile = Profile.objects.create(user=user)
             messages.success(request, mark_safe('<h4>Успешная регистрация!</h4><hr class="mt-0 mb-2"><p class="mb-0">' 
                                                 f'Поздравляем! Ваш аккаунт создан с именем пользователя {username}.<br>'
                                                 'Чтобы продолжить, войдите в свою новую учетную запись.</p>'))

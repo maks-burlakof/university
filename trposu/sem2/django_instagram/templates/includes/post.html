@@ -29,15 +29,15 @@
          <i class="fa-regular fa-bookmark"></i>
       </a>
    </div>
-   {% if post.get_number_of_likes != 0 %}
+   {% if post.get_num_of_likes != 0 %}
       <div class="small mb-1">
-         <span class="fw-medium">{{ post.get_number_of_likes }} {{ post.get_number_of_likes|ru_plural:"отметка,отметки,отметок" }} "Нравится"</span>
+         <span class="fw-medium">{{ post.get_num_of_likes }} {{ post.get_num_of_likes|ru_plural:"отметка,отметки,отметок" }} "Нравится"</span>
       </div>
    {% endif %}
    <div class="small">
       <span class="limit-str">
          <span class="fw-bold me-1">{{ post.user_profile.user.username }}</span>
-         {{ post.title }}
+         {{ post.title|default:"" }}
       </span>
    </div>
 </div>

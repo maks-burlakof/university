@@ -71,6 +71,10 @@ class Profile(models.Model):
     def __str__(self):
         return self.user.username
 
+    class Meta:
+        verbose_name = 'Профиль'
+        verbose_name_plural = 'Профили'
+
 
 class Post(models.Model):
     def img_path(self, filename):
@@ -79,6 +83,7 @@ class Post(models.Model):
     user_profile = models.ForeignKey(
         to=Profile,
         on_delete=models.CASCADE,
+        verbose_name='Пользователь',
     )
     title = models.CharField(
         max_length=256,
@@ -96,7 +101,7 @@ class Post(models.Model):
         verbose_name='Дата создания',
     )
     is_archived = models.BooleanField(
-        default=True,
+        default=False,
         verbose_name='В архиве',
     )
     is_allow_comments = models.BooleanField(
@@ -115,14 +120,18 @@ class Post(models.Model):
         else:
             return f'{days} дн.'
 
-    def get_number_of_likes(self):
+    def get_num_of_likes(self):
         return self.like_set.count()
 
-    def get_number_of_comments(self):
+    def get_num_of_comments(self):
         return self.comment_set.count()
 
     def __str__(self):
-        return self.title
+        return f'{self.user_profile}, {self.created}'
+
+    class Meta:
+        verbose_name = 'Пост'
+        verbose_name_plural = 'Посты'
 
 
 class Comment(models.Model):
@@ -146,6 +155,10 @@ class Comment(models.Model):
     def __str__(self):
         return self.comment
 
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
+
 
 class Like(models.Model):
     post = models.ForeignKey(
@@ -157,8 +170,10 @@ class Like(models.Model):
         on_delete=models.CASCADE,
     )
 
-    class Meta:
-        unique_together = ("post", "user")
-
     def __str__(self):
         return 'Лайк: ' + self.user.username + ' ' + self.post.title
+
+    class Meta:
+        unique_together = ("post", "user")
+        verbose_name = 'Лайк'
+        verbose_name_plural = 'Лайки'

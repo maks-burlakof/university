@@ -15,7 +15,8 @@ def index(request):
         users_followed = request.user.profile.following.all()
         posts = Post.objects.filter(
             Q(user_profile__in=users_followed) |
-            Q(user_profile=user.profile)
+            Q(user_profile=user.profile),
+            is_archived=False,
         ).select_related('user_profile', 'user_profile__user').order_by('-created')
     else:
         # TODO: show random posts
@@ -38,10 +39,9 @@ def explore(request):
 
 
 def profile(request, username=None):
-    if not username:
+    if not username or request.user.username == username:
         if request.user.is_authenticated:
             user = request.user
-            user_profile = user.profile
             template_name = 'my_profile.html'
         else:
             messages.info(request, 'Войдите в аккаунт, чтобы посмотреть свой профиль')
@@ -50,15 +50,15 @@ def profile(request, username=None):
     else:
         user = User.objects.get(username=username)
         if not user:
+            messages.warning(request, f'Аккаунта с @{username} не существует')
             return redirect('index')
-        user_profile = Profile.objects.get(user=user)
         template_name = 'profile.html'
 
     context = {
         'person': user,
-        'person_profile': user_profile,
-        'num_of_followers': user_profile.get_number_of_followers(),
-        'num_of_following': user_profile.get_number_of_following(),
+        'num_of_followers': user.profile.get_number_of_followers(),
+        'num_of_following': user.profile.get_number_of_following(),
+        'posts': Post.objects.filter(user_profile=user.profile, is_archived=False),
     }
     return render(request, template_name, context)
 
@@ -138,6 +138,8 @@ def post_picture(request):
             post.save()
             messages.success(request, mark_safe('<i class="fa-regular fa-images me-1"></i> Пост опубликован!'))
             return redirect('index')
+        else:
+            messages.error(request, mark_safe('<i class="fa-regular fa-face-surprise me-1"></i> Что-то не так. Проверь правильность своего поста!'))
     else:
         form = PostPictureForm()
 

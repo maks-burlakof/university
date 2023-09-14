@@ -3,7 +3,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 
-from .views import views, auth, docs
+from .views import views, auth, docs, ajax
 from . import forms
 
 urlpatterns = [
@@ -30,6 +30,9 @@ urlpatterns = [
     path('docs/', docs.index, name='docs-index'),
     path('docs/terms-and-rules/', docs.terms_of_use, name='docs-terms-and-rules'),
     path('docs/dev-tools/', docs.dev_tools, name='docs-dev-tools'),
+
+    # ajax
+    path('ajax/validate/username/', ajax.validate_username, name='ajax-validate-username'),
 ]
 
 if settings.DEBUG:

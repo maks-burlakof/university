@@ -21,7 +21,7 @@
             <div class="post-upload-form card card-body shadow border-0 p-4">
                <div class="d-flex justify-content-between align-items-center mb-3">
                   <div>
-                     <img src="{{ user.profile.get_profile_pic }}" class="me-2" style="width: 30px; height: 30px; border-radius: 50%;">
+                     <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-2" style="width: 30px; height: 30px;">
                      <span class="fw-bold">{{ user.username }}</span>
                   </div>
                   <div>
@@ -38,6 +38,10 @@
                   <div class="form-floating">
                      {{ form.title }}
                      <label for="id_title">Добавьте подпись...</label>
+                  </div>
+                  <div class="form-input-description">
+                     <span id="id_title_length"></span>
+                     <span> / 256</span>
                   </div>
                </div>
                <div class="accordion" id="postExtraSettings">
@@ -74,10 +78,20 @@
        {% endfor %}{% endif %}
    </script>
    <script>
-      let postForm = document.querySelector('#post-form');
+      // Progressbar
+       let postForm = document.querySelector('#post-form');
       let postProgressbar = document.querySelector('#post-progressbar');
       postForm.addEventListener('submit', function () {
           postProgressbar.style.display = 'flex';
+      })
+
+      // Title length widget
+      let formDescriptionInput = document.querySelector('#id_title');
+      let formDescriptionOutput = document.querySelector('#id_title_length');
+
+      formDescriptionOutput.textContent = 0 + formDescriptionInput.value.length;
+      formDescriptionInput.addEventListener('input', function () {
+          formDescriptionOutput.textContent = 0 + this.value.length;
       })
    </script>
 {% endblock %}

@@ -34,7 +34,7 @@ def delete_directory_if_empty(directory_path):
 
 @receiver(pre_delete, sender=Profile)
 def delete_image(sender, instance, **kwargs):
-    if instance.profile_pic.name != sender.DEFAULT_IMAGE:
+    if instance.profile_pic:
         filepath = instance.profile_pic.path
         if os.path.isfile(filepath):
             os.remove(filepath)
@@ -45,7 +45,7 @@ def delete_image(sender, instance, **kwargs):
 @receiver(pre_save, sender=Profile)
 def update_image(sender, instance, **kwargs):
     if not instance.pk:
-        instance.is_update_image = True if instance.profile_pic.name != sender.DEFAULT_IMAGE else False
+        instance.is_update_image = False
         return False
     try:
         old_image = sender.objects.get(pk=instance.pk).profile_pic
@@ -54,5 +54,5 @@ def update_image(sender, instance, **kwargs):
     is_new = old_image != instance.profile_pic
     if is_new:
         instance.is_update_image = True
-        if old_image.name != sender.DEFAULT_IMAGE and os.path.isfile(old_image.path):
+        if os.path.isfile(old_image.path):
             os.remove(old_image.path)

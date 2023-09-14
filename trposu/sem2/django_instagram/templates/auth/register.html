@@ -64,11 +64,36 @@
    </div>
 {% endblock %}
 {% block extrajs %}
-   <script>
-       {% if form.errors %}{% for field in form %}
-       {% if field.errors %}
-           AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
-       {% endif %}
-       {% endfor %}{% endif %}
-   </script>
+<script>
+    {% if form.errors %}{% for field in form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+</script>
+<script>
+    let usernameInput = document.querySelector('#id_username');
+    usernameInput.addEventListener('blur', function() {
+        let username = usernameInput.value;
+        if (username.trim() !== '') {
+            $.ajax({
+                data: $(this).serialize(),
+                url: "{% url 'ajax-validate-username' %}",
+                success: function (response) {
+                    if (response.is_taken == true) {
+                        $('#id_username').removeClass('is-valid').addClass('is-invalid');
+                        $('#id_username').after('<div class="invalid-feedback d-block" id="usernameError">Это имя пользователя уже занято</div>')
+                    } else {
+                        $('#id_username').removeClass('is-invalid').addClass('is-valid');
+                        $('#usernameError').remove();
+
+                    }
+                },
+                error: function (response) {
+                    console.log(response.responseJSON.errors)
+                }
+            });
+        }
+    })
+</script>
 {% endblock %}
