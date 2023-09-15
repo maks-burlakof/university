@@ -8,6 +8,14 @@ from django.utils.safestring import mark_safe
 from feeds.models import Profile, Post, Like
 from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm
 
+POSTS_ON_PAGE = 30
+
+
+def add_posts_likes(user: User, posts):
+    if user.is_authenticated:
+        for post in posts:
+            post.is_liked = post.is_user_liked(user)
+
 
 def index(request):
     if request.user.is_authenticated:
@@ -17,13 +25,16 @@ def index(request):
             Q(user_profile__in=users_followed) |
             Q(user_profile=user.profile),
             is_archived=False,
-        ).select_related('user_profile', 'user_profile__user').order_by('-created')
+        ).select_related('user_profile', 'user_profile__user').prefetch_related('like_set').order_by('-created')[:POSTS_ON_PAGE]
+        add_posts_likes(user, posts)
+        recommended_users = User.objects.all().exclude(pk=user.pk).select_related('profile').order_by('?')[:5]
     else:
-        # TODO: show random posts
-        return redirect('login')
+        posts = Post.objects.all().select_related('user_profile', 'user_profile__user').order_by('?')[:POSTS_ON_PAGE]
+        recommended_users = User.objects.all().select_related('profile').order_by('?')[:5]
 
     context = {
         'posts': posts,
+        'recommended_users': recommended_users,
     }
 
     return render(request, 'index.html', context)
@@ -58,6 +69,7 @@ def profile(request, username=None):
         'person': user,
         'num_of_followers': user.profile.get_number_of_followers(),
         'num_of_following': user.profile.get_number_of_following(),
+        'is_following': request.user.profile.following.filter(user=user).exists(),
         'posts': Post.objects.filter(user_profile=user.profile, is_archived=False),
     }
     return render(request, template_name, context)

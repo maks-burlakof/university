@@ -99,6 +99,9 @@ body a {
 .post-card {
     border: none;
 }
+.post-card a {
+    color: inherit;
+}
 .post-card .profile-photo {
     width: 30px;
     height: 30px;
@@ -108,10 +111,33 @@ body a {
     background-color: unset;
     border: none;
 }
-.post-card .post-buttons a {
+.post-card .post-buttons {
+    margin-bottom: 0.25rem;
+    margin-top: 0.8rem;
+    justify-content: space-between;
+}
+.post-card .post-buttons-flex {
+    display: flex;
+    align-items: center;
+}
+.post-card .post-buttons span {
     color: unset;
     text-decoration: none;
-    font-size: 1.31rem!important;
+    cursor: pointer;
+    font-size: 1.31rem;
+    display: flex;
+    align-items: center;
+}
+.post-card .post-buttons .like-count,
+.post-card .post-buttons .comment-count {
+    font-family: var(--bs-font-monospace)!important;
+    font-size: 1rem!important;
+    font-weight: 800;
+    margin-left: 5px;
+}
+.post-card .post-buttons .like-liked {
+    color: red;
+    font-weight: 900;
 }
 
 /* Create post */
@@ -129,6 +155,20 @@ body a {
     .create-post-form .post-upload-image {
         height: 20rem;
     }
+}
+
+/* Follow buttons */
+.submit-follow {
+    color: #fff;
+    background-color: #0d6efd;
+}
+.submit-follow:hover {
+    color: #fff;
+    background-color: #0b5ed7;
+}
+.follow-followed {
+    color: #000!important;
+    background-color: #EFEFEF !important;
 }
 
 /* Login page */

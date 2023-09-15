@@ -3,8 +3,10 @@
    <div class="card-header">
       <div class="d-flex justify-content-between align-items-center">
          <div>
-            <img src="{{ post.user_profile.get_profile_pic }}" class="profile-photo me-2">
-            <span class="fw-bold">{{ post.user_profile.user.username }}</span>
+            <a href="{{ post.user_profile.get_absolute_url }}">
+               <img src="{{ post.user_profile.get_profile_pic }}" class="profile-photo me-2">
+               <span class="fw-bold">{{ post.user_profile.user.username }}</span>
+            </a>
             <span class="text-muted small">· {{ post.get_str_time }}</span>
          </div>
          <div>
@@ -13,31 +15,30 @@
       </div>
    </div>
    <img src="{{ post.image.url }}" class="card-img-top rounded">
-   <div class="post-buttons d-flex justify-content-between mt-2 mb-1">
-      <div>
-         <a class="me-2" href="#">
-            <i class="fa-regular fa-heart"></i>
-         </a>
-         <a class="me-2" href="#">
+   <section data-post-id="{{ post.pk }}" class="post-buttons post-buttons-flex">
+      <div class="post-buttons-flex">
+         <span>
+            <i class="fa-regular fa-heart submit-like {% if post.is_liked %}like-liked{% endif %}"></i>
+            <span class="like-count">{{ post.get_num_of_likes|default:"" }}</span>
+         </span>
+         <span class="ms-3">
             <i class="fa-regular fa-comment"></i>
-         </a>
-         <a href="#">
-            <i class="fa-regular fa-paper-plane"></i>
-         </a>
+            <span class="comment-count">{{ post.get_num_of_comments|default:"" }}</span>
+         </span>
       </div>
-      <a href="#">
-         <i class="fa-regular fa-bookmark"></i>
-      </a>
-   </div>
-   {% if post.get_num_of_likes != 0 %}
-      <div class="small mb-1">
-         <span class="fw-medium">{{ post.get_num_of_likes }} {{ post.get_num_of_likes|ru_plural:"отметка,отметки,отметок" }} "Нравится"</span>
+      <div class="post-buttons-flex">
+         <span class="me-3">
+            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+         </span>
+         <span>
+            <i class="fa-regular fa-bookmark"></i>
+         </span>
       </div>
-   {% endif %}
-   <div class="small">
-      <span class="limit-str">
+   </section>
+   {% if post.title %}
+      <span class="small limit-str">
          <span class="fw-bold me-1">{{ post.user_profile.user.username }}</span>
-         {{ post.title|default:"" }}
+         {{ post.title }}
       </span>
-   </div>
+   {% endif %}
 </div>

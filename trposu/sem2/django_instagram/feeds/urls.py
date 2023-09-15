@@ -33,6 +33,8 @@ urlpatterns = [
 
     # ajax
     path('ajax/validate/username/', ajax.validate_username, name='ajax-validate-username'),
+    path('ajax/like/', ajax.like, name='ajax-like'),
+    path('ajax/follow/', ajax.follow, name='ajax-follow'),
 ]
 
 if settings.DEBUG:

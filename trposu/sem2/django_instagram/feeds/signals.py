@@ -54,5 +54,5 @@ def update_image(sender, instance, **kwargs):
     is_new = old_image != instance.profile_pic
     if is_new:
         instance.is_update_image = True
-        if os.path.isfile(old_image.path):
+        if old_image and os.path.isfile(old_image.path):
             os.remove(old_image.path)

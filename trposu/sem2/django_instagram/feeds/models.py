@@ -3,6 +3,19 @@ from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import User
 from django.contrib.staticfiles.storage import staticfiles_storage
+from django.urls import reverse
+
+
+def get_user_absolute_url(self):
+    return reverse('profile', args=[self.username])
+
+
+def get_user_str(self):
+    return f'@{self.username} {self.first_name} {self.last_name}'
+
+
+User.add_to_class("__str__", get_user_str)
+User.add_to_class("get_absolute_url", get_user_absolute_url)
 
 
 class Profile(models.Model):
@@ -68,6 +81,9 @@ class Profile(models.Model):
     def get_number_of_following(self):
         return self.following.count()
 
+    def get_absolute_url(self):
+        return reverse('profile', args=[self.user.username])
+
     def __str__(self):
         return self.user.username
 
@@ -112,7 +128,13 @@ class Post(models.Model):
     def get_str_time(self):
         days = (datetime.now().astimezone() - self.created).days
         if days == 0:
-            return 'Сегодня'
+            seconds = (datetime.now().astimezone() - self.created).seconds
+            if seconds < 60:
+                return f'{seconds} сек.'
+            elif 0 < seconds // 60 < 60:
+                return f'{seconds // 60} мин.'
+            else:
+                return f'{seconds // 60 // 60} ч.'
         elif days == 1:
             return 'Вчера'
         elif days == 2:
@@ -125,6 +147,9 @@ class Post(models.Model):
 
     def get_num_of_comments(self):
         return self.comment_set.count()
+
+    def is_user_liked(self, user):
+        return self.like_set.filter(user=user).exists()
 
     def __str__(self):
         return f'{self.user_profile}, {self.created}'
@@ -171,7 +196,7 @@ class Like(models.Model):
     )
 
     def __str__(self):
-        return 'Лайк: ' + self.user.username + ' ' + self.post.title
+        return f'Лайк {self.user.username} на пост {self.post.user_profile} #{self.post.pk}'
 
     class Meta:
         unique_together = ("post", "user")

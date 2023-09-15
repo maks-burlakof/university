@@ -1,0 +1,22 @@
+{% extends 'base_generic.html' %}
+{% load static custom_tags %}
+{% block extrastyle %}
+   <style>
+   .container {
+       @media(min-width: 1200px) {
+           max-width: 1100px;
+       }
+   }
+   </style>
+{% endblock %}
+{% block content %}
+	<div class="d-flex justify-content-center align-items-center mb-3">
+      <a href="{% url 'explore' %}" class="btn text-bg-gray rounded-pill {% block explore-posts-border %}border border-secondary{% endblock %} me-2">Публикации</a>
+      <a href="#" class="btn text-bg-gray rounded-pill {% block explore-users-border %}{% endblock %}">Профили</a>
+   </div>
+   <div class="row g-2">
+      {% for post in posts %}
+         {% include 'includes/post_only_image.html' %}
+      {% endfor %}
+   </div>
+{% endblock %}

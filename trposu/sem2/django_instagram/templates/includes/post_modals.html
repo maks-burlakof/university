@@ -1,0 +1,33 @@
+<div class="modal fade" id="post-modal" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-body list-group text-center p-0">
+         <a href="#" class="list-group-item list-group-item-action">Добавить в избранное</a>
+         <a href="#" class="list-group-item list-group-item-action">Перейти к публикации</a>
+         <a href="#" class="list-group-item list-group-item-action">Поделиться...</a>
+         <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Отмена</button>
+      </div>
+      <input id="post-details-id" type="hidden" name="post-details-id" value="">
+   </div>
+</div>
+<script>
+    // Modals
+    let postModal = document.getElementById('post-modal');
+    if (postModal) {
+        postModal.addEventListener('show.bs.modal', event => {
+            let postButton = event.relatedTarget;
+            let postId = postButton.getAttribute('data-bs-whatever');
+            let formIdInput = postModal.querySelector('#post-details-id');
+            formIdInput.value = `${postId}`;
+        })
+    }
+
+    // Likes
+    $('.submit-like').on('click', function() {
+    {% if user.is_authenticated %}
+        pressLike.call(this);
+    {% else %}
+        let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+        loginModal.show();
+    {% endif %}
+    });
+</script>

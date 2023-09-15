@@ -84,6 +84,14 @@
       {% endfor %}
    </div>
 {% endif %}
+<div class="modal fade" id="login-modal" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content modal-body">
+         Войдите в аккаунт
+         <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Отмена</button>
+      </div>
+   </div>
+</div>
 <div class="container mt-5 mb-5">
    <div class="pt-sm-4"></div>
    {% block content %}{% endblock %}

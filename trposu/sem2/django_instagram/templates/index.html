@@ -8,7 +8,16 @@
             {% for post in posts %}
                {% include 'includes/post.html' %}
             {% endfor %}
-            {% include 'includes/post_modal.html' %}
+            {% include 'includes/post_modals.html' %}
+
+            {% if not user.is_authenticated %}
+               <div class="text-muted opacity-50 mt-5">
+                  <h3 class="fw-bold"><i class="fa-solid fa-right-to-bracket fa-rotate-180 me-1"></i> Зарегистрируйтесь или войдите в аккаунт,</h3>
+                  <h4 class="mb-4">чтобы стать частью сообщества!</h4>
+                  <a href="{% url 'register' %}" class="btn text-bg-gray rounded-pill">Зарегистрироваться</a>
+                  <a href="{% url 'login' %}" class="btn text-bg-gray rounded-pill">Войти</a>
+               </div>
+            {% endif %}
          {% else %}
             <div class="text-muted opacity-50 p-4">
                <h1 class="fw-bold" style="font-size: 4.5rem">Ой ой <i class="fa-regular fa-face-frown-open ms-1"></i></h1>
@@ -33,22 +42,28 @@
                <a href="{% url 'logout' %}" class="text-muted"><i class="fa-solid fa-arrows-rotate"></i></a>
             </div>
 
-            <div class="d-flex justify-content-between align-items-center mb-2">
-               <a href="#" class="common-link text-muted fw-bold">Рекомендации для вас <i class="fa-solid fa-angle-right small"></i></a>
-            </div>
-
-            <div class="d-flex justify-content-between align-items-center mb-4">
-               <div class="d-flex align-items-center">
-                  <img src="{% static 'img/profile_default.jpg' %}" class="me-3" style="width: 45px; height: 45px; border-radius: 50%;">
-                  <div>
-                     <p class="fw-bold mb-0">{{ user.username }}</p>
-                     <p class="text-muted small mb-0">{{ user.first_name }} {{ user.last_name }}</p>
-                  </div>
+            {% if recommended_users %}
+               <div class="d-flex justify-content-between align-items-center mb-2">
+                  <a href="#" class="common-link text-muted fw-bold">Рекомендации для вас <i class="fa-solid fa-angle-right small"></i></a>
                </div>
-               <a href="#"><i class="fa-solid fa-user-plus"></i></a>
-            </div>
 
-            <div style="font-size: 0.8em; color: rgb(204,204,204)" class="pt-2">
+               {% for person in recommended_users %}
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                     <div class="d-flex align-items-center">
+                        <a href="{{ person.get_absolute_url }}">
+                           <img src="{{ person.profile.get_profile_pic }}" class="profile-photo me-3" style="width: 45px; height: 45px;">
+                        </a>
+                        <div>
+                           <a class="common-link fw-bold mb-0" href="{{ person.get_absolute_url }}">{{ person.username }}</a>
+                           <p class="text-muted small mb-0">{{ person.first_name }} {{ person.last_name }}</p>
+                        </div>
+                     </div>
+                     <a href="#"><i class="fa-solid fa-user-plus"></i></a>
+                  </div>
+               {% endfor %}
+            {% endif %}
+
+            <div style="font-size: 0.8em; color: rgb(204,204,204)" class="mt-4">
                <span><a href="{% url 'docs-index' %}" class="common-link">Информация</a> · </span>
                <span><a href="#" class="common-link">Рейтинг аккаунтов</a> · </span>
                <span><a href="#" class="common-link">Хэштэги</a> · </span>

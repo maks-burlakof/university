@@ -21,11 +21,15 @@
                <span><i class="fa-solid fa-at"></i></span>
                <span>{{ person.username }}</span>
             </div>
-            {% block profile_buttons %}{% endblock %}
+            <div>
+               {% block profile_buttons %}
+                  <span data-user-id="{{ person.id }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+               {% endblock %}
+            </div>
          </div>
          <div class="d-flex align-items-center mb-4">
-            <span class="lh-sm me-5"><strong>x</strong> публикаций</span>
-            <span class="lh-sm me-5"><strong>{{ num_of_followers }}</strong> {{ num_of_followers|ru_plural:"подписчик,подписчика,подписчиков" }}</span>
+            <span class="lh-sm me-5"><strong>{{ posts|length }}</strong> {{ posts|length|ru_plural:"публикация,публикации,публикаций" }}</span>
+            <span class="lh-sm me-5"><strong id="followers-count">{{ num_of_followers }}</strong> {{ num_of_followers|ru_plural:"подписчик,подписчика,подписчиков" }}</span>
             <span class="lh-sm"><strong>{{ num_of_following }}</strong> {{ num_of_following|ru_plural:"подписка,подписок,подписок" }}</span>
          </div>
          <div>
@@ -60,4 +64,16 @@
          {% include 'includes/post_only_image.html' %}
       {% endfor %}
    </div>
+{% endblock %}
+{% block extrajs %}
+<script>
+    $('.submit-follow').on('click', function() {
+        {% if user.is_authenticated %}
+            pressFollow.call(this);
+        {% else %}
+            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+            loginModal.show();
+        {% endif %}
+    });
+</script>
 {% endblock %}
