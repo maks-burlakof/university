@@ -148,3 +148,27 @@ function pressCommentDelete() {
         }
     });
 }
+
+function qrCodeGenerator(url) {
+    let qrElement = document.querySelector('#share-qr');
+    let qrUrlElement =document.querySelector('#share-qr-url');
+
+    $.ajax({
+        type: "GET",
+        url: '/ajax/qr/',
+        data: {
+            text: url,
+        },
+        success: function(response) {
+            if (response.is_success) {
+                qrElement.innerHTML = `<img src="data:image/png;base64, ${response.qr_image_base64}">`;
+                qrUrlElement.value = url;
+            } else {
+                console.error(response.message);
+            }
+        },
+        error: function(response) {
+            console.error(response);
+        }
+    });
+}

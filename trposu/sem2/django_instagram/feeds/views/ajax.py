@@ -122,3 +122,25 @@ def comment_delete(request):
         'message': message,
     }
     return JsonResponse(response)
+
+
+def qr_code_generator(request):
+    import qrcode
+    from PIL import Image
+    from io import BytesIO
+    import base64
+
+    qr_text = request.GET.get('text')
+    qr_image = qrcode.make(qr_text, box_size=15)
+    qr_image_pil = qr_image.get_image()
+
+    stream = BytesIO()
+    qr_image_pil.save(stream, format='PNG')
+    qr_image_data = stream.getvalue()
+    qr_image_base64 = base64.b64encode(qr_image_data).decode('utf-8')
+
+    response = {
+        'is_success': True,
+        'qr_image_base64': qr_image_base64,
+    }
+    return JsonResponse(response)

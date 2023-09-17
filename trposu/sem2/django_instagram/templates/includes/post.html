@@ -29,7 +29,7 @@
       </div>
       <div class="post-buttons-flex">
          <span class="me-3">
-            <i class="fa-solid fa-arrow-up-from-bracket"></i>
+            <a class="common-link fw-bold lh-1" data-bs-toggle="modal" data-bs-target="#post-share-modal" data-type="post" data-pk="{{ post.pk }}"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
          </span>
          <span>
             <i class="fa-regular fa-bookmark submit-bookmark {% if post.is_bookmark %}bookmark-marked{% endif %}"></i>

@@ -10,11 +10,11 @@ urlpatterns = [
     path('', views.index, name='index'),
     path('post/<int:post_pk>/', views.post, name='post'),
     path('profile/', views.profile, name='my-profile'),
-    path('profile/<str:username>', views.profile, name='profile'),
+    path('profile/<str:username>/', views.profile, name='profile'),
     path('explore/', views.explore, name='explore'),
     path('explore/users/', views.explore_users, name='explore-users'),
-    path('followers/<str:username>', views.followers, name='followers'),
-    path('following/<str:username>', views.following, name='following'),
+    path('followers/<str:username>/', views.followers, name='followers'),
+    path('following/<str:username>/', views.following, name='following'),
     path('profile/edit/info/', views.profile_settings_info, name='profile-settings'),
     path('profile/edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
     path('post-create/', views.post_picture, name='post-create'),
@@ -39,6 +39,7 @@ urlpatterns = [
     path('ajax/follow/', ajax.follow),
     path('ajax/comment/delete/', ajax.comment_delete),
     path('ajax/bookmark/', ajax.bookmark),
+    path('ajax/qr/', ajax.qr_code_generator),
 ]
 
 if settings.DEBUG:

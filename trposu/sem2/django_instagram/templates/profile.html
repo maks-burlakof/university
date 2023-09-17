@@ -24,8 +24,9 @@
             <div class="float-end">
                {% block profile_buttons %}
                   <span data-user-id="{{ person.id }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
-                  {% block recommended-users-button %}
+                  {% block important-users-button %}
                      <button id="buttonRecommendedPeople" class="btn btn-sm rounded-pill text-bg-gray" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRecommendedPeople" aria-expanded="false" aria-controls="collapseRecommendedPeople"><i class="fa-solid fa-user-plus"></i></button>
+                     <a class="btn btn-sm rounded-pill text-bg-gray" data-bs-toggle="modal" data-bs-target="#post-share-modal" data-type="user" data-username="{{ person.username }}"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
                   {% endblock %}
                {% endblock %}
             </div>
@@ -85,6 +86,7 @@
          {% include 'includes/post_only_image.html' %}
       {% endfor %}
    </div>
+   {% include 'includes/post_modals.html' %}
 {% endblock %}
 {% block extrajs %}
 <script>
