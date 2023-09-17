@@ -2,7 +2,7 @@
    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content modal-body list-group text-center p-0">
          <a href="#" class="list-group-item list-group-item-action">Добавить в избранное</a>
-         <a href="#" class="list-group-item list-group-item-action">Перейти к публикации</a>
+         <a id="post-details-url" href="#" class="list-group-item list-group-item-action">Перейти к публикации</a>
          <a href="#" class="list-group-item list-group-item-action">Поделиться...</a>
          <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Отмена</button>
       </div>
@@ -16,18 +16,32 @@
         postModal.addEventListener('show.bs.modal', event => {
             let postButton = event.relatedTarget;
             let postId = postButton.getAttribute('data-bs-whatever');
+            // Hidden input
             let formIdInput = postModal.querySelector('#post-details-id');
             formIdInput.value = `${postId}`;
+            // Go to publication
+            let formPostUrl = postModal.querySelector('#post-details-url');
+            formPostUrl.href = `/post/${postId}/`;
         })
     }
 
     // Likes
     $('.submit-like').on('click', function() {
-    {% if user.is_authenticated %}
-        pressLike.call(this);
-    {% else %}
-        let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
-        loginModal.show();
-    {% endif %}
+        {% if user.is_authenticated %}
+            pressLike.call(this);
+        {% else %}
+            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+            loginModal.show();
+        {% endif %}
+    });
+
+    // Bookmarks
+    $('.submit-bookmark').on('click', function() {
+        {% if user.is_authenticated %}
+            pressBookmark.call(this);
+        {% else %}
+            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+            loginModal.show();
+        {% endif %}
     });
 </script>

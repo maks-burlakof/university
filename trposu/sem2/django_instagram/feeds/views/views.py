@@ -5,16 +5,31 @@ from django.db.models import Q
 from django.shortcuts import render, redirect
 from django.utils.safestring import mark_safe
 
-from feeds.models import Profile, Post, Like
-from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm
+from feeds.models import Profile, Post, Like, Comment
+from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm
 
 POSTS_ON_PAGE = 30
 
 
 def add_posts_likes(user: User, posts):
     if user.is_authenticated:
-        for post in posts:
-            post.is_liked = post.is_user_liked(user)
+        if type(posts) == Post:
+            posts.is_liked = posts.is_user_liked(user)
+            posts.is_bookmark = posts.is_user_bookmarks(user)
+        else:
+            for post in posts:
+                post.is_liked = post.is_user_liked(user)
+                post.is_bookmark = post.is_user_bookmarks(user)
+
+
+def get_recommended_users(request, user_exclude=None):
+    id_list = []
+    if request.user.is_authenticated:
+        id_list = [request.user.pk]
+        if user_exclude:
+            id_list.append(user_exclude)
+
+    return User.objects.filter(profile__is_allow_recommends=True).exclude(pk__in=id_list).select_related('profile').order_by('?')
 
 
 def index(request):
@@ -27,10 +42,10 @@ def index(request):
             is_archived=False,
         ).select_related('user_profile', 'user_profile__user').prefetch_related('like_set').order_by('-created')[:POSTS_ON_PAGE]
         add_posts_likes(user, posts)
-        recommended_users = User.objects.all().exclude(pk=user.pk).select_related('profile').order_by('?')[:5]
     else:
-        posts = Post.objects.all().select_related('user_profile', 'user_profile__user').order_by('?')[:POSTS_ON_PAGE]
-        recommended_users = User.objects.all().select_related('profile').order_by('?')[:5]
+        posts = Post.objects.filter(is_archived=False).select_related('user_profile', 'user_profile__user').order_by('?')[:POSTS_ON_PAGE]
+
+    recommended_users = get_recommended_users(request)[:5]
 
     context = {
         'posts': posts,
@@ -41,12 +56,21 @@ def index(request):
 
 
 def explore(request):
-    random_posts = Post.objects.all().order_by('?')[:40]
+    random_posts = Post.objects.filter(is_archived=False).order_by('?')[:40]
 
     context = {
-        'posts': random_posts
+        'posts': random_posts,
     }
     return render(request, 'explore.html', context)
+
+
+def explore_users(request):
+    random_users = get_recommended_users(request)[:40]
+
+    context = {
+        'users': random_users,
+    }
+    return render(request, 'explore_users.html', context)
 
 
 def profile(request, username=None):
@@ -65,12 +89,20 @@ def profile(request, username=None):
             return redirect('index')
         template_name = 'profile.html'
 
+    if request.user.is_authenticated:
+        is_following = request.user.profile.following.filter(user=user).exists()
+    else:
+        is_following = False
+
+    recommended_users = get_recommended_users(request, user.pk)[:6]
+
     context = {
         'person': user,
         'num_of_followers': user.profile.get_number_of_followers(),
         'num_of_following': user.profile.get_number_of_following(),
-        'is_following': request.user.profile.following.filter(user=user).exists(),
-        'posts': Post.objects.filter(user_profile=user.profile, is_archived=False),
+        'is_following': is_following,
+        'posts': Post.objects.filter(user_profile=user.profile, is_archived=False).order_by('-created'),
+        'recommended_users': recommended_users,
     }
     return render(request, template_name, context)
 
@@ -161,16 +193,40 @@ def post_picture(request):
     return render(request, 'post_create.html', context)
 
 
-def post(request, pk):
-    post = Post.objects.get(pk=pk)
+def post(request, post_pk):
+    post = Post.objects.get(pk=post_pk)
     if not post:
+        messages.warning(request, f'Такой публикации не существует или она была удалена')
         return redirect('index')
 
-    liked = Like.objects.filter(post=post, user=request.user).exists()
+    if request.user.is_authenticated:
+        add_posts_likes(request.user, post)
+        is_following = request.user.profile.following.filter(user=post.user_profile.user).exists()
+    else:
+        is_following = False
+
+    other_posts = Post.objects.filter(user_profile=request.user.profile, is_archived=False).exclude(pk=post.pk)[:6]
+
+    if request.method == 'POST':
+        comment_form = CommentForm(request.POST)
+        if comment_form.is_valid():
+            comment = Comment.objects.create(
+                post=post,
+                user=request.user,
+                comment=comment_form.cleaned_data.get('comment'),
+            )
+            return redirect('post', post.pk)
+        else:
+            messages.error(request, 'Не получилось добавить комментарий. Попробуй еще раз.')
+    else:
+        comment_form = CommentForm()
 
     context = {
         'post': post,
-        'liked': liked,
+        'other_posts': other_posts,
+        'comments': post.comment_set.all().order_by('-created'),
+        'is_following': is_following,
+        'comment_form': comment_form,
     }
     return render(request, 'post.html', context)
 

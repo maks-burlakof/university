@@ -12,18 +12,21 @@
 {% endblock %}
 {% block content %}
    <div class="row pt-sm-3 mb-5">
-      <div class="col-3 col-lg-2 col-xl-2 offset-lg-1 pe-xl-4 me-2 me-sm-4">
-         <img src="{{ person.profile.get_profile_pic }}" class="profile-photo img-fluid">
+      <div class="col-3 col-lg-2 col-xl-2 me-2 me-sm-4 me-lg-5">
+         <img src="{{ person.profile.get_profile_pic }}" class="profile-photo w-100">
       </div>
-      <div class="col-8 col-lg-8 col-xl-7">
+      <div class="col-8 col-lg-8 col-xl-9">
          <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="align-items-center fs-3 fw-bold">
                <span><i class="fa-solid fa-at"></i></span>
                <span>{{ person.username }}</span>
             </div>
-            <div>
+            <div class="float-end">
                {% block profile_buttons %}
                   <span data-user-id="{{ person.id }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+                  {% block recommended-users-button %}
+                     <button id="buttonRecommendedPeople" class="btn btn-sm rounded-pill text-bg-gray" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRecommendedPeople" aria-expanded="false" aria-controls="collapseRecommendedPeople"><i class="fa-solid fa-user-plus"></i></button>
+                  {% endblock %}
                {% endblock %}
             </div>
          </div>
@@ -34,15 +37,33 @@
          </div>
          <div>
             <p class="fw-medium fs-5 mb-0">{{ person.first_name }} {{ person.last_name }}</p>
-            {% if person_profile.site_url %}
+            {% if person.profile.site_url %}
                <div class="mb-1">
                   <i class="fa-solid fa-link text-muted small"></i>
-                  <a href="{{ person_profile.site_url }}" class="small">{{ person_profile.site_url }}</a>
+                  <a href="{{ person.profile.site_url }}" class="small">{{ person.profile.site_url }}</a>
                </div>
             {% endif %}
-            {% if person_profile.description %}
-               <p class="small">{{ person_profile.description }}</p>
+            {% if person.profile.description %}
+               <p class="small">{{ person.profile.description }}</p>
             {% endif %}
+         </div>
+      </div>
+   </div>
+   <div class="collapse" id="collapseRecommendedPeople">
+      <div class="pb-3">
+         <h6 class="text-muted mb-2">Рекомендуемые</h6>
+         <div class="row row-cols-3 row-cols-md-4 row-cols-lg-6 g-2">
+            {% for recommended_user in recommended_users %}
+               <div class="col">
+                  <div class="card card-body rounded-4 h-100">
+                     <a href="{{ recommended_user.get_absolute_url }}" class="common-link text-center">
+                        <img src="{{ recommended_user.profile.get_profile_pic }}" class="profile-photo mb-3" style="width: 80px; height: 80px;">
+                        <p class="fw-bold mb-0">{{ recommended_user.username }}</p>
+                        <p class="text-muted mb-0 limit-str" style="--num-lines: 1;">{{ recommended_user.first_name }} {{ recommended_user.last_name }}</p>
+                     </a>
+                  </div>
+               </div>
+            {% endfor %}
          </div>
       </div>
    </div>
@@ -67,13 +88,14 @@
 {% endblock %}
 {% block extrajs %}
 <script>
-    $('.submit-follow').on('click', function() {
-        {% if user.is_authenticated %}
-            pressFollow.call(this);
-        {% else %}
-            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
-            loginModal.show();
-        {% endif %}
+    $('#buttonRecommendedPeople').on('click', function() {
+        if (this.classList.contains('recommended-pressed')) {
+            this.innerHTML = '<i class="fa-solid fa-user-plus"></i>';
+            this.classList.remove('recommended-pressed');
+        } else {
+            this.innerHTML = '<i class="fa-solid fa-user-slash"></i>';
+            this.classList.add('recommended-pressed');
+        }
     });
 </script>
 {% endblock %}

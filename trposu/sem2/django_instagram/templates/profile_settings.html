@@ -76,13 +76,22 @@
                      </div>
                   </div>
                </div>
-               <div class="mb-3 row">
+               <div class="mb-4 row">
                   <label for="id_gender" class="fw-bold col-sm-2 col-form-label">Пол</label>
                   <div class="col-sm-10">
                      <div>
                         {{ profile_form.gender }}
                      </div>
                      <span class="form-input-description">Эта информация не будет показываться в вашем общедоступном профиле.</span>
+                  </div>
+               </div>
+               <div class="mb-3 row">
+                  <label for="id_is_allow_recommends" class="fw-bold col-sm-4 col-form-label">Рекомендовать ваш профиль</label>
+                  <div class="col-sm-8">
+                     <div class="form-check form-switch">
+                        {{ profile_form.is_allow_recommends }}
+                     </div>
+                     <span class="form-input-description">Рекомендовать ваш профиль другим пользователям.</span>
                   </div>
                </div>
 

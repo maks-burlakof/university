@@ -2,9 +2,17 @@
 {% load static %}
 {% block title %}Вход в Instagram{% endblock %}
 {% block navbar %}{% endblock %}
+{% block extrastyle %}
+   <link rel="stylesheet" href="{% static 'css/blobs.css' %}">
+   <style>
+      body {
+          overflow-x: hidden;
+      }
+   </style>
+{% endblock %}
 {% block content %}
    <div class="row">
-      <div class="col-7 d-md-none d-lg-block">
+      <div class="col-6 col-xl-7 d-none d-lg-block">
          <div class="mobile-slider" style="background-image: url({% static 'img/home-phones.png' %})">
             <img class="mobile-slider-img1" src="{% static 'img/screenshot1.png' %}" />
             <img class="mobile-slider-img2" src="{% static 'img/screenshot2.png' %}" />
@@ -12,10 +20,13 @@
             <img class="mobile-slider-img4" src="{% static 'img/screenshot4.png' %}" />
          </div>
       </div>
-      <div class="col-5">
-         <div class="card shadow my-3 mx-4">
-            <div class="card-body p-md-5">
-               <img class="d-block mx-auto mb-3" src="{% static 'img/instagram_logo.png' %}" width="200" />
+      <div class="col-md-8 col-lg-6 col-xl-5 offset-md-2 offset-lg-0">
+         <div class="square twitter">
+            <span></span>
+            <span></span>
+            <span></span>
+            <div class="content">
+               <img class="d-block mx-auto mb-3 mt-2" src="{% static 'img/instagram_logo.png' %}" width="200" />
                {% if form.non_field_errors %}
                   {% include 'includes/form_non_field_errors.html' %}
                {% endif %}
@@ -39,16 +50,16 @@
                         <label for="id_remember_me" class="ms-1">Запомнить меня</label>
                      </div>
                   </div>
-                  <button type="submit" class="btn btn-primary rounded-pill w-100">Войти</button>
+                  <button type="submit" class="btn btn-primary rounded-pill w-100 mb-5">Войти</button>
                </form>
             </div>
          </div>
 
-         <div class="card shadow mt-4 mx-4">
-            <div class="card-body p-md-4">
+         <div class="card shadow rounded-5 mt-3 mx-sm-4">
+            <div class="card-body p-4">
                <p class="text-center mb-2">
                   Нет аккаунта?
-                  <a href="{% url 'register' %}" class="btn btn-primary btn-sm rounded-pill ms-2">Зарегистрируйтесь!</a>
+                  <a href="{% url 'register' %}" class="btn btn-primary btn-sm rounded-pill ms-2 px-3">Зарегистрируйтесь!</a>
                </p>
                <p class="text-center mb-0"><a href="#" class="small">Забыли пароль?</a></p>
             </div>

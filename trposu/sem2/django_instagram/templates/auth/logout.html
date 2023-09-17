@@ -1,4 +1,10 @@
 {% extends 'base_generic.html' %}
+{% load static %}
 {% block content %}
-   <a href="{% url 'login' %}">Войти снова</a>
+   <div class="mx-auto text-center text-muted mt-5">
+      <img class="d-block mx-auto mb-1" src="{% static 'img/logout.png' %}" width="400" />
+      <p class="fs-2 opacity-50 fw-bold">Вы вышли из аккаунта</p>
+      <a href="{% url 'login' %}" class="btn text-bg-gray rounded-pill">Войти снова</a>
+   </div>
 {% endblock %}
+{% block footer %}{% endblock %}

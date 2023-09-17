@@ -1,4 +1,3 @@
-{% load custom_tags %}
 <div class="card post-card mb-4">
    <div class="card-header">
       <div class="d-flex justify-content-between align-items-center">
@@ -21,17 +20,19 @@
             <i class="fa-regular fa-heart submit-like {% if post.is_liked %}like-liked{% endif %}"></i>
             <span class="like-count">{{ post.get_num_of_likes|default:"" }}</span>
          </span>
-         <span class="ms-3">
-            <i class="fa-regular fa-comment"></i>
-            <span class="comment-count">{{ post.get_num_of_comments|default:"" }}</span>
-         </span>
+         {% if post.is_allow_comments %}
+            <a href="{{ post.get_absolute_url }}" class="d-flex ms-3">
+               <span><i class="fa-regular fa-comment"></i></span>
+               <span class="comment-count">{{ post.get_num_of_comments|default:"" }}</span>
+            </a>
+         {% endif %}
       </div>
       <div class="post-buttons-flex">
          <span class="me-3">
             <i class="fa-solid fa-arrow-up-from-bracket"></i>
          </span>
          <span>
-            <i class="fa-regular fa-bookmark"></i>
+            <i class="fa-regular fa-bookmark submit-bookmark {% if post.is_bookmark %}bookmark-marked{% endif %}"></i>
          </span>
       </div>
    </section>

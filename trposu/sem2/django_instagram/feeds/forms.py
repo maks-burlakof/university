@@ -147,18 +147,23 @@ class UpdateProfileForm(forms.ModelForm):
         choices=[('', 'Не указывать'), ('m', 'Мужской'), ('w', 'Женский')],
         widget=forms.Select(attrs={'class': 'form-select'})
     )
+    is_allow_recommends = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
 
     class Meta:
         model = Profile
-        fields = ['profile_pic', 'description', 'site_url', 'gender']
+        fields = ['profile_pic', 'description', 'site_url', 'gender', 'is_allow_recommends']
 
 
 class CommentForm(forms.ModelForm):
     comment = forms.CharField(
-        max_length=100,
+        max_length=256,
         required=True,
-        widget=forms.TextInput(attrs={'class': 'form-control',
-                                      'placeholder': 'Комментарий'})
+        widget=forms.Textarea(attrs={'class': 'form-control',
+                                     'style': 'height: 2rem; font-size: .8rem;',
+                                     'placeholder': 'Добавьте комментарий...'})
     )
 
     class Meta:
@@ -168,7 +173,7 @@ class CommentForm(forms.ModelForm):
 
 class PostPictureForm(forms.ModelForm):
     title = forms.CharField(
-        max_length=256,
+        max_length=512,
         required=False,
         widget=forms.Textarea(attrs={'class': 'form-control',
                                      'style': 'height: 10rem;',

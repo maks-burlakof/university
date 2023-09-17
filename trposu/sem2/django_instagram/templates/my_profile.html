@@ -1,6 +1,7 @@
 {% extends 'profile.html' %}
 {% block profile_buttons %}
    <a href="{% url 'profile-settings' %}" class="btn btn-sm text-bg-gray rounded-pill">Редактировать</a>
+   {% block recommended-users-button %}{{ block.super }}{% endblock %}
    <a href="{% url 'logout' %}" class="btn btn-sm text-bg-gray rounded-pill"><i class="fa-solid fa-right-from-bracket"></i></a>
 {% endblock %}
 {% block post_links %}

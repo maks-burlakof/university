@@ -19,10 +19,12 @@ function AddBsError(fieldStrId, errorMsg) {
 function changeCountText(is_add, is_zero, element) {
     let initialCount = isNaN(parseInt(element.innerText)) ? 0 : parseInt(element.innerText);
     let finalCount = is_add? initialCount + 1 : initialCount - 1;
-    if (is_zero) {
-        element.innerText = finalCount;
-    } else {
-        element.innerText = finalCount ? finalCount : "";
+    if (element) {
+        if (is_zero) {
+            element.innerText = finalCount;
+        } else {
+            element.innerText = finalCount ? finalCount : "";
+        }
     }
 }
 
@@ -82,6 +84,61 @@ function pressFollow() {
                     followElem.innerText = "Подписка";
                     changeCountText(true, true, followersCountElem);
                 }
+            } else {
+                console.error(response.message);
+            }
+        },
+        error: function(response) {
+            console.error(response);
+        }
+    });
+}
+
+function pressBookmark() {
+    let bookmarkElem = this;
+    let postId = bookmarkElem.parentNode.parentNode.parentNode.dataset.postId;
+    let isMarked = bookmarkElem.classList.contains('bookmark-marked');
+
+    $.ajax({
+        type: "GET",
+        url: '/ajax/bookmark/',
+        data: {
+            action: isMarked ? 'remove' : 'add',
+            post: postId,
+        },
+        success: function(response) {
+            if (response.is_success) {
+                let bookmarkCountElem = bookmarkElem.parentNode.querySelector('.bookmark-count');
+                if (isMarked) {
+                    bookmarkElem.classList.remove('bookmark-marked');
+                    changeCountText(false, false, bookmarkCountElem);
+                } else {
+                    bookmarkElem.classList.add('bookmark-marked');
+                    changeCountText(true, false, bookmarkCountElem);
+                }
+            } else {
+                console.error(response.message);
+            }
+        },
+        error: function(response) {
+            console.error(response);
+        }
+    });
+}
+
+function pressCommentDelete() {
+    let commentElem = this;
+    let commentId = commentElem.dataset.commentId;
+
+    $.ajax({
+        type: "GET",
+        url: '/ajax/comment/delete/',
+        data: {
+            comment: commentId,
+        },
+        success: function(response) {
+            if (response.is_success) {
+                location.reload();
             } else {
                 console.error(response.message);
             }

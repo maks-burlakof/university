@@ -18,6 +18,26 @@ User.add_to_class("__str__", get_user_str)
 User.add_to_class("get_absolute_url", get_user_absolute_url)
 
 
+def get_str_time(self):
+    days = (datetime.now().astimezone() - self.created).days
+    if days == 0:
+        seconds = (datetime.now().astimezone() - self.created).seconds
+        if 0 <= seconds < 5:
+            return 'только что'
+        if seconds < 60:
+            return f'{seconds} сек.'
+        elif 0 < seconds // 60 < 60:
+            return f'{seconds // 60} мин.'
+        else:
+            return f'{seconds // 60 // 60} ч.'
+    elif days == 1:
+        return 'Вчера'
+    elif days == 2:
+        return 'Позавчера'
+    else:
+        return f'{days} дн.'
+
+
 class Profile(models.Model):
     is_update_image = False
 
@@ -39,6 +59,12 @@ class Profile(models.Model):
         related_name="following_profile",
         blank=True,
         verbose_name='Подписки',
+    )
+    bookmarks = models.ManyToManyField(
+        to='Post',
+        related_name="bookmarks_profile",
+        blank=True,
+        verbose_name='Сохраненное',
     )
     profile_pic = models.ImageField(
         upload_to=img_path,
@@ -62,6 +88,10 @@ class Profile(models.Model):
         null=True,
         blank=True,
         verbose_name='Пол',
+    )
+    is_allow_recommends = models.BooleanField(
+        default=True,
+        verbose_name='Рекомендовать профиль',
     )
 
     def save(self, *args, **kwargs):
@@ -102,7 +132,7 @@ class Post(models.Model):
         verbose_name='Пользователь',
     )
     title = models.CharField(
-        max_length=256,
+        max_length=512,
         blank=True,
         null=True,
         verbose_name='Описание',
@@ -126,21 +156,7 @@ class Post(models.Model):
     )
 
     def get_str_time(self):
-        days = (datetime.now().astimezone() - self.created).days
-        if days == 0:
-            seconds = (datetime.now().astimezone() - self.created).seconds
-            if seconds < 60:
-                return f'{seconds} сек.'
-            elif 0 < seconds // 60 < 60:
-                return f'{seconds // 60} мин.'
-            else:
-                return f'{seconds // 60 // 60} ч.'
-        elif days == 1:
-            return 'Вчера'
-        elif days == 2:
-            return 'Позавчера'
-        else:
-            return f'{days} дн.'
+        return get_str_time(self)
 
     def get_num_of_likes(self):
         return self.like_set.count()
@@ -148,8 +164,17 @@ class Post(models.Model):
     def get_num_of_comments(self):
         return self.comment_set.count()
 
+    def get_num_of_bookmarks(self):
+        return self.bookmarks_profile.count()
+
     def is_user_liked(self, user):
         return self.like_set.filter(user=user).exists()
+
+    def is_user_bookmarks(self, user):
+        return self.bookmarks_profile.filter(user=user).exists()
+
+    def get_absolute_url(self):
+        return reverse('post', args=[self.pk])
 
     def __str__(self):
         return f'{self.user_profile}, {self.created}'
@@ -169,13 +194,16 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
     )
     comment = models.CharField(
-        max_length=100,
+        max_length=256,
     )
     created = models.DateTimeField(
         auto_now_add=True,
         auto_now=False,
         verbose_name='Дата создания',
     )
+
+    def get_str_time(self):
+        return get_str_time(self)
 
     def __str__(self):
         return self.comment

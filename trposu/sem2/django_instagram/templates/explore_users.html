@@ -1,0 +1,20 @@
+{% extends 'explore.html' %}
+{% block explore-posts-border %}{% endblock %}
+{% block explore-users-border %}border border-secondary{% endblock %}
+{% block explore-content %}
+   <div class="row row-cols-2 g-5">
+      {% for recommended_user in users %}
+         <div class="col d-flex align-items-center">
+            <a href="{{ recommended_user.get_absolute_url }}">
+               <img src="{{ recommended_user.profile.get_profile_pic }}" class="profile-photo" style="width: 110px; height: 110px;">
+            </a>
+            <div class="ms-4">
+               <a href="{{ recommended_user.get_absolute_url }}" class="fs-5 fw-bold common-link mb-0">{{ recommended_user.username }}</a>
+               <p class="mb-0 limit-str" style="--num-lines: 1;">{{ recommended_user.first_name }} {{ recommended_user.last_name }}</p>
+               <p class="text-muted small mb-2 limit-str" style="--num-lines: 1;">{{ recommended_user.profile.description|default:"" }}</p>
+               <span data-user-id="{{ person.id }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+            </div>
+         </div>
+      {% endfor %}
+   </div>
+{% endblock %}

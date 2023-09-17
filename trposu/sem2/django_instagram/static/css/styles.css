@@ -135,9 +135,36 @@ body a {
     font-weight: 800;
     margin-left: 5px;
 }
-.post-card .post-buttons .like-liked {
+.like-liked {
     color: red;
     font-weight: 900;
+}
+.bookmark-marked {
+    font-weight: 900;
+}
+
+/* Comments */
+.comment-container {
+    display: flex;
+    font-size: .875em;
+    margin-top: 1rem;
+}
+.comment-container .profile-photo {
+    width: 35px;
+    height: 35px;
+    margin-right: 0.5rem;
+}
+.comment-container p {
+    margin-bottom: 0;
+    line-height: 1.25;
+}
+.comment-container .comment-trash {
+    display: none;
+}
+.comment-container:hover .comment-trash {
+    display: inline;
+    color: rgba(33, 37, 41, 0.75);
+    cursor: pointer;
 }
 
 /* Create post */
@@ -169,6 +196,9 @@ body a {
 .follow-followed {
     color: #000!important;
     background-color: #EFEFEF !important;
+}
+.recommended-pressed {
+    background-color: #d7d7d7 !important;
 }
 
 /* Login page */

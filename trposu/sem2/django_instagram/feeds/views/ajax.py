@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
-from feeds.models import Profile, Post, Like
+from feeds.models import Profile, Post, Like, Comment
 
 
 def validate_username(request):
@@ -67,6 +67,55 @@ def follow(request):
             message = str(e)
     else:
         message = "You can't follow yourself"
+
+    response = {
+        'is_success': is_success,
+        'message': message,
+    }
+    return JsonResponse(response)
+
+
+@login_required
+def bookmark(request):
+    post_pk = request.GET.get('post')
+    action = request.GET.get('action')
+    is_success = False
+    message = ""
+    try:
+        post = Post.objects.get(pk=post_pk)
+        if action == "add":
+            request.user.profile.bookmarks.add(post)
+            is_success = True
+        elif action == "remove":
+            request.user.profile.bookmarks.remove(post)
+            is_success = True
+        else:
+            message = "Action is not provided"
+    except Exception as e:
+        message = str(e)
+
+    response = {
+        'is_success': is_success,
+        'message': message,
+    }
+    return JsonResponse(response)
+
+
+@login_required
+def comment_delete(request):
+    comment_pk = request.GET.get('comment')
+    is_success = False
+    message = ""
+
+    try:
+        comment = Comment.objects.get(pk=comment_pk)
+        if comment.user == request.user:
+            comment.delete()
+            is_success = True
+        else:
+            message = "This comment is not yours"
+    except Exception as e:
+        message = str(e)
 
     response = {
         'is_success': is_success,

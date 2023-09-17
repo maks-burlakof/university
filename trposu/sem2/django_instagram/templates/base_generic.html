@@ -98,18 +98,18 @@
 </div>
 {% block footer %}
    <footer class="mb-4">
-      <ul class="d-flex flex-row list-unstyled justify-content-center flex-wrap small">
+      <ul class="d-flex flex-row list-unstyled justify-content-center flex-wrap small opacity-50">
          <li class="mx-3">
-            <a href="{% url 'docs-index' %}" target="_blank" class="text-decoration-none text-secondary">Информация</a>
+            <a href="{% url 'docs-index' %}" target="_blank" class="text-decoration-none text-muted">Информация</a>
          </li>
          <li class="mx-4">
-            <a href="#" target="_blank" class="text-decoration-none text-secondary">Рейтинг аккаунтов</a>
+            <a href="#" target="_blank" class="text-decoration-none text-muted">Рейтинг аккаунтов</a>
          </li>
          <li class="mx-4">
-            <a href="#" target="_blank" class="text-decoration-none text-secondary">Хэштэги</a>
+            <a href="#" target="_blank" class="text-decoration-none text-muted">Хэштэги</a>
          </li>
          <li class="mx-4">
-            <a href="#" target="_blank" class="text-decoration-none text-secondary">Места</a>
+            <a href="#" target="_blank" class="text-decoration-none text-muted">Места</a>
          </li>
          <li class="mx-4 text-secondary">
             <i class="fa-regular fa-copyright"></i> 2023 Instagram from BSUIR
@@ -117,6 +117,19 @@
       </ul>
    </footer>
 {% endblock %}
+<script>
+   $('.submit-follow').on('click', function() {
+        {% if user.is_authenticated %}
+            pressFollow.call(this);
+            if (document.querySelector('#buttonRecommendedPeople')) {
+                $('#buttonRecommendedPeople').click();
+            }
+        {% else %}
+            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+            loginModal.show();
+        {% endif %}
+    });
+</script>
 {% block extrajs %}{% endblock %}
 </body>
 </html>

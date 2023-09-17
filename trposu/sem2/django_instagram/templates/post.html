@@ -1,0 +1,118 @@
+{% extends 'base_generic.html' %}
+{% block title %}Публикация {{ post.user_profile.user.username }} {{ post.title|default:"" }}{% endblock %}
+{% block content %}
+   <div class="row g-5 pt-3 justify-content-center">
+      <div class="col-md-6">
+         <img src="{{ post.image.url }}" class="card-img-top rounded">
+      </div>
+      <div class="col-md-6 col-lg-5 col-xl-4">
+         <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+               <a href="{{ post.user_profile.get_absolute_url }}" class="common-link">
+                  <span class="d-flex align-items-center">
+                     <img src="{{ post.user_profile.get_profile_pic }}" class="profile-photo me-3" style="width: 40px; height: 40px;">
+                     <span>
+                        <p class="fw-bold mb-0">{{ post.user_profile.user.username }}</p>
+                        <p class="small mb-0">{{ post.user_profile.user.first_name }} {{ post.user_profile.user.last_name }}</p>
+                     </span>
+                  </span>
+               </a>
+            </div>
+            {% if user != post.user_profile.user %}
+               <div>
+                  <span data-user-id="{{ post.user_profile.user.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+               </div>
+            {% endif %}
+         </div>
+         <section data-post-id="{{ post.pk }}" class="d-flex align-items-center justify-content-between" style="font-size: 1.31rem;">
+            <div class="d-flex align-items-center">
+               <span>
+                  <i class="fa-regular fa-heart submit-like {% if post.is_liked %}like-liked{% endif %}" style="cursor: pointer"></i>
+                  <span class="like-count">{{ post.get_num_of_likes|default:"" }}</span>
+               </span>
+               {% if post.is_allow_comments %}
+                  <a class="common-link ms-3" href="#id_comment">
+                     <i class="fa-regular fa-comment"></i>
+                     <span class="comment-count">{{ post.get_num_of_comments|default:"" }}</span>
+                  </a>
+               {% endif %}
+            </div>
+            <div class="d-flex align-items-center">
+               <span class="text-muted me-3" style="font-size: .8rem;">{{ post.get_str_time }}</span>
+               <a class="common-link fw-bold me-3" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}"><i class="fa-solid fa-ellipsis-vertical"></i></a>
+               <span class="me-3">
+                  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+               </span>
+               <span>
+                  <i class="fa-regular fa-bookmark submit-bookmark {% if post.is_bookmark %}bookmark-marked{% endif %}" style="cursor: pointer"></i>
+                  <span class="bookmark-count">{{ post.get_num_of_bookmarks|default:"" }}</span>
+               </span>
+            </div>
+         </section>
+         {% if post.title %}
+            <div class="small mt-2">{{ post.title }}</div>
+         {% endif %}
+         <hr>
+         {% if user.is_authenticated %}
+            <form method="post" action="{{ post.get_absolute_url }}" class="mb-4">
+               {% csrf_token %}
+               <div class="input-group">
+                  {{ comment_form.comment }}
+                  <button type="submit" class="input-group-text"><i class="fa-regular fa-paper-plane small"></i></button>
+               </div>
+            </form>
+         {% endif %}
+         {% if post.is_allow_comments %}
+            {% if post.get_num_of_comments == 0 %}
+               <p class="small text-muted">Комментариев пока нет</p>
+            {% endif %}
+            {% for comment in comments %}
+            	<div class="comment-container">
+                  <a href="{{ comment.user.get_absolute_url }}">
+                     <img src="{{ comment.user.profile.profile_pic.url }}" class="profile-photo">
+                  </a>
+                  <div>
+                     <p class="fw-bold">
+                        {{ comment.user.username }}
+                        <span class="text-muted fw-light">· {{ comment.get_str_time }}</span>
+                        {% if user == comment.user %}
+                           <span data-comment-id="{{ comment.pk }}" class="comment-trash"><i class="fa-regular fa-trash-can"></i></span>
+                        {% endif %}
+                     </p>
+                     <p>{{ comment.comment }}</p>
+                  </div>
+               </div>
+            {% endfor %}
+         {% else %}
+            <p class="small text-muted">Комментарии отключены</p>
+         {% endif %}
+      </div>
+
+      {% if other_posts %}
+         <div class="col-12 col-md-12 col-lg-11 col-xl-10">
+            <hr>
+            <p class="text-muted">Ещё публикации от <span class="fw-bold text-body">{{ post.user_profile.user.username }}</span></p>
+            <div class="row g-2">
+               {% for post in other_posts %}
+                  {% include 'includes/post_only_image.html' %}
+               {% endfor %}
+            </div>
+         </div>
+      {% endif %}
+   </div>
+
+   {% include 'includes/post_modals.html' %}
+{% endblock %}
+{% block extrajs %}
+<script>
+    {% if comment_form.errors %}{% for field in comment_form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+
+    $('.comment-trash').on('click', function() {
+        pressCommentDelete.call(this);
+    });
+</script>
+{% endblock %}

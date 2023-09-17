@@ -8,9 +8,11 @@ from . import forms
 
 urlpatterns = [
     path('', views.index, name='index'),
-    path('explore/', views.explore, name='explore'),
+    path('post/<int:post_pk>/', views.post, name='post'),
     path('profile/', views.profile, name='my-profile'),
     path('profile/<str:username>', views.profile, name='profile'),
+    path('explore/', views.explore, name='explore'),
+    path('explore/users/', views.explore_users, name='explore-users'),
     path('followers/<str:username>', views.followers, name='followers'),
     path('following/<str:username>', views.following, name='following'),
     path('profile/edit/info/', views.profile_settings_info, name='profile-settings'),
@@ -33,8 +35,10 @@ urlpatterns = [
 
     # ajax
     path('ajax/validate/username/', ajax.validate_username, name='ajax-validate-username'),
-    path('ajax/like/', ajax.like, name='ajax-like'),
-    path('ajax/follow/', ajax.follow, name='ajax-follow'),
+    path('ajax/like/', ajax.like),
+    path('ajax/follow/', ajax.follow),
+    path('ajax/comment/delete/', ajax.comment_delete),
+    path('ajax/bookmark/', ajax.bookmark),
 ]
 
 if settings.DEBUG:
