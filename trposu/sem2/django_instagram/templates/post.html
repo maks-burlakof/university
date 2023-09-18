@@ -39,9 +39,9 @@
             </div>
             <div class="d-flex align-items-center">
                <span class="text-muted me-3" style="font-size: .8rem;">{{ post.get_str_time }}</span>
-               <a class="common-link fw-bold me-3" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}"><i class="fa-solid fa-ellipsis-vertical"></i></a>
+               <a class="common-link fw-bold me-3" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}" data-bs-username="{{ post.user_profile.user.username }}"><i class="fa-solid fa-ellipsis-vertical"></i></a>
                <span class="me-3">
-                  <i class="fa-solid fa-arrow-up-from-bracket"></i>
+                  <a class="common-link fw-bold lh-1" data-bs-toggle="modal" data-bs-target="#post-share-modal" data-type="post" data-pk="{{ post.pk }}"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
                </span>
                <span>
                   <i class="fa-regular fa-bookmark submit-bookmark {% if post.is_bookmark %}bookmark-marked{% endif %}" style="cursor: pointer"></i>

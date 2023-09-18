@@ -96,12 +96,18 @@ def profile(request, username=None):
 
     recommended_users = get_recommended_users(request, user.pk)[:6]
 
+    if 'profile-bookmarks' in request.path:
+        template_name = 'my_bookmarks.html'
+        posts = request.user.profile.bookmarks.filter(is_archived=False)
+    else:
+        posts = Post.objects.filter(user_profile=user.profile, is_archived=False).order_by('-created')
+
     context = {
         'person': user,
         'num_of_followers': user.profile.get_number_of_followers(),
         'num_of_following': user.profile.get_number_of_following(),
         'is_following': is_following,
-        'posts': Post.objects.filter(user_profile=user.profile, is_archived=False).order_by('-created'),
+        'posts': posts,
         'recommended_users': recommended_users,
     }
     return render(request, template_name, context)

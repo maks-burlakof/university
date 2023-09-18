@@ -1,12 +1,11 @@
 <div class="modal fade" id="post-modal" tabindex="-1" aria-hidden="true">
    <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content modal-body rounded-5 list-group text-center p-0">
-         <a href="#" class="list-group-item list-group-item-action">Добавить в избранное</a>
-         <a id="post-details-url" href="#" class="list-group-item list-group-item-action">Перейти к публикации</a>
-         <a href="#" class="list-group-item list-group-item-action">Поделиться...</a>
-         <button type="button" class="list-group-item list-group-item-action" data-bs-dismiss="modal">Отмена</button>
+         <a id="post-details-url" href="#" class="fw-medium list-group-item list-group-item-action">Перейти к публикации</a>
+         <a id="post-details-profile" href="#" class="fw-medium list-group-item list-group-item-action">Перейти к <span class="opacity-25 placeholder col-2"></span></a>
+         <a id="post-details-share" data-bs-toggle="modal" data-bs-target="#post-share-modal" data-type="post" data-pk="" class="list-group-item list-group-item-action">Поделиться...</a>
+         <button type="button" class="list-group-item list-group-item-action text-muted" data-bs-dismiss="modal">Отмена</button>
       </div>
-      <input id="post-details-id" type="hidden" name="post-details-id" value="">
    </div>
 </div>
 <div class="modal fade" id="post-share-modal" tabindex="-1" aria-hidden="true">
@@ -17,7 +16,13 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
          </div>
          <div class="modal-body pt-0">
-            <div id="share-qr"></div>
+            <div id="share-qr">
+               <div class="d-flex justify-content-center" style="height: 300px; width: 100%">
+                  <div class="spinner-border text-primary my-auto" role="status">
+                     <span class="visually-hidden">Loading...</span>
+                  </div>
+               </div>
+            </div>
             <div class="d-flex">
                <input id="share-qr-url" type="text" value="" class="form-control text-muted" disabled placeholder="Ссылка">
                <span id="share-qr-copy" class="btn btn-info text-nowrap ms-3"><i class="fa-solid fa-link me-1"></i> Копировать</span>
@@ -27,67 +32,23 @@
    </div>
 </div>
 <script>
-    // Post modal
-    let postModal = document.getElementById('post-modal');
-    if (postModal) {
-        postModal.addEventListener('show.bs.modal', event => {
-            let postButton = event.relatedTarget;
-            let postId = postButton.getAttribute('data-bs-whatever');
-            // Hidden input
-            let formIdInput = postModal.querySelector('#post-details-id');
-            formIdInput.value = `${postId}`;
-            // Go to publication
-            let formPostUrl = postModal.querySelector('#post-details-url');
-            formPostUrl.href = `/post/${postId}/`;
-        })
-    }
+// Likes
+$('.submit-like').on('click', function() {
+    {% if user.is_authenticated %}
+    pressLike.call(this);
+    {% else %}
+    let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+    loginModal.show();
+    {% endif %}
+});
 
-    // Share modal
-    let shareModal = document.getElementById('post-share-modal');
-    if (shareModal) {
-        shareModal.addEventListener('show.bs.modal', event => {
-            let postButton = event.relatedTarget;
-            let buttonType = postButton.getAttribute('data-type');
-            let qrUrl = "";
-
-            if (buttonType === "post") {
-                let postId = postButton.getAttribute('data-pk');
-                qrUrl = window.location.protocol + '//' + window.location.host + `/post/${postId}/`;
-            } else if (buttonType === "user") {
-                let userUsername = postButton.getAttribute('data-username');
-                qrUrl = window.location.protocol + '//' + window.location.host + `/profile/${userUsername}/`;
-            }
-            qrCodeGenerator(qrUrl);
-        })
-    }
-    $('#share-qr-copy').on('click', function() {
-        let copyBtn = this;
-        let qrUrl = this.parentNode.querySelector('#share-qr-url').value;
-
-        navigator.clipboard.writeText(qrUrl);
-        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
-        setTimeout(function() {
-            copyBtn.innerHTML = '<i class="fa-solid fa-link me-1"></i> Копировать';
-        }, 3000);
-    })
-
-    // Likes
-    $('.submit-like').on('click', function() {
-        {% if user.is_authenticated %}
-            pressLike.call(this);
-        {% else %}
-            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
-            loginModal.show();
-        {% endif %}
-    });
-
-    // Bookmarks
-    $('.submit-bookmark').on('click', function() {
-        {% if user.is_authenticated %}
-            pressBookmark.call(this);
-        {% else %}
-            let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
-            loginModal.show();
-        {% endif %}
-    });
+// Bookmarks
+$('.submit-bookmark').on('click', function() {
+    {% if user.is_authenticated %}
+    pressBookmark.call(this);
+    {% else %}
+    let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
+    loginModal.show();
+    {% endif %}
+});
 </script>

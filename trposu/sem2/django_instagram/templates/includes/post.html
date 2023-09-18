@@ -9,7 +9,7 @@
             <span class="text-muted small">· {{ post.get_str_time }}</span>
          </div>
          <div>
-            <a class="common-link fw-bold" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}"><i class="fa-solid fa-ellipsis"></i></a>
+            <a class="common-link fw-bold" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}" data-bs-username="{{ post.user_profile.user.username }}"><i class="fa-solid fa-ellipsis"></i></a>
          </div>
       </div>
    </div>

@@ -16,6 +16,8 @@ function AddBsError(fieldStrId, errorMsg) {
     }
 }
 
+/* AJAX */
+
 function changeCountText(is_add, is_zero, element) {
     let initialCount = isNaN(parseInt(element.innerText)) ? 0 : parseInt(element.innerText);
     let finalCount = is_add? initialCount + 1 : initialCount - 1;
@@ -172,3 +174,57 @@ function qrCodeGenerator(url) {
         }
     });
 }
+
+/* POST MODALS */
+
+$(window).on('load', function() {
+
+    // Post modal
+    let postModal = document.getElementById('post-modal');
+    if (postModal) {
+        postModal.addEventListener('show.bs.modal', event => {
+            let postButton = event.relatedTarget;
+            let postId = postButton.getAttribute('data-bs-whatever');
+            let profileUsername = postButton.getAttribute('data-bs-username');
+            // Go to publication
+            let formPostUrl = postModal.querySelector('#post-details-url');
+            formPostUrl.href = `/post/${postId}/`;
+            // Share
+            let formSharePost = postModal.querySelector('#post-details-share');
+            formSharePost.setAttribute('data-pk', `${postId}`);
+            // Go to profile
+            let formProfileUrl = postModal.querySelector('#post-details-profile');
+            formProfileUrl.href = `/profile/${profileUsername}/`;
+            formProfileUrl.innerText = `Перейти к @${profileUsername}`;
+        })
+    }
+
+    // Share modal
+    let shareModal = document.getElementById('post-share-modal');
+    if (shareModal) {
+        shareModal.addEventListener('show.bs.modal', event => {
+            let postButton = event.relatedTarget;
+            let buttonType = postButton.getAttribute('data-type');
+            let qrUrl = "";
+
+            if (buttonType === "post") {
+                let postId = postButton.getAttribute('data-pk');
+                qrUrl = window.location.protocol + '//' + window.location.host + `/post/${postId}/`;
+            } else if (buttonType === "user") {
+                let userUsername = postButton.getAttribute('data-username');
+                qrUrl = window.location.protocol + '//' + window.location.host + `/profile/${userUsername}/`;
+            }
+            qrCodeGenerator(qrUrl);
+        })
+    }
+    $('#share-qr-copy').on('click', function() {
+        let copyBtn = this;
+        let qrUrl = this.parentNode.querySelector('#share-qr-url').value;
+
+        navigator.clipboard.writeText(qrUrl);
+        copyBtn.innerHTML = '<i class="fa-solid fa-check"></i>';
+        setTimeout(function() {
+            copyBtn.innerHTML = '<i class="fa-solid fa-link me-1"></i> Копировать';
+        }, 3000);
+    });
+});

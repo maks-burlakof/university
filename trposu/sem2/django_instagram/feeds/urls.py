@@ -17,6 +17,7 @@ urlpatterns = [
     path('following/<str:username>/', views.following, name='following'),
     path('profile/edit/info/', views.profile_settings_info, name='profile-settings'),
     path('profile/edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
+    path('profile-bookmarks/', views.profile, name='profile-bookmarks'),
     path('post-create/', views.post_picture, name='post-create'),
 
     # auth

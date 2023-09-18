@@ -63,6 +63,12 @@ body a {
 .posts-link-active {
     border-top: 1px solid black;
 }
+#post-modal .list-group a,
+#post-modal .list-group button {
+    padding-top: .7rem;
+    padding-bottom: .7rem;
+    cursor: pointer;
+}
 #share-qr img {
     width: 80%;
     height: auto;
