@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.utils.safestring import mark_safe
 
 from feeds.models import Profile, Post, Like, Comment
-from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm
+from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm, EditPostForm
 
 POSTS_ON_PAGE = 30
 
@@ -235,6 +235,34 @@ def post(request, post_pk):
         'comment_form': comment_form,
     }
     return render(request, 'post.html', context)
+
+
+@login_required
+def post_edit(request, post_pk):
+    post = Post.objects.get(pk=post_pk)
+    if not post:
+        messages.warning(request, f'Такой публикации не существует или она была удалена')
+        return redirect('index')
+
+    if request.user.profile != post.user_profile:
+        messages.error(request, f'Вы не можете отредактировать эту публикацию')
+        return redirect('index')
+
+    if request.method == 'POST':
+        form = EditPostForm(request.POST, instance=post)
+        if form.is_valid():
+            form.save()
+            return redirect('post', post.pk)
+        else:
+            messages.error(request, 'Не получилось отредактировать пост. Попробуй еще раз.')
+    else:
+        form = EditPostForm(instance=post)
+
+    context = {
+        'post': post,
+        'form': form,
+    }
+    return render(request, 'post_edit.html', context)
 
 
 def likes(request, pk):

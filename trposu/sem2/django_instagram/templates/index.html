@@ -44,7 +44,7 @@
 
             {% if recommended_users %}
                <div class="d-flex justify-content-between align-items-center mb-2">
-                  <a href="#" class="common-link text-muted fw-bold">Рекомендации для вас <i class="fa-solid fa-angle-right small"></i></a>
+                  <a href="{% url 'explore-users' %}" class="common-link text-muted fw-bold">Рекомендации для вас <i class="fa-solid fa-angle-right small"></i></a>
                </div>
 
                {% for person in recommended_users %}

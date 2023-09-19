@@ -2,61 +2,80 @@
 {% load static %}
 {% block title %}Загрузить фотографию · Instagram{% endblock %}
 {% block extrastyle %}
+   <style>
+   body {
+       overflow: hidden;
+   }
+   .container {
+       padding: 0!important;
+       margin: 0!important;
+   }
+   #content-top-padding {
+       padding: 0!important;
+       margin: 0!important;
+   }
+   </style>
    {{ form.media }}
 {% endblock %}
+{% block navbar %}{% endblock %}
 {% block content %}
-   <div class="text-center mb-4">
-      <h3 class="fw-bold">Создание публикации</h3>
-   </div>
+   <div class="position-absolute top-50 start-50 translate-middle w-100">
+      <div class="text-center mb-3">
+         <h1 class="fw-bold text-body-tertiary">СОЗДАТЬ ПУБЛИКАЦИЮ</h1>
+      </div>
 
-   <form method="post" enctype="multipart/form-data" id="post-form" >
-      {% csrf_token %}
-      <div class="row g-4 create-post-form">
-         <div class="col-12 col-md-6 col-lg-5 col-xl-4 offset-lg-1 offset-xl-2">
-            <div class="post-upload-image card card-body shadow border-0 p-4">
-               {{ form.image }}
+      <form method="post" enctype="multipart/form-data" id="post-form" >
+         {% csrf_token %}
+         <div class="row g-4 create-post-form justify-content-center" style="opacity: .90">
+            <div class="col-11 col-sm-9 col-md-5 col-lg-5 col-xl-3">
+               <div class="post-upload-image card card-body shadow border-0 p-4">
+                  {{ form.image }}
+               </div>
             </div>
-         </div>
-         <div class="col-12 col-md-6 col-lg-5 col-xl-4">
-            <div class="post-upload-form card card-body shadow border-0 p-4">
-               <div class="d-flex justify-content-between align-items-center mb-3">
-                  <div>
-                     <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-2" style="width: 30px; height: 30px;">
-                     <span class="fw-bold">{{ user.username }}</span>
+            <div class="col-11 col-sm-9 col-md-6 col-lg-5 col-xl-4">
+               <div class="post-upload-form card card-body shadow border-0 p-4">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                     <div class="d-flex align-items-center">
+                        <a href="{% url 'index' %}" class="btn-close me-3"></a>
+                        <div>
+                           <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-2" style="width: 30px; height: 30px;">
+                           <span class="fw-bold">{{ user.username }}</span>
+                        </div>
+                     </div>
+                     <div>
+                        <button type="submit" class="btn btn-sm text-bg-gray rounded-pill">Опубликовать</button>
+                     </div>
                   </div>
-                  <div>
-                     <button type="submit" class="btn btn-sm text-bg-gray rounded-pill">Опубликовать</button>
+                  <div id="post-progressbar" class="progress mb-3" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 10px; display: none;">
+                     <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
                   </div>
-               </div>
-               <div id="post-progressbar" class="progress mb-3" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="height: 10px; display: none;">
-                  <div class="progress-bar progress-bar-striped progress-bar-animated" style="width: 100%"></div>
-               </div>
-               {% if form.non_field_errors %}
-                  {% include 'includes/form_non_field_errors.html' %}
-               {% endif %}
-               <div class="mb-3">
-                  <div class="form-floating">
-                     {{ form.title }}
-                     <label for="id_title">Добавьте подпись...</label>
+                  {% if form.non_field_errors %}
+                     {% include 'includes/form_non_field_errors.html' %}
+                  {% endif %}
+                  <div class="mb-3">
+                     <div class="form-floating">
+                        {{ form.title }}
+                        <label for="id_title">Добавьте подпись...</label>
+                     </div>
+                     <div class="form-input-description">
+                        <span id="id_title_length"></span>
+                        <span> / 512</span>
+                     </div>
                   </div>
-                  <div class="form-input-description">
-                     <span id="id_title_length"></span>
-                     <span> / 512</span>
-                  </div>
-               </div>
-               <div class="accordion" id="postExtraSettings">
-                  <div class="accordion-item">
-                     <h2 class="accordion-header">
-                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
-                           Расширенные настройки
-                        </button>
-                     </h2>
-                     <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#postExtraSettings">
-                        <div class="accordion-body">
-                           <div class="mb-0">
-                              <div class="form-check form-switch">
-                                 {{ form.is_allow_comments }}
-                                 <label for="id_is_allow_comments">Разрешить комментарии</label>
+                  <div class="accordion" id="postExtraSettings">
+                     <div class="accordion-item">
+                        <h2 class="accordion-header">
+                           <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                              Расширенные настройки
+                           </button>
+                        </h2>
+                        <div id="flush-collapseOne" class="accordion-collapse collapse" data-bs-parent="#postExtraSettings">
+                           <div class="accordion-body">
+                              <div class="mb-0">
+                                 <div class="form-check form-switch">
+                                    {{ form.is_allow_comments }}
+                                    <label for="id_is_allow_comments">Разрешить комментарии</label>
+                                 </div>
                               </div>
                            </div>
                         </div>
@@ -65,33 +84,217 @@
                </div>
             </div>
          </div>
-      </div>
-   </form>
+      </form>
+   </div>
+   <div class="wrapper" id="wrapper"></div>
 {% endblock %}
 {% block footer %}{% endblock %}
 {% block extrajs %}
-   <script>
-       {% if form.errors %}{% for field in form %}
-       {% if field.errors %}
-           AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
-       {% endif %}
-       {% endfor %}{% endif %}
-   </script>
-   <script>
-      // Progressbar
-       let postForm = document.querySelector('#post-form');
-      let postProgressbar = document.querySelector('#post-progressbar');
-      postForm.addEventListener('submit', function () {
-          postProgressbar.style.display = 'flex';
-      })
+<script>
+    {% if form.errors %}{% for field in form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+</script>
+<script>
+    // Progressbar
+    let postForm = document.querySelector('#post-form');
+    let postProgressbar = document.querySelector('#post-progressbar');
+    postForm.addEventListener('submit', function () {
+        postProgressbar.style.display = 'flex';
+    })
 
-      // Title length widget
-      let formDescriptionInput = document.querySelector('#id_title');
-      let formDescriptionOutput = document.querySelector('#id_title_length');
+    // Title length widget
+    let formDescriptionInput = document.querySelector('#id_title');
+    let formDescriptionOutput = document.querySelector('#id_title_length');
 
-      formDescriptionOutput.textContent = 0 + formDescriptionInput.value.length;
-      formDescriptionInput.addEventListener('input', function () {
-          formDescriptionOutput.textContent = 0 + this.value.length;
-      })
-   </script>
+    formDescriptionOutput.textContent = 0 + formDescriptionInput.value.length;
+    formDescriptionInput.addEventListener('input', function () {
+        formDescriptionOutput.textContent = 0 + this.value.length;
+    })
+</script>
+
+<script id="vs" type="x-shader/x-vertex">
+  varying vec3 vPos;
+  // varying vec3 vNormal;
+  uniform float uTick;
+  const float PI = 3.1415926;
+  mat2 calcRotate2D(float _time){
+    float _sin = sin(_time);
+    float _cos = cos(_time);
+    return mat2(_cos, _sin, -_sin, _cos);
+  }
+  vec3 paramFunction1(){
+      float u = -uv.x * 2.0 * PI;
+      float v = uv.y * PI;
+      float _x = sin(u) * sin(v);
+      float _y = cos(u) * sin(v);
+      float _z = cos(v);
+      return vec3(_x, _y, _z);
+  }
+  vec3 paramFunction2(){
+      float a = 3.0;
+      float n = 3.0;
+      float m = 1.0;
+      float u = uv.x * 4.0 * PI;
+      float v = uv.y * 2.0 * PI;
+      float _x = (a + cos(n * u / 2.0) * sin(v) - sin(n * u / 2.0) * sin(2.0 * v)) * cos(m * u / 2.0);
+      float _y = (a + cos(n * u / 2.0) * sin(v) - sin(n * u / 2.0) * sin(2.0 * v)) * sin(m * u / 2.0);
+      float _z = sin(n * u / 2.0) * sin(v) + cos(n * u / 2.0) * sin(2.0 * v);
+      return vec3(_x, _y, _z);
+  }
+  void main(){
+    float time = uTick * 0.002;
+    float shapeRatio = cos(time * 1.5 + sin(time * 1.5)) * 0.5 + 0.5;
+    vec3 shape1 = paramFunction1() * 1.5;
+    vec3 shape2 = paramFunction2();
+    vec3 newPos =mix(shape2, shape1, shapeRatio);
+    // vec3 newPos = shape2;
+    vec3 scalePos = newPos * 4.0;
+    vec3 rotatePos = scalePos;
+    rotatePos.yz = calcRotate2D(time * 0.6) * rotatePos.yz;
+    rotatePos.xz = calcRotate2D(time * 0.6) * rotatePos.xz;
+    vec4 mvPos = vec4(rotatePos, 1.0);
+    vPos = mvPos.xyz;
+    // vNormal = normal;
+    gl_Position =projectionMatrix * modelViewMatrix * mvPos;
+  }
+</script>
+<script id="fs" type="x-shader/x-fragment">
+  varying vec3 vPos;
+  // varying vec3 vNormal;
+  uniform float uTick;
+  // base color
+  const vec3 objColor = vec3(1.0);
+  // hemisphere ground color
+  const vec3 hemiLight_g = vec3(0.86,0.86,0.86);
+  // hemisphere sky color
+  const vec3 hemiLight_s_1 = vec3(0.5882352941176471,0.8274509803921568,0.8823529411764706);
+  const vec3 hemiLight_s_2 = vec3(0.9686274509803922,0.8509803921568627,0.6666666666666666);
+  const vec3 hemiLight_s_3 = vec3(0.8784313725490196,0.5882352941176471,0.7647058823529411);
+  // directional light color
+  const vec3 dirLight = vec3(0.16);
+  const vec3 dirLight_2 = vec3(0.02);
+  const vec3 hemiLightPos_1 = vec3(100.0, 100.0, -100.0);
+  const vec3 hemiLightPos_2 = vec3(-100.0, -100.0, 100.0);
+  const vec3 hemiLightPos_3 = vec3(-100.0, 100.0, 100.0);
+  const vec3 dirLightPos = vec3(-30, 50, 50);
+  const vec3 dirLightPos_2 = vec3(30, -50, -50);
+  vec3 calcIrradiance_hemi(vec3 newNormal, vec3 lightPos, vec3 grd, vec3 sky){
+    float dotNL = dot(newNormal, normalize(lightPos));
+    float hemiDiffuseWeight = 0.5 * dotNL + 0.5;
+    return mix(grd, sky, hemiDiffuseWeight);
+  }
+  vec3 calcIrradiance_dir(vec3 newNormal, vec3 lightPos, vec3 light){
+    float dotNL = dot(newNormal, normalize(lightPos));
+    return light * max(0.0, dotNL);
+  }
+  void main(){
+    float time = uTick * 0.006;
+    vec3 _normal = normalize(cross(dFdx(vPos), dFdy(vPos)));
+    vec3 hemiColor = vec3(0.0);
+    hemiColor += calcIrradiance_hemi(_normal, hemiLightPos_1, hemiLight_g, hemiLight_s_1) * 0.38;
+    hemiColor += calcIrradiance_hemi(_normal, hemiLightPos_2, hemiLight_g, hemiLight_s_2) * 0.26;
+    hemiColor += calcIrradiance_hemi(_normal, hemiLightPos_3, hemiLight_g, hemiLight_s_3) * 0.36;
+    vec3 dirColor = vec3(0.0);
+    dirColor += calcIrradiance_dir(_normal, dirLightPos, dirLight);
+    dirColor += calcIrradiance_dir(_normal, dirLightPos_2, dirLight_2);
+    vec3 color = objColor * hemiColor;
+    color += dirColor;
+    gl_FragColor = vec4(color, 1.0);
+  }
+</script>
+<script src='https://cdnjs.cloudflare.com/ajax/libs/three.js/84/three.js'></script>
+<script src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/593507/OrbitControls.js'></script>
+<script>
+window.onload = () => {
+  var webgl = new Webgl();
+  window.onresize = () => {
+    webgl.resize();
+  };
+};
+class Webgl {
+  constructor() {
+    this.vertShader = document.getElementById("vs").textContent;
+    this.fragShader = document.getElementById("fs").textContent;
+    this.setProps();
+    this.init();
+  }
+  init() {
+    this.scene = new THREE.Scene();
+    this.camera = new THREE.PerspectiveCamera(45, this.props.width / this.props.height, this.props.near, this.props.far);
+    this.camera.position.set(10, 10, -10);
+    this.camera.lookAt(this.scene.position);
+    this.renderer = new THREE.WebGLRenderer({
+      antialias: true,
+      alpha: true });
+    this.renderer.setPixelRatio(1.5);
+    this.renderer.setClearColor(0xb7d3dc, 0.3);
+    this.renderer.setSize(this.props.width, this.props.height);
+    this.div = document.getElementById("wrapper");
+    this.div.appendChild(this.renderer.domElement);
+    this.obj = new Obj(this);
+    this.render();
+    var control = new THREE.OrbitControls(this.camera, this.renderer.domElement);
+  }
+  setProps() {
+    var width = document.body.clientWidth;
+    var height = window.innerHeight;
+    var aspect = width / height;
+    this.props = {
+      width: width,
+      height: height,
+      aspect: aspect,
+      left: -width / 2,
+      right: width / 2,
+      top: height / 2,
+      bottom: -height / 2,
+      near: 0.1,
+      far: 10000 };
+
+  }
+  resize() {
+    this.setProps();
+    this.renderer.setSize(this.props.width, this.props.height);
+    this.camera.aspect = this.props.width / this.props.height;
+    this.camera.updateProjectionMatrix();
+  }
+  render() {
+    this.obj.uniforms.uTick.value += 1;
+    this.renderer.render(this.scene, this.camera);
+    requestAnimationFrame(this.render.bind(this));
+  }}
+class Obj {
+  constructor(webgl) {
+    this.webgl = webgl;
+    this.init();
+  }
+  paramFunc() {
+    return new THREE.Vector3(0, 0, 0);
+  }
+  init() {
+    var g = new THREE.ParametricBufferGeometry(this.paramFunc, 100, 100);
+    const uvArray = [];
+    for (let i = 0; i < 100; i++) {
+      var _u = i / 99;
+      for (let j = 0; j < 100; j++) {
+        var _v = j / 99;
+        uvArray.push(_u, _v);
+      }
+    }
+    this.uniforms = {
+      uTick: { type: "f", value: 0 } };
+    var m = new THREE.ShaderMaterial({
+      vertexShader: this.webgl.vertShader,
+      fragmentShader: this.webgl.fragShader,
+      uniforms: this.uniforms,
+      side: THREE.DoubleSide,
+      shading: THREE.FlatShading
+      // wireframe: true
+    });
+    var mesh = new THREE.Mesh(g, m);
+    this.webgl.scene.add(mesh);
+  }}
+</script>
 {% endblock %}

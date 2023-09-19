@@ -19,6 +19,7 @@
                <div class="collapse show" id="about-collapse">
                   <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
                      <li><a href="{% url 'docs-index' %}" class="link-dark rounded"><i class="fa-solid fa-file-word align-self-center me-1"></i> Техническое задание</a></li>
+                     <li><a href="{% url 'docs-index' %}#extra-technical-assignment" class="link-dark rounded"><i class="fa-solid fa-file-import me-1"></i> За рамками задания</a></li>
                      <li><a href="{% url 'docs-index' %}#technologies" class="link-dark rounded"><i class="fa-solid fa-microchip align-self-center me-1"></i> Технологии</a></li>
                      <li><a href="{% url 'docs-index' %}#links" class="link-dark rounded"><i class="fa-solid fa-link align-self-center me-1"></i> Ссылки</a></li>
                   </ul>
@@ -90,7 +91,34 @@
             <p class="mb-2">Реализовать новостную ленту, в которой в порядке от более нового до старого отображаются посты из групп, на которые подписан пользователь.</p>
             <p class="mb-2">Шапка приложения содержит кнопки для перехода на главную страницу, на страницу с группами, кнопки для выхода из аккаунта и для открытия своего профиля.</p>
             <p>На главное странице отображать все посты сайта и авторов постов.</p>
+
             <hr>
+
+            <h3 id="extra-technical-assignment" class="fw-bold mb-3"><i class="fa-solid fa-file-import align-self-center me-1"></i> За рамками задания</h3>
+            <div class="d-flex align-items-center mb-3">
+               <span class="p-2 rounded-pill text-bg-gray fw-bold me-4">Пользователи</span>
+               <div>
+                  <p class="mb-2">Пользователь может сохранять понравившиеся посты в закладки. Они доступны только ему.</p>
+                  <p class="mb-2">Всем пользователям рекомендуются для просмотра другие профили пользователей.</p>
+                  <p class="mb-2">Пользователь может отказаться от рекомендации его профиля другим пользователям.</p>
+                  <p class="mb-2">В свой профиль можно добавить ссылку на сторонний веб-сайт.</p>
+                  <p class="mb-2">Пользователь может быстро поделиться ссылкой свой или чужой профиль.</p>
+               </div>
+            </div>
+            <div class="d-flex align-items-center">
+               <span class="p-2 rounded-pill text-bg-gray fw-bold me-4">Посты</span>
+               <div>
+                  <p class="mb-2">Пользователь может отредактировать свой пост после публикации.</p>
+                  <p class="mb-2">Посты можно архивировать. Они будут доступны только на отдельной странице для его владельца.</p>
+                  <p class="mb-2">У каждого поста можно отключить комментарии. Никто не сможет просмотреть комментарии к нему.</p>
+                  <p class="mb-2">Все пользователи могут посмотреть, сколько человек добавило пост в закладки.</p>
+                  <p class="mb-2">Все пользователи могут быстро делиться ссылками на посты.</p>
+                  <p class="mb-2">Посты имеют дату и время публикации.</p>
+               </div>
+            </div>
+
+            <hr>
+
             <h3 id="technologies" class="fw-bold mb-3"><i class="fa-solid fa-microchip align-self-center me-1"></i> Технологии</h3>
             <div class="row mt-3">
                <div class="col">

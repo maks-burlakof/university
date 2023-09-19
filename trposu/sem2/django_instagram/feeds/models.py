@@ -176,6 +176,9 @@ class Post(models.Model):
     def get_absolute_url(self):
         return reverse('post', args=[self.pk])
 
+    def get_edit_absolute_url(self):
+        return reverse('post-edit', args=[self.pk])
+
     def __str__(self):
         return f'{self.user_profile}, {self.created}'
 

@@ -19,6 +19,7 @@ urlpatterns = [
     path('profile/edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
     path('profile-bookmarks/', views.profile, name='profile-bookmarks'),
     path('post-create/', views.post_picture, name='post-create'),
+    path('post/edit/<int:post_pk>/', views.post_edit, name='post-edit'),
 
     # auth
     path('login/', auth.CustomLoginView.as_view(

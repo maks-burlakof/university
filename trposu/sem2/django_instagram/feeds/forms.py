@@ -196,3 +196,25 @@ class PostPictureForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'image', 'is_archived', 'is_allow_comments']
+
+
+class EditPostForm(forms.ModelForm):
+    title = forms.CharField(
+        max_length=512,
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control',
+                                     'style': 'height: 10rem;',
+                                     'placeholder': 'Добавьте подпись...'})
+    )
+    is_archived = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+    is_allow_comments = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'class': 'form-check-input'})
+    )
+
+    class Meta:
+        model = Post
+        fields = ['title', 'is_archived', 'is_allow_comments']

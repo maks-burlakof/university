@@ -1,0 +1,53 @@
+{% extends 'post.html' %}
+{% block post-content %}
+   <form method="post">
+      {% csrf_token %}
+      <div class="d-flex justify-content-between align-items-center mb-3">
+         <a href="{{ post.get_absolute_url }}" class="common-link text-muted small"><i class="fa-solid fa-chevron-left"></i> Вернуться к публикации</a>
+         <div class="d-flex align-items-center">
+            <button type="reset" class="btn btn-sm text-bg-gray rounded-pill me-2"><i class="fa-solid fa-arrow-rotate-left"></i></button>
+            <button type="submit" class="btn btn-sm text-bg-gray rounded-pill">Сохранить</button>
+         </div>
+      </div>
+      <div class="mb-4">
+         <div class="form-floating">
+            {{ form.title }}
+            <label for="id_title">Добавьте подпись...</label>
+         </div>
+         <div class="form-input-description">
+            <span id="id_title_length"></span>
+            <span> / 512</span>
+         </div>
+      </div>
+      <div class="mb-3">
+         <div class="form-check form-switch">
+            {{ form.is_archived }}
+            <label for="id_is_allow_comments">В архив</label>
+         </div>
+      </div>
+      <div class="mb-3">
+         <div class="form-check form-switch">
+            {{ form.is_allow_comments }}
+            <label for="id_is_allow_comments">Разрешить комментарии</label>
+         </div>
+      </div>
+   </form>
+{% endblock %}
+{% block extrajs %}
+<script>
+    {% if form.errors %}{% for field in form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+
+    // Title length widget
+    let formDescriptionInput = document.querySelector('#id_title');
+    let formDescriptionOutput = document.querySelector('#id_title_length');
+
+    formDescriptionOutput.textContent = 0 + formDescriptionInput.value.length;
+    formDescriptionInput.addEventListener('input', function () {
+        formDescriptionOutput.textContent = 0 + this.value.length;
+    })
+</script>
+{% endblock %}
