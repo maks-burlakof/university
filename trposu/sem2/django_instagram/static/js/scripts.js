@@ -64,16 +64,30 @@ function pressLike() {
 
 function pressFollow() {
     let followElem = this;
-    let userId = followElem.dataset.userId;
     let isFollowed = followElem.classList.contains('follow-followed');
+
+    let followUrl = ""
+    let followData = ""
+    if (followElem.dataset.userId) {
+        followUrl = '/ajax/follow/user/';
+        followData = {
+            action: isFollowed ? 'unfollow' : 'follow',
+            user: followElem.dataset.userId,
+        }
+    } else if (followElem.dataset.groupId) {
+        followUrl = '/ajax/follow/group/';
+        followData = {
+            action: isFollowed ? 'unfollow' : 'follow',
+            group: followElem.dataset.groupId,
+        }
+    } else {
+        return;
+    }
 
     $.ajax({
         type: "GET",
-        url: '/ajax/follow/',
-        data: {
-            action: isFollowed ? 'unfollow' : 'follow',
-            user: userId,
-        },
+        url: followUrl,
+        data: followData,
         success: function(response) {
             if (response.is_success) {
                 let followersCountElem = document.querySelector('#followers-count');
@@ -185,7 +199,6 @@ $(window).on('load', function() {
         postModal.addEventListener('show.bs.modal', event => {
             let postButton = event.relatedTarget;
             let postId = postButton.getAttribute('data-bs-whatever');
-            let profileUsername = postButton.getAttribute('data-bs-username');
             // Go to publication
             let formPostUrl = postModal.querySelector('#post-details-url');
             formPostUrl.href = `/post/${postId}/`;
@@ -193,9 +206,16 @@ $(window).on('load', function() {
             let formSharePost = postModal.querySelector('#post-details-share');
             formSharePost.setAttribute('data-pk', `${postId}`);
             // Go to profile
+            let profileUsername = postButton.getAttribute('data-bs-username');
+            let groupGroupname = postButton.getAttribute('data-bs-groupname');
             let formProfileUrl = postModal.querySelector('#post-details-profile');
-            formProfileUrl.href = `/profile/${profileUsername}/`;
-            formProfileUrl.innerText = `Перейти к @${profileUsername}`;
+            if (profileUsername) {
+                formProfileUrl.href = `/profile/${profileUsername}/`;
+                formProfileUrl.innerText = `Перейти к @${profileUsername}`;
+            } else if (groupGroupname) {
+                formProfileUrl.href = `/group/${groupGroupname}/`;
+                formProfileUrl.innerText = `Перейти к сообществу @${groupGroupname}`;
+            }
         })
     }
 
@@ -213,6 +233,9 @@ $(window).on('load', function() {
             } else if (buttonType === "user") {
                 let userUsername = postButton.getAttribute('data-username');
                 qrUrl = window.location.protocol + '//' + window.location.host + `/profile/${userUsername}/`;
+            } else if (buttonType === "group") {
+                let groupGroupname = postButton.getAttribute('data-groupname');
+                qrUrl = window.location.protocol + '//' + window.location.host + `/group/${groupGroupname}/`;
             }
             qrCodeGenerator(qrUrl);
         })

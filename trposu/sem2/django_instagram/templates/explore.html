@@ -9,9 +9,12 @@
    </style>
 {% endblock %}
 {% block content %}
-	<div class="d-flex justify-content-center align-items-center mt-1 mb-4">
-      <a href="{% url 'explore' %}" class="btn text-bg-gray rounded-pill {% block explore-posts-border %}border border-secondary{% endblock %} me-2">Публикации</a>
-      <a href="{% url 'explore-users' %}" class="btn text-bg-gray rounded-pill {% block explore-users-border %}{% endblock %}">Профили</a>
+   <div class="d-flex justify-content-center align-items-center mt-1 mb-4">
+      {% block explore-buttons %}
+         <a href="{% url 'explore' %}" class="btn text-bg-gray rounded-pill border border-secondary me-2">Публикации</a>
+         <a href="{% url 'explore-users' %}" class="btn text-bg-gray rounded-pill me-2">Профили</a>
+         <a href="{% url 'explore-groups' %}" class="btn text-bg-gray rounded-pill">Сообщества</a>
+      {% endblock %}
    </div>
    {% block explore-content %}
       <div class="row g-2">

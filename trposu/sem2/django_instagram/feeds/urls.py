@@ -11,15 +11,16 @@ urlpatterns = [
     path('post/<int:post_pk>/', views.post, name='post'),
     path('profile/', views.profile, name='my-profile'),
     path('profile/<str:username>/', views.profile, name='profile'),
+    path('group/<str:groupname>/', views.group, name='group'),
     path('explore/', views.explore, name='explore'),
     path('explore/users/', views.explore_users, name='explore-users'),
-    path('followers/<str:username>/', views.followers, name='followers'),
-    path('following/<str:username>/', views.following, name='following'),
+    path('explore/groups/', views.explore_groups, name='explore-groups'),
     path('profile/edit/info/', views.profile_settings_info, name='profile-settings'),
     path('profile/edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
     path('profile-bookmarks/', views.profile, name='profile-bookmarks'),
     path('post-create/', views.post_picture, name='post-create'),
     path('post/edit/<int:post_pk>/', views.post_edit, name='post-edit'),
+    path('group-create/', views.group_create, name='group-create'),
 
     # auth
     path('login/', auth.CustomLoginView.as_view(
@@ -38,7 +39,8 @@ urlpatterns = [
     # ajax
     path('ajax/validate/username/', ajax.validate_username, name='ajax-validate-username'),
     path('ajax/like/', ajax.like),
-    path('ajax/follow/', ajax.follow),
+    path('ajax/follow/user/', ajax.follow_user),
+    path('ajax/follow/group/', ajax.follow_group),
     path('ajax/comment/delete/', ajax.comment_delete),
     path('ajax/bookmark/', ajax.bookmark),
     path('ajax/qr/', ajax.qr_code_generator),

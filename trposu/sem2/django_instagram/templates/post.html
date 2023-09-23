@@ -7,8 +7,9 @@
       </div>
       <div class="col-md-6 col-lg-5 col-xl-4">
          <div class="d-flex justify-content-between align-items-center mb-3">
-            <div>
-               <a href="{{ post.user_profile.get_absolute_url }}" class="common-link">
+            {% block post-from-profile %}
+               <div>
+                  <a href="{{ post.user_profile.get_absolute_url }}" class="common-link">
                   <span class="d-flex align-items-center">
                      <img src="{{ post.user_profile.get_profile_pic }}" class="profile-photo me-3" style="width: 40px; height: 40px;">
                      <span>
@@ -16,13 +17,14 @@
                         <p class="small mb-0">{{ post.user_profile.user.first_name }} {{ post.user_profile.user.last_name }}</p>
                      </span>
                   </span>
-               </a>
-            </div>
-            {% if user != post.user_profile.user %}
-               <div>
-                  <span data-user-id="{{ post.user_profile.user.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+                  </a>
                </div>
-            {% endif %}
+               {% if user != post.user_profile.user %}
+                  <div>
+                     <span data-user-id="{{ post.user_profile.user.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+                  </div>
+               {% endif %}
+            {% endblock %}
          </div>
 
          {% block post-content %}
@@ -42,9 +44,11 @@
                <div class="d-flex align-items-center">
                   <span class="text-muted me-3" style="font-size: .8rem;">{{ post.get_str_time }}</span>
                   <a class="common-link fw-bold me-3" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}" data-bs-username="{{ post.user_profile.user.username }}"><i class="fa-solid fa-ellipsis-vertical"></i></a>
-                  {% if user.profile == post.user_profile %}
-                     <a href="{{ post.get_edit_absolute_url }}" class="common-link fw-bold me-3"><i class="fa-solid fa-gear"></i></a>
-                  {% endif %}
+                  {% block post-edit-link %}
+                     {% if user.profile == post.user_profile %}
+                        <a href="{{ post.get_edit_absolute_url }}" class="common-link fw-bold me-3"><i class="fa-solid fa-gear"></i></a>
+                     {% endif %}
+                  {% endblock %}
                   <span class="me-3">
                      <a class="common-link fw-bold lh-1" data-bs-toggle="modal" data-bs-target="#post-share-modal" data-type="post" data-pk="{{ post.pk }}"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
                   </span>
@@ -59,9 +63,6 @@
             {% endif %}
             <hr>
             {% if post.is_allow_comments %}
-               {% if post.get_num_of_comments == 0 %}
-                  <p class="small text-muted">Комментариев пока нет</p>
-               {% endif %}
                {% if user.is_authenticated %}
                   <form method="post" action="{{ post.get_absolute_url }}" class="mb-4">
                      {% csrf_token %}
@@ -70,6 +71,9 @@
                         <button type="submit" class="input-group-text"><i class="fa-regular fa-paper-plane small"></i></button>
                      </div>
                   </form>
+               {% endif %}
+               {% if post.get_num_of_comments == 0 %}
+                  <p class="small text-muted">Комментариев пока нет</p>
                {% endif %}
                {% for comment in comments %}
                   <div class="comment-container">
@@ -97,7 +101,9 @@
       {% if other_posts %}
          <div class="col-12 col-md-12 col-lg-11 col-xl-10">
             <hr>
-            <p class="text-muted">Ещё публикации от <span class="fw-bold text-body">{{ post.user_profile.user.username }}</span></p>
+            {% block post-other-posts-title %}
+               <p class="text-muted">Ещё публикации от <span class="fw-bold text-body">{{ post.user_profile.user.username }}</span></p>
+            {% endblock %}
             <div class="row g-2">
                {% for post in other_posts %}
                   {% include 'includes/post_only_image.html' %}

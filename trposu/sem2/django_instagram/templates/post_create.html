@@ -14,6 +14,19 @@
        padding: 0!important;
        margin: 0!important;
    }
+   .account-choice {
+       cursor: pointer;
+       display: flex;
+       align-items: center;
+       border-radius: 1rem;
+       border: 2px solid #dee2e6;
+       padding: 1rem;
+   }
+   .account-choice img {
+       width: 30px;
+       height: 30px;
+       margin-right: 1rem;
+   }
    </style>
    {{ form.media }}
 {% endblock %}
@@ -37,9 +50,12 @@
                   <div class="d-flex justify-content-between align-items-center mb-3">
                      <div class="d-flex align-items-center">
                         <a href="{% url 'index' %}" class="btn-close me-3"></a>
-                        <div>
+                        <div id="chosen-account">
                            <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-2" style="width: 30px; height: 30px;">
                            <span class="fw-bold">{{ user.username }}</span>
+                           {% if user_owned_groups %}
+                              <a type="button" class="common-link fw-bold ps-1 pe-3" data-bs-toggle="modal" data-bs-target="#choose-account-modal"><i class="fa-solid fa-chevron-right"></i></a>
+                           {% endif %}
                         </div>
                      </div>
                      <div>
@@ -81,12 +97,48 @@
                         </div>
                      </div>
                   </div>
+                  <input id="id_account" name="from_account" type="hidden" value="">
                </div>
             </div>
          </div>
       </form>
    </div>
    <div class="wrapper" id="wrapper"></div>
+   {% if user_owned_groups %}
+      <div class="modal fade" id="choose-account-modal" tabindex="-1" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content rounded-5 p-4 text-center">
+               <div class="modal-header border-0">
+                  <h3 class="modal-title">Выбрать аккаунт</h3>
+                  <button id="choose-account-modal-close-btn" type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body pt-2">
+                  <div class="d-flex justify-content-between align-items-center mb-3">
+                     <div class="account-choice border-primary">
+                        <img src="{{ user.profile.get_profile_pic }}" class="profile-photo">
+                        <span class="fw-bold">{{ user.username }}</span>
+                     </div>
+                     <span class="text-primary">
+                        <i class="fa-solid fa-user-tie"></i>
+                     </span>
+                  </div>
+                  {% for group in user_owned_groups %}
+                     {% comment %} Edit also upper code for personal profile {% endcomment %}
+                     <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="account-choice">
+                           <img src="{{ group.get_profile_pic }}" class="profile-photo">
+                           <span class="fw-bold">{{ group.groupname }}</span>
+                        </div>
+                        <span class="text-muted">
+                           <i class="fa-solid fa-user-group"></i>
+                        </span>
+                     </div>
+                  {% endfor %}
+               </div>
+            </div>
+         </div>
+      </div>
+   {% endif %}
 {% endblock %}
 {% block footer %}{% endblock %}
 {% block extrajs %}
@@ -113,6 +165,19 @@
     formDescriptionInput.addEventListener('input', function () {
         formDescriptionOutput.textContent = 0 + this.value.length;
     })
+
+    // Choose account
+    $('.account-choice').on('click', function() {
+        console.log('Pressed');
+        let chosenImg = this.querySelector('img').src;
+        let chosenUsername = this.querySelector('span').innerText;
+
+        document.querySelector('#chosen-account img').src = chosenImg;
+        document.querySelector('#chosen-account span').innerText = chosenUsername;
+        document.querySelector('#id_account').value = chosenUsername;
+
+        document.querySelector('#choose-account-modal-close-btn').click();
+    });
 </script>
 
 <script id="vs" type="x-shader/x-vertex">

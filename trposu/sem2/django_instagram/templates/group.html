@@ -1,0 +1,70 @@
+{% extends 'profile.html' %}
+{% block title %}{{ group.title }} (@{{ group.groupname }}) · Babushka{% endblock %}
+
+{% block profile-photo %}
+	<img src="{{ group.get_profile_pic }}" class="profile-photo w-100">
+{% endblock %}
+
+{% block profile-username %}
+   <span><i class="fa-solid fa-people-group"></i></span>
+   <span>{{ group.groupname }}</span>
+{% endblock %}
+
+{% block profile_buttons %}
+   <span data-group-id="{{ group.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+   {% block important-users-button %}
+      <button id="buttonRecommendedGroups" class="btn btn-sm rounded-pill text-bg-gray" type="button" data-bs-toggle="collapse" data-bs-target="#collapseRecommendedGroups" aria-expanded="false" aria-controls="collapseRecommendedGroups"><i class="fa-solid fa-users-between-lines"></i></button>
+      <a class="btn btn-sm rounded-pill text-bg-gray" data-bs-toggle="modal" data-bs-target="#post-share-modal" data-type="group" data-groupname="{{ group.groupname }}"><i class="fa-solid fa-arrow-up-from-bracket"></i></a>
+   {% endblock %}
+{% endblock %}
+
+{% block profile-description %}
+   <p class="fw-medium fs-5 mb-0">{{ group.title }}</p>
+   {% if group.site_url %}
+      <div class="mb-1">
+         <i class="fa-solid fa-link text-muted small"></i>
+         <a href="{{ group.site_url }}" target="_blank" class="small">{{ group.site_url }}</a>
+      </div>
+   {% endif %}
+   {% if group.description %}
+      <p class="small">{{ group.description }}</p>
+   {% endif %}
+{% endblock %}
+
+{% block profile-recommended %}
+   <div class="collapse" id="collapseRecommendedGroups">
+      <div class="pb-3">
+         <h6 class="text-muted mb-2">Рекомендуемые</h6>
+         {% if not recommended_groups %}
+            <span class="text-muted">Не смогли найти для вас рекомендуемые группы <i class="fa-regular fa-face-frown-open"></i></span>
+         {% endif %}
+         <div class="row row-cols-3 row-cols-md-4 row-cols-lg-6 g-2">
+            {% for recommended_group in recommended_groups %}
+               <div class="col">
+                  <div class="card card-body rounded-4 h-100">
+                     <a href="{{ recommended_group.get_absolute_url }}" class="common-link text-center">
+                        <img src="{{ recommended_group.get_profile_pic }}" class="profile-photo mb-3" style="width: 80px; height: 80px;">
+                        <p class="fw-bold mb-0">{{ recommended_group.groupname }}</p>
+                        <p class="text-muted mb-0 limit-str" style="--num-lines: 1;">{{ recommended_group.title }}</p>
+                     </a>
+                  </div>
+               </div>
+            {% endfor %}
+         </div>
+      </div>
+   </div>
+{% endblock %}
+
+{% block extrajs %}
+<script>
+    $('#buttonRecommendedGroups').on('click', function() {
+        if (this.classList.contains('recommended-pressed')) {
+            this.innerHTML = '<i class="fa-solid fa-users-between-lines"></i>';
+            this.classList.remove('recommended-pressed');
+        } else {
+            this.innerHTML = '<i class="fa-solid fa-users-line"></i>';
+            this.classList.add('recommended-pressed');
+        }
+    });
+</script>
+{% endblock %}

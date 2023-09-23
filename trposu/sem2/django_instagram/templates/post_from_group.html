@@ -1,0 +1,29 @@
+{% extends 'post.html' %}
+{% block title %}Публикация {{ post.group.groupname }} {{ post.title|default:"" }}{% endblock %}
+
+{% block post-from-profile %}
+   <div>
+      <a href="{{ post.group.get_absolute_url }}" class="common-link">
+         <span class="d-flex align-items-center">
+            <img src="{{ post.group.get_profile_pic }}" class="profile-photo me-3" style="width: 40px; height: 40px;">
+            <span>
+               <p class="fw-bold mb-0">{{ post.group.groupname }}</p>
+               <p class="small mb-0">{{ post.group.title }}</p>
+            </span>
+         </span>
+      </a>
+   </div>
+   <div>
+      <span data-group-id="{{ post.group.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+   </div>
+{% endblock %}
+
+{% block post-edit-link %}
+   {% if user == post.group.owner %}
+      <a href="{{ post.get_edit_absolute_url }}" class="common-link fw-bold me-3"><i class="fa-solid fa-gear"></i></a>
+   {% endif %}
+{% endblock %}
+
+{% block post-other-posts-title %}
+   <p class="text-muted">Ещё публикации от <span class="fw-bold text-body">{{ post.group.groupname }}</span></p>
+{% endblock %}

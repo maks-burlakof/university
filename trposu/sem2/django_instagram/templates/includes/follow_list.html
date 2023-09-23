@@ -1,0 +1,56 @@
+<div class="modal fade" id="followers-list" tabindex="-1" aria-hidden="true">
+   <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+      <div class="modal-content rounded-5 p-4 text-center">
+         <div class="modal-header">
+            <h3 class="modal-title">Подписчики</h3>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+         </div>
+         <div class="modal-body">
+            {% for follower in followers %}
+               <div class="d-flex align-items-center mb-2">
+                  <a href="{{ follower.get_absolute_url }}">
+                     <img src="{{ follower.get_profile_pic }}" class="profile-photo me-3" style="width: 45px; height: 45px;">
+                  </a>
+                  <a href="{{ follower.get_absolute_url }}" class="fw-bold common-link mb-0">{{ follower.user.username }}</a>
+               </div>
+            {% endfor %}
+         </div>
+      </div>
+   </div>
+</div>
+{% if users_following or groups_following %}
+   <div class="modal fade" id="following-list" tabindex="-1" aria-hidden="true">
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+         <div class="modal-content rounded-5 p-4 text-center">
+            <div class="modal-header">
+               <h3 class="modal-title">Подписки</h3>
+               <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+               {% if users_following %}
+                  <h5 class="text-start text-muted mb-3">Пользователи</h5>
+                  {% for user_following in users_following %}
+                     <div class="d-flex align-items-center mb-2">
+                        <a href="{{ user_following.get_absolute_url }}">
+                           <img src="{{ user_following.profile.get_profile_pic }}" class="profile-photo me-3" style="width: 45px; height: 45px;">
+                        </a>
+                        <a href="{{ user_following.get_absolute_url }}" class="fw-bold common-link mb-0">{{ user_following.username }}</a>
+                     </div>
+                  {% endfor %}
+               {% endif %}
+               {% if groups_following %}
+                  <h5 class="text-start text-muted mt-3 mb-3">Сообщества</h5>
+                  {% for group_following in groups_following %}
+                     <div class="d-flex align-items-center mb-2">
+                        <a href="{{ group_following.get_absolute_url }}">
+                           <img src="{{ group_following.get_profile_pic }}" class="profile-photo me-3" style="width: 45px; height: 45px;">
+                        </a>
+                        <a href="{{ group_following.get_absolute_url }}" class="fw-bold common-link mb-0">{{ group_following.groupname }}</a>
+                     </div>
+                  {% endfor %}
+               {% endif %}
+            </div>
+         </div>
+      </div>
+   </div>
+{% endif %}

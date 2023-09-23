@@ -6,7 +6,11 @@
       <div class="col-12 col-sm-12 col-md-7 col-lg-7 col-xl-6 offset-lg-1 offset-xl-2">
          {% if posts %}
             {% for post in posts %}
-               {% include 'includes/post.html' %}
+               {% if post.user_profile %}
+                  {% include 'includes/post.html' %}
+               {% elif post.group %}
+                  {% include 'includes/post_from_group.html' %}
+               {% endif %}
             {% endfor %}
             {% include 'includes/post_modals.html' %}
 
@@ -44,10 +48,27 @@
                </div>
             {% endif %}
 
-            {% if recommended_users %}
-               <div class="d-flex justify-content-between align-items-center mb-2">
-                  <a href="{% url 'explore-users' %}" class="common-link text-muted fw-bold">Рекомендации для вас <i class="fa-solid fa-angle-right small"></i></a>
+            {% if owned_groups %}
+               <div class="mb-3">
+                  <p class="text-muted fw-bold mb-2">Мои сообщества</p>
+                  {% for group in owned_groups %}
+                     <div class="mb-2">
+                        <div class="d-flex align-items-center">
+                           <a href="{{ group.get_absolute_url }}">
+                              <img src="{{ group.get_profile_pic }}" class="profile-photo me-3" style="width: 45px; height: 45px;">
+                           </a>
+                           <div>
+                              <a class="common-link fw-bold mb-0" href="{{ group.get_absolute_url }}">{{ group.groupname }}</a>
+                              <p class="text-muted small limit-str mb-0" style="--num-lines: 1;">{{ group.title }}</p>
+                           </div>
+                        </div>
+                     </div>
+                  {% endfor %}
                </div>
+            {% endif %}
+
+            {% if recommended_users %}
+               <a href="{% url 'explore-users' %}" class="common-link text-muted fw-bold mb-2">Рекомендации для вас <i class="fa-solid fa-angle-right small"></i></a>
 
                {% for person in recommended_users %}
                   <div class="d-flex align-items-center mb-2">

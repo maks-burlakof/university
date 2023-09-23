@@ -2,13 +2,18 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.safestring import mark_safe
 
-from feeds.models import Profile, Post, Like, Comment
-from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm, EditPostForm
+from feeds.models import Profile, Post, Like, Comment, Group
+from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm, EditPostForm, GroupCreateEditForm
 
 POSTS_ON_PAGE = 30
+
+POST_SR = ['user_profile', 'user_profile__user', 'group', 'group__owner']
+POST_PR = ['likes', 'comments']
+COMMENT_SR = ['user', 'user__profile']
+GROUP_SR = ['owner']
 
 
 def add_posts_likes(user: User, posts):
@@ -28,27 +33,30 @@ def get_recommended_users(request, user_exclude=None):
         id_list = [request.user.pk]
         if user_exclude:
             id_list.append(user_exclude)
-
     return User.objects.filter(profile__is_allow_recommends=True).exclude(pk__in=id_list).select_related('profile').order_by('?')
 
 
 def index(request):
     if request.user.is_authenticated:
         user = request.user
-        users_followed = request.user.profile.following.all()
+        users_following, group_following = request.user.profile.get_following_users_groups()
         posts = Post.objects.filter(
-            Q(user_profile__in=users_followed) |
-            Q(user_profile=user.profile),
+            Q(user_profile__user__in=users_following) |
+            Q(user_profile=user.profile) |
+            Q(group__in=group_following),
             is_archived=False,
-        ).select_related('user_profile', 'user_profile__user').prefetch_related('like_set').order_by('-created')[:POSTS_ON_PAGE]
+        ).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')[:POSTS_ON_PAGE]
         add_posts_likes(user, posts)
+        owned_groups = Group.objects.filter(owner=request.user)
     else:
         posts = Post.objects.filter(is_archived=False).select_related('user_profile', 'user_profile__user').order_by('?')[:POSTS_ON_PAGE]
+        owned_groups = None
 
     recommended_users = get_recommended_users(request)[:5]
 
     context = {
         'posts': posts,
+        'owned_groups': owned_groups,
         'recommended_users': recommended_users,
     }
 
@@ -56,7 +64,7 @@ def index(request):
 
 
 def explore(request):
-    random_posts = Post.objects.filter(is_archived=False).order_by('?')[:40]
+    random_posts = Post.objects.filter(is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('?')[:40]
 
     context = {
         'posts': random_posts,
@@ -73,6 +81,13 @@ def explore_users(request):
     return render(request, 'explore_users.html', context)
 
 
+def explore_groups(request):
+    context = {
+
+    }
+    return render(request, 'explore_groups.html', context)
+
+
 def profile(request, username=None):
     if not username or request.user.username == username:
         if request.user.is_authenticated:
@@ -83,10 +98,7 @@ def profile(request, username=None):
             return redirect('login')
 
     else:
-        user = User.objects.get(username=username)
-        if not user:
-            messages.warning(request, f'Аккаунта с @{username} не существует')
-            return redirect('index')
+        user = get_object_or_404(User.objects.select_related('profile'), username=username)
         template_name = 'profile.html'
 
     if request.user.is_authenticated:
@@ -98,19 +110,77 @@ def profile(request, username=None):
 
     if 'profile-bookmarks' in request.path:
         template_name = 'my_bookmarks.html'
-        posts = request.user.profile.bookmarks.filter(is_archived=False)
+        posts = request.user.profile.bookmarks.filter(is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR)
     else:
-        posts = Post.objects.filter(user_profile=user.profile, is_archived=False).order_by('-created')
+        posts = Post.objects.filter(user_profile=user.profile, is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
+
+    users_following, groups_following = user.profile.get_following_users_groups()
+    followers = user.profile.followers.all().select_related('user')
 
     context = {
         'person': user,
-        'num_of_followers': user.profile.get_number_of_followers(),
-        'num_of_following': user.profile.get_number_of_following(),
+        'followers': followers,
+        'users_following': users_following,
+        'groups_following': groups_following,
+        'num_of_following': users_following.count() + groups_following.count(),
         'is_following': is_following,
         'posts': posts,
         'recommended_users': recommended_users,
     }
     return render(request, template_name, context)
+
+
+def group(request, groupname):
+    group = get_object_or_404(Group.objects.select_related(*GROUP_SR), groupname=groupname)
+
+    if request.user == group.owner:
+        template_name = 'my_group.html'
+    else:
+        template_name = 'group.html'
+
+    if request.user.is_authenticated:
+        is_following = group.followers.filter(pk=request.user.profile.pk).exists()
+    else:
+        is_following = False
+
+    posts = Post.objects.filter(group=group, is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
+
+    context = {
+        'group': group,
+        'followers': group.followers.all().select_related('user'),
+        'is_following': is_following,
+        'posts': posts,
+        # 'recommended_groups': recommended_groups,
+    }
+    return render(request, template_name, context)
+
+
+@login_required
+def group_create(request):
+    if request.method == 'POST':
+        form = GroupCreateEditForm(request.POST, files=request.FILES)
+        if form.is_valid():
+            group = Group.objects.create(
+                groupname=form.cleaned_data.get('groupname'),
+                owner=request.user,
+                title=form.cleaned_data.get('title'),
+                profile_pic=request.FILES.get('profile_pic'),
+                description=form.cleaned_data.get('description'),
+                site_url=form.cleaned_data.get('site_url'),
+            )
+            group.followers.add(request.user.profile)
+            messages.success(request, 'Сообщество создано!')
+            return redirect('group', group.groupname)
+        else:
+            messages.error(request, 'Не получилось. Проверьте правильность введенных данных и повторите попытку.')
+
+    else:
+        form = GroupCreateEditForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'group_create.html', context)
 
 
 @login_required
@@ -144,46 +214,32 @@ def profile_settings_info(request):
     return render(request, 'profile_settings.html', context)
 
 
-def followers(request, username):
-    user = User.objects.get(username=username)
-    if not user:
-        return redirect('index')
-
-    user_profile = user.profile
-    users_followers = user_profile.followers.all
-
-    context = {
-        'header': 'Подписчики',
-        'users_followers': users_followers,
-    }
-
-    return render(request, 'follow_list.html', context)
-
-
-def following(request, username):
-    user = User.objects.get(username=username)
-    if not user:
-        return redirect('index')
-
-    user_profile = user.profile
-    users_following = user_profile.following.all
-
-    context = {
-        'header': 'Подписки',
-        'users_following': users_following,
-    }
-    return render(request, 'follow_list.html', context)
-
-
 @login_required
 def post_picture(request):
+    user_owned_groups = Group.objects.filter(owner=request.user)
+
     if request.method == 'POST':
         form = PostPictureForm(data=request.POST, files=request.FILES)
         if form.is_valid():
+
+            from_account = request.POST.get('from_account')
+            print(from_account)
+            if from_account == request.user.username:
+                post_user_profile = request.user.profile
+                post_group = None
+            else:
+                post_group = user_owned_groups.get(groupname=from_account)
+                if not post_group:
+                    messages.error(request, f'Не удалось найти аккаунт @{from_account} для публикации')
+                    return redirect('post-create')
+                post_user_profile = None
+
             post = Post(
-                user_profile=request.user.profile,
+                user_profile=post_user_profile,
+                group=post_group,
                 title=form.cleaned_data.get('title'),
                 image=request.FILES.get('image'),
+                is_allow_comments=form.cleaned_data.get('is_allow_comments'),
             )
             post.save()
             messages.success(request, mark_safe('<i class="fa-regular fa-images me-1"></i> Пост опубликован!'))
@@ -195,23 +251,31 @@ def post_picture(request):
 
     context = {
         'form': form,
+        'user_owned_groups': user_owned_groups,
     }
     return render(request, 'post_create.html', context)
 
 
 def post(request, post_pk):
-    post = Post.objects.get(pk=post_pk)
-    if not post:
-        messages.warning(request, f'Такой публикации не существует или она была удалена')
-        return redirect('index')
+    post = get_object_or_404(Post.objects.select_related(*POST_SR).prefetch_related(*POST_PR), pk=post_pk)
 
-    if request.user.is_authenticated:
-        add_posts_likes(request.user, post)
-        is_following = request.user.profile.following.filter(user=post.user_profile.user).exists()
+    if post.user_profile:
+        if request.user.is_authenticated:
+            add_posts_likes(request.user, post)
+            is_following = post.user_profile.followers.filter(user=request.user).exists()
+        else:
+            is_following = False
+        other_posts = Post.objects.filter(user_profile=post.user_profile, is_archived=False).exclude(pk=post.pk).select_related(*POST_SR).prefetch_related(*POST_PR)[:6]
+        template_name = 'post.html'
+
     else:
-        is_following = False
-
-    other_posts = Post.objects.filter(user_profile=request.user.profile, is_archived=False).exclude(pk=post.pk)[:6]
+        if request.user.is_authenticated:
+            add_posts_likes(request.user, post)
+            is_following = post.group.followers.filter(user=request.user).exists()
+        else:
+            is_following = False
+        other_posts = Post.objects.filter(group=post.group, is_archived=False).exclude(pk=post.pk).select_related(*POST_SR).prefetch_related(*POST_PR)[:6]
+        template_name = 'post_from_group.html'
 
     if request.method == 'POST':
         comment_form = CommentForm(request.POST)
@@ -230,23 +294,23 @@ def post(request, post_pk):
     context = {
         'post': post,
         'other_posts': other_posts,
-        'comments': post.comment_set.all().order_by('-created'),
+        'comments': post.comments.all().select_related(*COMMENT_SR).order_by('-created'),
         'is_following': is_following,
         'comment_form': comment_form,
     }
-    return render(request, 'post.html', context)
+    return render(request, template_name, context)
 
 
 @login_required
 def post_edit(request, post_pk):
-    post = Post.objects.get(pk=post_pk)
+    post = get_object_or_404(Post, pk=post_pk)
     if not post:
         messages.warning(request, f'Такой публикации не существует или она была удалена')
         return redirect('index')
 
-    if request.user.profile != post.user_profile:
+    if (post.user_profile and request.user.profile != post.user_profile) or (post.group and request.user != post.group.owner):
         messages.error(request, f'Вы не можете отредактировать эту публикацию')
-        return redirect('index')
+        return redirect('post', post.pk)
 
     if request.method == 'POST':
         form = EditPostForm(request.POST, instance=post)
@@ -263,17 +327,3 @@ def post_edit(request, post_pk):
         'form': form,
     }
     return render(request, 'post_edit.html', context)
-
-
-def likes(request, pk):
-    post = Post.objects.get(pk=pk)
-    if not post:
-        return redirect('index')
-
-    likes = Like.objects.filter(post=post)
-
-    context = {
-        'header': 'Лайки',
-        'likes': likes,
-    }
-    return render(request, 'follow_list.html', context)

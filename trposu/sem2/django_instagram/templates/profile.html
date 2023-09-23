@@ -13,13 +13,17 @@
 {% block content %}
    <div class="row pt-sm-3 mb-5">
       <div class="col-3 col-lg-2 col-xl-2 me-2 me-sm-4 me-lg-5">
-         <img src="{{ person.profile.get_profile_pic }}" class="profile-photo w-100">
+         {% block profile-photo %}
+            <img src="{{ person.profile.get_profile_pic }}" class="profile-photo w-100">
+         {% endblock %}
       </div>
       <div class="col-8 col-lg-8 col-xl-9">
          <div class="d-flex justify-content-between align-items-center mb-2">
             <div class="align-items-center fs-3 fw-bold">
-               <span><i class="fa-solid fa-at"></i></span>
-               <span>{{ person.username }}</span>
+               {% block profile-username %}
+                  <span><i class="fa-solid fa-at"></i></span>
+                  <span>{{ person.username }}</span>
+               {% endblock %}
             </div>
             <div class="float-end">
                {% block profile_buttons %}
@@ -39,37 +43,44 @@
             {% endif %}
          </div>
          <div>
-            <p class="fw-medium fs-5 mb-0">{{ person.first_name }} {{ person.last_name }}</p>
-            {% if person.profile.site_url %}
-               <div class="mb-1">
-                  <i class="fa-solid fa-link text-muted small"></i>
-                  <a href="{{ person.profile.site_url }}" class="small">{{ person.profile.site_url }}</a>
-               </div>
-            {% endif %}
-            {% if person.profile.description %}
-               <p class="small">{{ person.profile.description }}</p>
-            {% endif %}
-         </div>
-      </div>
-   </div>
-   <div class="collapse" id="collapseRecommendedPeople">
-      <div class="pb-3">
-         <h6 class="text-muted mb-2">Рекомендуемые</h6>
-         <div class="row row-cols-3 row-cols-md-4 row-cols-lg-6 g-2">
-            {% for recommended_user in recommended_users %}
-               <div class="col">
-                  <div class="card card-body rounded-4 h-100">
-                     <a href="{{ recommended_user.get_absolute_url }}" class="common-link text-center">
-                        <img src="{{ recommended_user.profile.get_profile_pic }}" class="profile-photo mb-3" style="width: 80px; height: 80px;">
-                        <p class="fw-bold mb-0">{{ recommended_user.username }}</p>
-                        <p class="text-muted mb-0 limit-str" style="--num-lines: 1;">{{ recommended_user.first_name }} {{ recommended_user.last_name }}</p>
-                     </a>
+            {% block profile-description %}
+               <p class="fw-medium fs-5 mb-0">{{ person.first_name }} {{ person.last_name }}</p>
+               {% if person.profile.site_url %}
+                  <div class="mb-1">
+                     <i class="fa-solid fa-link text-muted small"></i>
+                     <a href="{{ person.profile.site_url }}" target="_blank" class="small">{{ person.profile.site_url }}</a>
                   </div>
-               </div>
-            {% endfor %}
+               {% endif %}
+               {% if person.profile.description %}
+                  <p class="small">{{ person.profile.description }}</p>
+               {% endif %}
+            {% endblock %}
          </div>
       </div>
    </div>
+   {% block profile-recommended %}
+      <div class="collapse" id="collapseRecommendedPeople">
+         <div class="pb-3">
+            <h6 class="text-muted mb-2">Рекомендуемые</h6>
+            {% if not recommended_users %}
+               <span class="text-muted">Не смогли найти для вас рекомендуемых пользователей <i class="fa-regular fa-face-frown-open"></i></span>
+            {% endif %}
+            <div class="row row-cols-3 row-cols-md-4 row-cols-lg-6 g-2">
+               {% for recommended_user in recommended_users %}
+                  <div class="col">
+                     <div class="card card-body rounded-4 h-100">
+                        <a href="{{ recommended_user.get_absolute_url }}" class="common-link text-center">
+                           <img src="{{ recommended_user.profile.get_profile_pic }}" class="profile-photo mb-3" style="width: 80px; height: 80px;">
+                           <p class="fw-bold mb-0">{{ recommended_user.username }}</p>
+                           <p class="text-muted mb-0 limit-str" style="--num-lines: 1;">{{ recommended_user.first_name }} {{ recommended_user.last_name }}</p>
+                        </a>
+                     </div>
+                  </div>
+               {% endfor %}
+            </div>
+         </div>
+      </div>
+   {% endblock %}
    <div class="row">
       <div class="col-12">
          <span class="d-flex w-100 border-bottom"></span>

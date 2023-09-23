@@ -2,7 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 
-from feeds.models import Profile, Post, Like, Comment
+from feeds.models import Profile, Post, Like, Comment, Group
 
 
 def validate_username(request):
@@ -42,7 +42,7 @@ def like(request):
 
 
 @login_required
-def follow(request):
+def follow_user(request):
     action = request.GET.get('action')
     follow_profile_pk = request.GET.get('user')
     is_success = False
@@ -54,11 +54,9 @@ def follow(request):
     if user_profile != follow_profile:
         try:
             if action == 'follow':
-                user_profile.following.add(follow_profile)
                 follow_profile.followers.add(user_profile)
                 is_success = True
             elif action == 'unfollow':
-                user_profile.following.remove(follow_profile)
                 follow_profile.followers.remove(user_profile)
                 is_success = True
             else:
@@ -67,6 +65,35 @@ def follow(request):
             message = str(e)
     else:
         message = "You can't follow yourself"
+
+    response = {
+        'is_success': is_success,
+        'message': message,
+    }
+    return JsonResponse(response)
+
+
+@login_required
+def follow_group(request):
+    action = request.GET.get('action')
+    follow_group_pk = request.GET.get('group')
+    is_success = False
+    message = ""
+
+    user_profile = request.user.profile
+    follow_group = Group.objects.get(pk=follow_group_pk)
+
+    try:
+        if action == 'follow':
+            follow_group.followers.add(user_profile)
+            is_success = True
+        elif action == 'unfollow':
+            follow_group.followers.remove(user_profile)
+            is_success = True
+        else:
+            message = "Action is not provided"
+    except Exception as e:
+        message = str(e)
 
     response = {
         'is_success': is_success,

@@ -2,14 +2,18 @@
    <div class="card-header">
       <div class="d-flex justify-content-between align-items-center">
          <div>
-            <a href="{{ post.user_profile.get_absolute_url }}">
-               <img src="{{ post.user_profile.get_profile_pic }}" class="profile-photo me-2">
-               <span class="fw-bold">{{ post.user_profile.user.username }}</span>
-            </a>
+            {% block post-from-account %}
+               <a href="{{ post.user_profile.get_absolute_url }}">
+                  <img src="{{ post.user_profile.get_profile_pic }}" class="profile-photo me-2">
+                  <span class="fw-bold">{{ post.user_profile.user.username }}</span>
+               </a>
+            {% endblock %}
             <span class="text-muted small">· {{ post.get_str_time }}</span>
          </div>
          <div>
-            <a class="common-link fw-bold" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}" data-bs-username="{{ post.user_profile.user.username }}"><i class="fa-solid fa-ellipsis"></i></a>
+            {% block post-account-modal %}
+               <a class="common-link fw-bold" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}" data-bs-username="{{ post.user_profile.user.username }}"><i class="fa-solid fa-ellipsis"></i></a>
+            {% endblock %}
          </div>
       </div>
    </div>
@@ -38,7 +42,9 @@
    </section>
    {% if post.title %}
       <span class="small limit-str">
-         <span class="fw-bold me-1">{{ post.user_profile.user.username }}</span>
+         {% block post-description-account %}
+            <span class="fw-bold me-1">{{ post.user_profile.user.username }}</span>
+         {% endblock %}
          {{ post.title }}
       </span>
    {% endif %}

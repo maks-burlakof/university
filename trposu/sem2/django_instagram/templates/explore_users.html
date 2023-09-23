@@ -1,6 +1,9 @@
 {% extends 'explore.html' %}
-{% block explore-posts-border %}{% endblock %}
-{% block explore-users-border %}border border-secondary{% endblock %}
+{% block explore-buttons %}
+   <a href="{% url 'explore' %}" class="btn text-bg-gray rounded-pill me-2">Публикации</a>
+   <a href="{% url 'explore-users' %}" class="btn text-bg-gray border border-secondary rounded-pill me-2">Профили</a>
+   <a href="{% url 'explore-groups' %}" class="btn text-bg-gray rounded-pill">Сообщества</a>
+{% endblock %}
 {% block explore-content %}
    <div class="row row-cols-2 g-5">
       {% for recommended_user in users %}

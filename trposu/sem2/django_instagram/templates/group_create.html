@@ -1,0 +1,82 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block title %}Создать сообщество · Babushka{% endblock %}
+{% block extrastyle %}
+   <style>
+       body {
+           background: linear-gradient(-45deg, #2196F3 50%, #EEEEEE 50%) no-repeat;
+           overflow-x: hidden;
+           background-size: 100% 100%;
+       }
+       .navbar {
+           background-color: rgba(255, 255, 255, 0.55) !important;
+       }
+   </style>
+   {{ form.media }}
+{% endblock %}
+{% block content %}
+   <div class="row justify-content-center mt-5 mb-5">
+      <div class="col-11 col-md-7 col-lg-6 col-xl-5">
+         <div class="card card-body rounded-5 shadow p-5">
+            <h1 class="text-primary mb-4">Создайте свое сообщество!</h1>
+            <form method="post" enctype="multipart/form-data">
+               {% csrf_token %}
+               <div class="mb-3">
+                  <div class="input-group">
+                     <span class="input-group-text text-primary"><i class="fa-solid fa-at"></i></span>
+                     {{ form.groupname }}
+                  </div>
+               </div>
+               <div class="mb-3">
+                  <div>
+                     {{ form.title }}
+                  </div>
+               </div>
+               <div class="mb-3">
+                  <div>
+                     {{ form.description }}
+                  </div>
+                  <div class="form-input-description">
+                     <span id="id_description_length"></span>
+                     <span> / 128</span>
+                  </div>
+               </div>
+               <div class="mb-3">
+                  <div class="input-group">
+                     <span class="input-group-text text-primary"><i class="fa-solid fa-link"></i></span>
+                     {{ form.site_url }}
+                  </div>
+               </div>
+               <div class="mb-3">
+                  <div>
+                     <label for="id_profile_pic" class="form-label fw-bold text-primary">Главное фото</label>
+                     {{ form.profile_pic }}
+                  </div>
+               </div>
+               <button class="btn btn-primary rounded-pill fw-bold mt-4" type="submit">Создать</button>
+            </form>
+         </div>
+      </div>
+   </div>
+   <div>
+   </div>
+{% endblock %}
+{% block footer %}{% endblock %}
+{% block extrajs %}
+<script>
+    {% if form.errors %}{% for field in form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+</script>
+<script>
+    let groupDescriptionInput = document.querySelector('#id_description');
+    let groupDescriptionOutput = document.querySelector('#id_description_length');
+
+    groupDescriptionOutput.textContent = 0 + groupDescriptionInput.value.length;
+    groupDescriptionInput.addEventListener('input', function () {
+        groupDescriptionOutput.textContent = 0 + this.value.length;
+    })
+</script>
+{% endblock %}

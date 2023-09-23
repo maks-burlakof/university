@@ -1,0 +1,16 @@
+{% extends 'includes/post.html' %}
+
+{% block post-from-account %}
+   <a href="{{ post.group.get_absolute_url }}">
+      <img src="{{ post.group.get_profile_pic }}" class="profile-photo me-2">
+      <span class="fw-bold">{{ post.group.groupname }}</span>
+   </a>
+{% endblock %}
+
+{% block post-account-modal %}
+   <a class="common-link fw-bold" data-bs-toggle="modal" data-bs-target="#post-modal" data-bs-whatever="{{ post.pk }}" data-bs-groupname="{{ post.group.groupname }}"><i class="fa-solid fa-ellipsis"></i></a>
+{% endblock %}
+
+{% block post-description-account %}
+   <span class="fw-bold me-1">{{ post.group.groupname }}</span>
+{% endblock %}

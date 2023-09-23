@@ -39,8 +39,8 @@
                   </a>
                </li>
                <li class="nav-item">
-                  <a class="nav-link fs-5 text-dark" href="{% url 'post-create' %}">
-                     <i class="fa-solid fa-circle-plus"></i>
+                  <a class="nav-link fs-5 text-dark" href="{% url 'explore-groups' %}">
+                     <i class="fa-solid fa-user-group"></i>
                   </a>
                </li>
                <li class="nav-item">
@@ -138,6 +138,8 @@
             pressFollow.call(this);
             if (document.querySelector('#buttonRecommendedPeople')) {
                 $('#buttonRecommendedPeople').click();
+            } else if (document.querySelector('#buttonRecommendedGroups')) {
+                $('#buttonRecommendedGroups').click();
             }
         {% else %}
             let loginModal = new bootstrap.Modal(document.getElementById('login-modal'));
