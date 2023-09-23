@@ -54,12 +54,6 @@ class Profile(models.Model):
         blank=True,
         verbose_name='Подписчики',
     )
-    following = models.ManyToManyField(
-        to='Profile',
-        related_name="following_profile",
-        blank=True,
-        verbose_name='Подписки',
-    )
     bookmarks = models.ManyToManyField(
         to='Post',
         related_name="bookmarks_profile",
@@ -108,8 +102,8 @@ class Profile(models.Model):
     def get_number_of_followers(self):
         return self.followers.count()
 
-    def get_number_of_following(self):
-        return self.following.count()
+    def get_followers(self):
+        return self.followers.all()
 
     def get_absolute_url(self):
         return reverse('profile', args=[self.user.username])

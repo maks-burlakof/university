@@ -1,6 +1,6 @@
 {% extends 'base_generic.html' %}
 {% load static %}
-{% block title %}Вход в Instagram{% endblock %}
+{% block title %}Вход в Babushka{% endblock %}
 {% block navbar %}{% endblock %}
 {% block extrastyle %}
    <link rel="stylesheet" href="{% static 'css/blobs.css' %}">
@@ -26,7 +26,7 @@
             <span></span>
             <span></span>
             <div class="content">
-               <img class="d-block mx-auto mb-3 mt-2" src="{% static 'img/instagram_logo.png' %}" width="200" />
+               <img class="d-block mx-auto mb-3 mt-2" src="{% static 'img/babushka-logo.png' %}" width="260" />
                {% if form.non_field_errors %}
                   {% include 'includes/form_non_field_errors.html' %}
                {% endif %}

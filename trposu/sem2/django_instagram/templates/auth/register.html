@@ -1,12 +1,12 @@
 {% extends 'base_generic.html' %}
 {% load static %}
-{% block title %}Регистрация на Instagram{% endblock %}
+{% block title %}Регистрация на Babushka{% endblock %}
 {% block navbar %}{% endblock %}
 {% block content %}
    <div class="card shadow rounded-5 mx-auto mt-3 mb-3" style="max-width: 30rem;">
       <div class="card-body p-md-4">
-         <img class="d-block mx-auto mb-2" src="{% static 'img/instagram_logo.png' %}" width="200" />
-         <p class="fw-semibold text-center px-md-4">Зарегистрируйтесь, чтобы смотреть фото и видео ваших друзей.</p>
+         <img class="d-block mx-auto mb-2" src="{% static 'img/babushka-logo.png' %}" width="300" />
+         <p class="fw-semibold text-center px-md-4">Зарегистрируйтесь, чтобы стать частью сообщества!</p>
          {% if form.non_field_errors %}
             {% include 'includes/form_non_field_errors.html' %}
          {% endif %}

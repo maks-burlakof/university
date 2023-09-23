@@ -83,7 +83,7 @@ class ResetPasswordForm(PasswordResetForm):
     )
 
     def send_mail(self, subject_template_name, email_template_name, context, from_email, to_email, html_email_template_name=None):
-        subject = 'Сброс пароля на Instagram'
+        subject = 'Сброс пароля на Babushka'
 
         user = context['user']
         del context['user']

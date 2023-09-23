@@ -1,6 +1,6 @@
 {% extends 'base_generic.html' %}
 {% load static custom_tags %}
-{% block title %}{{ person.first_name }} {{ person.last_name }} (@{{ person.username }}) · Instagram{% endblock %}
+{% block title %}{{ person.first_name }} {{ person.last_name }} (@{{ person.username }}) · Babushka{% endblock %}
 {% block extrastyle %}
    <style>
    .container {
@@ -33,8 +33,10 @@
          </div>
          <div class="d-flex align-items-center mb-4">
             <span class="lh-sm me-5"><strong>{{ posts|length }}</strong> {{ posts|length|ru_plural:"публикация,публикации,публикаций" }}</span>
-            <span class="lh-sm me-5"><strong id="followers-count">{{ num_of_followers }}</strong> {{ num_of_followers|ru_plural:"подписчик,подписчика,подписчиков" }}</span>
-            <span class="lh-sm"><strong>{{ num_of_following }}</strong> {{ num_of_following|ru_plural:"подписка,подписок,подписок" }}</span>
+            <a class="common-link lh-sm me-5" data-bs-toggle="modal" data-bs-target="#followers-list"><strong id="followers-count">{{ followers|length }}</strong> {{ followers|length|ru_plural:"подписчик,подписчика,подписчиков" }}</a>
+            {% if num_of_following or num_of_following == 0 %}
+               <a class="common-link lh-sm" data-bs-toggle="modal" data-bs-target="#following-list"><strong>{{ num_of_following }}</strong> {{ num_of_following|ru_plural:"подписка,подписок,подписок" }}</a>
+            {% endif %}
          </div>
          <div>
             <p class="fw-medium fs-5 mb-0">{{ person.first_name }} {{ person.last_name }}</p>
@@ -88,6 +90,7 @@
       {% endfor %}
    </div>
    {% include 'includes/post_modals.html' %}
+   {% include 'includes/follow_list.html' %}
 {% endblock %}
 {% block extrajs %}
 <script>

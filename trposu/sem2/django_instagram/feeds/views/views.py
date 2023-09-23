@@ -90,7 +90,7 @@ def profile(request, username=None):
         template_name = 'profile.html'
 
     if request.user.is_authenticated:
-        is_following = request.user.profile.following.filter(user=user).exists()
+        is_following = user.profile.followers.filter(user=request.user).exists()
     else:
         is_following = False
 
