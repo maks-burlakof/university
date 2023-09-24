@@ -15,12 +15,15 @@ urlpatterns = [
     path('explore/', views.explore, name='explore'),
     path('explore/users/', views.explore_users, name='explore-users'),
     path('explore/groups/', views.explore_groups, name='explore-groups'),
-    path('profile/edit/info/', views.profile_settings_info, name='profile-settings'),
-    path('profile/edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
+    path('profile-edit/info/', views.profile_settings_info, name='profile-settings'),
+    path('profile-edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
     path('profile-bookmarks/', views.profile, name='profile-bookmarks'),
+    path('profile-archived/', views.profile, name='profile-archived'),
+    path('group-archived/<str:groupname>/', views.group, name='group-archived'),
     path('post-create/', views.post_picture, name='post-create'),
     path('post/edit/<int:post_pk>/', views.post_edit, name='post-edit'),
     path('group-create/', views.group_create, name='group-create'),
+    path('group-edit/<str:groupname>/', views.group_settings, name='group-settings'),
 
     # auth
     path('login/', auth.CustomLoginView.as_view(

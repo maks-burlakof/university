@@ -220,7 +220,7 @@ class EditPostForm(forms.ModelForm):
         fields = ['title', 'is_archived', 'is_allow_comments']
 
 
-class GroupCreateEditForm(forms.ModelForm):
+class GroupCreateForm(forms.ModelForm):
     groupname = forms.CharField(
         max_length=20,
         required=True,
@@ -254,3 +254,33 @@ class GroupCreateEditForm(forms.ModelForm):
     class Meta:
         model = Group
         fields = ['groupname', 'title', 'profile_pic', 'description', 'site_url']
+
+
+class GroupEditForm(forms.ModelForm):
+    title = forms.CharField(
+        max_length=64,
+        required=True,
+        widget=forms.TextInput(attrs={'placeholder': 'Название',
+                                      'class': 'form-control'})
+    )
+    profile_pic = forms.ImageField(
+        required=False,
+        widget=ImageUploaderWidget(empty_text="Перетащите сюда фото"),
+    )
+    description = forms.CharField(
+        max_length=128,
+        required=False,
+        widget=forms.Textarea(attrs={'class': 'form-control',
+                                     'style': 'height: 8rem;',
+                                     'placeholder': 'О сообществе'})
+    )
+    site_url = forms.URLField(
+        max_length=128,
+        required=False,
+        widget=forms.URLInput(attrs={'class': 'form-control',
+                                     'placeholder': 'Ссылка на вебсайт'})
+    )
+
+    class Meta:
+        model = Group
+        fields = ['title', 'profile_pic', 'description', 'site_url']

@@ -6,7 +6,8 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.safestring import mark_safe
 
 from feeds.models import Profile, Post, Like, Comment, Group
-from feeds.forms import UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm, EditPostForm, GroupCreateEditForm
+from feeds.forms import (UpdateProfileForm, UpdateUserForm, PostPictureForm, CommentForm, EditPostForm,
+                         GroupCreateForm, GroupEditForm)
 
 POSTS_ON_PAGE = 30
 
@@ -34,6 +35,13 @@ def get_recommended_users(request, user_exclude=None):
         if user_exclude:
             id_list.append(user_exclude)
     return User.objects.filter(profile__is_allow_recommends=True).exclude(pk__in=id_list).select_related('profile').order_by('?')
+
+
+def get_recommended_groups(group_exclude=None):
+    id_list = []
+    if group_exclude:
+        id_list.append(group_exclude.pk)
+    return Group.objects.all().exclude(pk__in=id_list).select_related(*GROUP_SR).order_by('?')
 
 
 def index(request):
@@ -83,7 +91,7 @@ def explore_users(request):
 
 def explore_groups(request):
     context = {
-
+        'recommended_groups': get_recommended_groups(),
     }
     return render(request, 'explore_groups.html', context)
 
@@ -111,6 +119,9 @@ def profile(request, username=None):
     if 'profile-bookmarks' in request.path:
         template_name = 'my_bookmarks.html'
         posts = request.user.profile.bookmarks.filter(is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR)
+    elif 'profile-archived' in request.path:
+        template_name = 'my_archived.html'
+        posts = Post.objects.filter(user_profile=request.user.profile, is_archived=True).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
     else:
         posts = Post.objects.filter(user_profile=user.profile, is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
 
@@ -143,14 +154,18 @@ def group(request, groupname):
     else:
         is_following = False
 
-    posts = Post.objects.filter(group=group, is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
+    if group.owner == request.user and 'group-archived' in request.path:
+        template_name = 'my_group_archived.html'
+        posts = Post.objects.filter(group=group, is_archived=True).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
+    else:
+        posts = Post.objects.filter(group=group, is_archived=False).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
 
     context = {
         'group': group,
         'followers': group.followers.all().select_related('user'),
         'is_following': is_following,
         'posts': posts,
-        # 'recommended_groups': recommended_groups,
+        'recommended_groups': get_recommended_groups(group_exclude=group),
     }
     return render(request, template_name, context)
 
@@ -158,7 +173,7 @@ def group(request, groupname):
 @login_required
 def group_create(request):
     if request.method == 'POST':
-        form = GroupCreateEditForm(request.POST, files=request.FILES)
+        form = GroupCreateForm(request.POST, files=request.FILES)
         if form.is_valid():
             group = Group.objects.create(
                 groupname=form.cleaned_data.get('groupname'),
@@ -175,7 +190,7 @@ def group_create(request):
             messages.error(request, 'Не получилось. Проверьте правильность введенных данных и повторите попытку.')
 
     else:
-        form = GroupCreateEditForm()
+        form = GroupCreateForm()
 
     context = {
         'form': form,
@@ -212,6 +227,37 @@ def profile_settings_info(request):
         'profile_form': profile_form,
     }
     return render(request, 'profile_settings.html', context)
+
+
+@login_required
+def group_settings(request, groupname):
+    group = get_object_or_404(Group, groupname=groupname)
+    if group.owner != request.user:
+        messages.error(request, "Вы не можете редактировать настройки этой группы")
+        return redirect('group', groupname)
+
+    if request.method == 'POST':
+        form = GroupEditForm(request.POST, instance=group, files=request.FILES)
+
+        if request.POST.get('delete_current_photo') == 'Удалить текущее фото':
+            group.profile_pic.delete()
+            messages.success(request, mark_safe('<i class="fa-regular fa-face-frown"></i> Главное фото удалено. Давай загрузим новое!'))
+
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Сообщество обновлено!')
+            return redirect('group', groupname)
+        else:
+            messages.error(request, 'Не удалось изменить настройки. Проверьте правильность введенных данных и повторите попытку.')
+
+    else:
+        form = GroupEditForm(instance=group)
+
+    context = {
+        'form': form,
+        'group': group,
+    }
+    return render(request, 'group_settings.html', context)
 
 
 @login_required
@@ -308,7 +354,11 @@ def post_edit(request, post_pk):
         messages.warning(request, f'Такой публикации не существует или она была удалена')
         return redirect('index')
 
-    if (post.user_profile and request.user.profile != post.user_profile) or (post.group and request.user != post.group.owner):
+    if post.user_profile and request.user.profile == post.user_profile:
+        template_name = 'post_edit.html'
+    elif post.group and request.user == post.group.owner:
+        template_name = 'post_edit_from_group.html'
+    else:
         messages.error(request, f'Вы не можете отредактировать эту публикацию')
         return redirect('post', post.pk)
 
@@ -326,4 +376,4 @@ def post_edit(request, post_pk):
         'post': post,
         'form': form,
     }
-    return render(request, 'post_edit.html', context)
+    return render(request, template_name, context)

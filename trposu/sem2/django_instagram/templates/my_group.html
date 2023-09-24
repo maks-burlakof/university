@@ -1,1 +1,9 @@
 {% extends 'group.html' %}
+{% block profile_buttons %}
+   {{ block.super }}
+   <a href="{{ group.get_edit_absolute_url }}" class="btn btn-sm text-bg-gray rounded-pill">Редактировать</a>
+{% endblock %}
+{% block post_links %}
+   <a href="#" class="common-link posts-link-active pt-3"><i class="fa-solid fa-table-cells me-1"></i> ПУБЛИКАЦИИ</a>
+	<a href="{% url 'group-archived' group.groupname %}" class="pt-3 common-link"><i class="fa-regular fa-folder me-1"></i> АРХИВ</a>
+{% endblock %}

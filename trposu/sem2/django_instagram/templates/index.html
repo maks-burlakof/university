@@ -44,7 +44,12 @@
                         <p class="text-muted small mb-0">{{ user.first_name }} {{ user.last_name }}</p>
                      </div>
                   </div>
-                  <a href="{% url 'logout' %}" class="text-muted"><i class="fa-solid fa-arrows-rotate"></i></a>
+                  <div class="d-flex">
+                     {% if user.is_superuser %}
+                        <a href="{% url 'admin:index' %}" title="Админ-панель" class="text-muted me-2"><i class="fa-solid fa-screwdriver-wrench"></i></a>
+                     {% endif %}
+                     <a href="{% url 'logout' %}" title="Сменить аккаунт" class="text-muted"><i class="fa-solid fa-arrows-rotate"></i></a>
+                  </div>
                </div>
             {% endif %}
 

@@ -1,0 +1,89 @@
+{% extends 'profile_settings.html' %}
+{% block title %}Редактировать сообщество @{{ group.groupname }} · Babushka{% endblock %}
+{% block extrastyle %}
+   {{ form.media }}
+{% endblock %}
+
+{% block profile-settings-title %}
+   <h3 class="fw-bold mb-4">Редактировать сообщество</h3>
+{% endblock %}
+
+{% block profile-settings-info %}
+   <div class="d-flex align-items-center mb-4">
+      <img src="{{ group.get_profile_pic }}" class="profile-photo me-3" style="width: 55px; height: 55px;">
+      <div>
+         <p class="mb-0">{{ group.groupname }}</p>
+         <a type="button" data-bs-toggle="modal" data-bs-target="#upload-photo-modal" class="link-primary">Изменить главное фото</a>
+      </div>
+   </div>
+{% endblock %}
+
+{% block profile-settings-tabs %}{% endblock %}
+
+{% block profile-settings-form %}
+	<form method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      {% if form.non_field_errors %}
+         {% include 'includes/form_non_field_errors.html' %}
+      {% endif %}
+      <div class="mb-3 row">
+         <label for="id_title" class="fw-bold col-sm-3 col-form-label">Название</label>
+         <div class="col-sm-9">
+            <div>
+               {{ form.title }}
+            </div>
+         </div>
+      </div>
+      <div class="mb-3 row">
+         <label for="id_description" class="fw-bold col-sm-3 col-form-label">О сообществе</label>
+         <div class="col-sm-9">
+            <div>
+               {{ form.description }}
+            </div>
+            <div class="form-input-description">
+               <span id="id_description_length"></span>
+               <span> / 128</span>
+            </div>
+         </div>
+      </div>
+      <div class="mb-4 row">
+         <label for="id_site_url" class="fw-bold col-sm-3 col-form-label">Сайт</label>
+         <div class="col-sm-9">
+            <div>
+               {{ form.site_url }}
+            </div>
+         </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary rounded-pill">Сохранить</button>
+
+      <div class="modal fade" id="upload-photo-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-5 p-4">
+               <div class="modal-header border-0 pb-1">
+                  <h5 class="modal-title"><i class="fa-regular fa-image me-1"></i> Изменить главное фото</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  {{ form.profile_pic }}
+                  <div class="d-flex justify-content-between mt-4">
+                     <button type="submit" class="btn btn-sm btn-primary rounded-pill">Сохранить</button>
+                     <input type="submit" name="delete_current_photo" value="Удалить текущее фото" class="btn btn-sm btn-danger rounded-pill">
+                  </div>
+               </div>
+            </div>
+         </div>
+      </div>
+   </form>
+{% endblock %}
+{% block extrajs %}
+	{{ block.super }}
+<script>
+    {% if form.errors %}{% for field in form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+</script>
+{% endblock %}
+{% block footer %}{% endblock %}

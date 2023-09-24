@@ -27,9 +27,6 @@
             <span></span>
             <div class="content">
                <img class="d-block mx-auto mb-3 mt-2" src="{% static 'img/babushka-logo.png' %}" width="260" />
-               {% if form.non_field_errors %}
-                  {% include 'includes/form_non_field_errors.html' %}
-               {% endif %}
                <form method="post">
                   {% csrf_token %}
                   <div class="mb-3">
@@ -57,6 +54,9 @@
 
          <div class="card shadow rounded-5 mt-3 mx-sm-4">
             <div class="card-body p-4">
+               {% if form.non_field_errors %}
+                  {% include 'includes/form_non_field_errors.html' %}
+               {% endif %}
                <p class="text-center mb-2">
                   Нет аккаунта?
                   <a href="{% url 'register' %}" class="btn btn-primary btn-sm rounded-pill ms-2 px-3">Зарегистрируйтесь!</a>

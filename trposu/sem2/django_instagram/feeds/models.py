@@ -12,7 +12,7 @@ def get_user_absolute_url(self):
 
 
 def get_user_str(self):
-    return f'@{self.username} {self.first_name} {self.last_name}'
+    return self.username
 
 
 User.add_to_class("__str__", get_user_str)
@@ -63,6 +63,8 @@ class Profile(models.Model):
     )
     profile_pic = models.ImageField(
         upload_to=img_path,
+        null=True,
+        blank=True,
         verbose_name='Фото профиля',
     )
     description = models.CharField(
@@ -132,6 +134,7 @@ class Group(models.Model):
         error_messages={
             "unique": "Такое сообщество уже существует.",
         },
+        verbose_name='Никнейм',
     )
     title = models.CharField(
         max_length=64,
@@ -140,6 +143,7 @@ class Group(models.Model):
     owner = models.OneToOneField(
         to=User,
         on_delete=models.DO_NOTHING,
+        verbose_name='Владелец',
     )
     followers = models.ManyToManyField(
         to='Profile',
@@ -148,6 +152,8 @@ class Group(models.Model):
     )
     profile_pic = models.ImageField(
         upload_to=img_path,
+        null=True,
+        blank=True,
         verbose_name='Фото сообщества',
     )
     description = models.CharField(
@@ -176,6 +182,9 @@ class Group(models.Model):
 
     def get_absolute_url(self):
         return reverse('group', args=[self.groupname])
+
+    def get_edit_absolute_url(self):
+        return reverse('group-settings', args=[self.groupname])
 
     def __str__(self):
         return self.groupname
@@ -250,6 +259,11 @@ class Post(models.Model):
     def get_num_of_bookmarks(self):
         return self.bookmarks_profile.count()
 
+    get_str_time.short_description = 'Создан'
+    get_num_of_likes.short_description = 'Лайков'
+    get_num_of_comments.short_description = 'Комментариев'
+    get_num_of_bookmarks.short_description = 'В закладках'
+
     def is_user_liked(self, user):
         # return self.likes.filter(user=user).exists()
         return self.likes.filter(user=user).exists()
@@ -276,13 +290,16 @@ class Comment(models.Model):
         to=Post,
         on_delete=models.CASCADE,
         related_name='comments',
+        verbose_name='Публикация',
     )
     user = models.ForeignKey(
         to=User,
         on_delete=models.CASCADE,
+        verbose_name='Пользователь',
     )
     comment = models.CharField(
         max_length=256,
+        verbose_name='Комментарий',
     )
     created = models.DateTimeField(
         auto_now_add=True,
@@ -292,6 +309,8 @@ class Comment(models.Model):
 
     def get_str_time(self):
         return get_str_time(self)
+
+    get_str_time.short_description = 'Время'
 
     def __str__(self):
         return self.comment

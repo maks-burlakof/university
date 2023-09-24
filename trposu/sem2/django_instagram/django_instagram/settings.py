@@ -15,6 +15,7 @@ ALLOWED_HOSTS = ['*', ]
 
 INSTALLED_APPS = [
     'image_uploader_widget',
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -100,6 +101,34 @@ LOGGING = {
             'level': getenv('DJANGO_LOG_LEVEL', 'INFO'),
         },
     },
+}
+
+JAZZMIN_SETTINGS = {
+    'site_logo': 'favicon.png',
+    'login_logo': 'img/babushka-photo.png',
+    'welcome_sign': 'Администратор Babushka',
+    'copyright': 'Babushka',
+    'search_model': ['auth.User', 'feeds.group', 'feeds.post'],
+    'topmenu_links': [
+        {'name': 'Открыть сайт',  'url': 'index'}
+    ],
+    'usermenu_links': [
+        {'name': 'Открыть сайт',  'url': 'index', 'new_window': False, 'icon': 'fas fa-external-link-square-alt'}
+    ],
+    'custom_links': {
+        'feeds': [
+            {'name': 'Пользователи', 'url': 'admin:auth_user_changelist', 'icon': 'fas fa-user'},
+        ]
+    },
+    'icons': {
+        'feeds.group': 'fas fa-users',
+        'feeds.post': 'fas fa-camera-retro',
+        'admin.logentry': 'fas fa-address-book',
+    },
+    'hide_apps': ['auth'],
+    'related_modal_active': False,
+    'show_ui_builder': False,
+    'dark_mode_theme': 'darkly',
 }
 
 LANGUAGE_CODE = 'ru-ru'

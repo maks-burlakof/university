@@ -1,5 +1,4 @@
 {% extends 'base_generic.html' %}
-{% load static %}
 {% block title %}Редактировать профиль · Babushka{% endblock %}
 {% block extrastyle %}
 	{{ profile_form.media }}
@@ -7,20 +6,27 @@
 {% block content %}
    <div class="row justify-content-center">
       <div class="col-12 col-md-8 col-lg-7 col-xl-5">
-         <h3 class="fw-bold mb-4">Редактировать профиль</h3>
 
-         <div class="d-flex align-items-center mb-4">
-            <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-3" style="width: 55px; height: 55px;">
-            <div>
-               <p class="mb-0">{{ user.username }}</p>
-               {% block set-profile-picture-link %}<a type="button" data-bs-toggle="modal" data-bs-target="#upload-photo-modal" class="link-primary">Изменить фото профиля</a>{% endblock %}
+         {% block profile-settings-title %}
+            <h3 class="fw-bold mb-4">Редактировать профиль</h3>
+         {% endblock %}
+
+         {% block profile-settings-info %}
+            <div class="d-flex align-items-center mb-4">
+               <img src="{{ user.profile.get_profile_pic }}" class="profile-photo me-3" style="width: 55px; height: 55px;">
+               <div>
+                  <p class="mb-0">{{ user.username }}</p>
+                  {% block set-profile-picture-link %}<a type="button" data-bs-toggle="modal" data-bs-target="#upload-photo-modal" class="link-primary">Изменить фото профиля</a>{% endblock %}
+               </div>
             </div>
-         </div>
+         {% endblock %}
 
-         <div class="mb-4">
-            <span><a href="{% url 'profile-settings' %}" class="btn btn-sm text-bg-gray rounded-pill {% block border-info %}border border-secondary{% endblock %} me-2 mb-1"><i class="fa-solid fa-user mx-1"></i> Основная информация</a></span>
-            <span><a href="{% url 'profile-settings-security' %}" class="btn btn-sm text-bg-gray rounded-pill {% block border-security %}{% endblock %} mb-1"><i class="fa-solid fa-lock mx-1"></i> Безопасность</a></span>
-         </div>
+         {% block profile-settings-tabs %}
+            <div class="mb-4">
+               <span><a href="{% url 'profile-settings' %}" class="btn btn-sm text-bg-gray rounded-pill {% block border-info %}border border-secondary{% endblock %} me-2 mb-1"><i class="fa-solid fa-user mx-1"></i> Основная информация</a></span>
+               <span><a href="{% url 'profile-settings-security' %}" class="btn btn-sm text-bg-gray rounded-pill {% block border-security %}{% endblock %} mb-1"><i class="fa-solid fa-lock mx-1"></i> Безопасность</a></span>
+            </div>
+         {% endblock %}
 
          {% block profile-settings-form %}
             <form method="post" enctype="multipart/form-data">
@@ -99,12 +105,12 @@
 
                <div class="modal fade" id="upload-photo-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
                   <div class="modal-dialog modal-dialog-centered">
-                     <div class="modal-content">
+                     <div class="modal-content rounded-5 p-4">
+                        <div class="modal-header border-0 pb-1">
+                           <h5 class="modal-title"><i class="fa-regular fa-image me-1"></i> Изменить фото профиля</h5>
+                           <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
                         <div class="modal-body">
-                           <div class="d-flex justify-content-between mb-2">
-                              <h5><i class="fa-regular fa-image me-1"></i> Изменить фото профиля</h5>
-                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                           </div>
                            {{ profile_form.profile_pic }}
                            <div class="d-flex justify-content-between mt-4">
                               <button type="submit" class="btn btn-sm btn-primary rounded-pill">Сохранить</button>
@@ -120,26 +126,26 @@
    </div>
 {% endblock %}
 {% block extrajs %}
-   <script>
-       {% if user_form.errors %}{% for field in user_form %}
-       {% if field.errors %}
-           AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
-       {% endif %}
-       {% endfor %}{% endif %}
+<script>
+    {% if user_form.errors %}{% for field in user_form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
 
-       {% if profile_form.errors %}{% for field in profile_form %}
-       {% if field.errors %}
-           AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
-       {% endif %}
-       {% endfor %}{% endif %}
-   </script>
-   <script>
-       let profileFormDescriptionInput = document.querySelector('#id_description');
-       let profileFormDescriptionOutput = document.querySelector('#id_description_length');
+    {% if profile_form.errors %}{% for field in profile_form %}
+    {% if field.errors %}
+        AddBsError("{{ field.id_for_label }}", "{% for error in field.errors %}{{ error }} {% endfor %}")
+    {% endif %}
+    {% endfor %}{% endif %}
+</script>
+<script>
+    let profileFormDescriptionInput = document.querySelector('#id_description');
+    let profileFormDescriptionOutput = document.querySelector('#id_description_length');
 
-       profileFormDescriptionOutput.textContent = 0 + profileFormDescriptionInput.value.length;
-       profileFormDescriptionInput.addEventListener('input', function () {
-           profileFormDescriptionOutput.textContent = 0 + this.value.length;
-       })
-   </script>
+    profileFormDescriptionOutput.textContent = 0 + profileFormDescriptionInput.value.length;
+    profileFormDescriptionInput.addEventListener('input', function () {
+        profileFormDescriptionOutput.textContent = 0 + this.value.length;
+    })
+</script>
 {% endblock %}

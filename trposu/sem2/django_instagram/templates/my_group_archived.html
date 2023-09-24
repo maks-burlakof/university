@@ -1,0 +1,5 @@
+{% extends 'my_group.html' %}
+{% block post_links %}
+   <a href="{{ group.get_absolute_url }}" class="common-link pt-3"><i class="fa-solid fa-table-cells me-1"></i> ПУБЛИКАЦИИ</a>
+	<a href="#" class="pt-3 common-link posts-link-active"><i class="fa-regular fa-folder me-1"></i> АРХИВ</a>
+{% endblock %}

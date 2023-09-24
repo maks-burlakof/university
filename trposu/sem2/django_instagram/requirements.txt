@@ -3,3 +3,4 @@ Pillow~=10.0.0
 django-image-uploader-widget~=0.3.0
 python-dotenv~=1.0.0
 qrcode~=7.4.2
+django-jazzmin~=2.6.0

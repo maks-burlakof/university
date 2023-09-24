@@ -1,0 +1,14 @@
+{% extends 'post_edit.html' %}
+{% block post-from-profile %}
+   <div>
+      <a href="{{ post.group.get_absolute_url }}" class="common-link">
+         <span class="d-flex align-items-center">
+            <img src="{{ post.group.get_profile_pic }}" class="profile-photo me-3" style="width: 40px; height: 40px;">
+            <span>
+               <p class="fw-bold mb-0">{{ post.group.groupname }}</p>
+               <p class="small mb-0">{{ post.group.title }}</p>
+            </span>
+         </span>
+      </a>
+   </div>
+{% endblock %}
