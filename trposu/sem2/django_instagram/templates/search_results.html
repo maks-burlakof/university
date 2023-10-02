@@ -1,0 +1,101 @@
+{% extends 'base_generic.html' %}
+{% block title %}Поиск · Babushka{% endblock %}
+{% block content %}
+	<div class="row g-5">
+      <div class="col-12 col-sm-12 col-md-7 col-lg-7 col-xl-6 offset-lg-1 offset-xl-2">
+         {% if not users_result and not groups_result and not posts_result %}
+            <div class="text-muted opacity-50">
+               <h3 class="fw-bold"><i class="fa-solid fa-circle-notch fa-spin me-1"></i> Ничего не смогли найти,</h3>
+               <h4 class="mb-4">может попробуем поискать что-нибудь еще?</h4>
+            </div>
+         {% endif %}
+
+         {% if groups_result %}
+            <h5 class="fw-bold text-primary mb-3">Сообщества</h5>
+            <div class="row row-cols-2 g-5 mb-5">
+               {% for group in groups_result %}
+                  <div class="col d-flex align-items-center">
+                     <a href="{{ group.get_absolute_url }}">
+                        <img src="{{ group.get_profile_pic }}" class="profile-photo" style="width: 80px; height: 80px;">
+                     </a>
+                     <div class="ms-4">
+                        <a href="{{ group.get_absolute_url }}" class="fs-5 fw-bold common-link mb-0">{{ group.groupname }}</a>
+                        <p class="mb-0 limit-str" style="--num-lines: 1;">{{ group.title }}</p>
+                        <p class="text-muted small mb-2 limit-str" style="--num-lines: 1;">{{ group.description|default:"" }}</p>
+                     </div>
+                  </div>
+               {% endfor %}
+            </div>
+         {% endif %}
+
+         {% if posts_result %}
+            <h5 class="fw-bold text-primary mb-2">Публикации</h5>
+            {% for post in posts_result %}
+               {% if post.user_profile %}
+                  {% include 'includes/post.html' %}
+               {% elif post.group %}
+                  {% include 'includes/post_from_group.html' %}
+               {% endif %}
+            {% endfor %}
+            {% include 'includes/post_modals.html' %}
+
+            {% if not user.is_authenticated %}
+               <div class="text-muted opacity-50 mt-5">
+                  <h3 class="fw-bold"><i class="fa-solid fa-right-to-bracket fa-rotate-180 me-1"></i> Зарегистрируйтесь или войдите в аккаунт,</h3>
+                  <h4 class="mb-4">чтобы стать частью сообщества!</h4>
+                  <a href="{% url 'register' %}" class="btn text-bg-gray rounded-pill">Зарегистрироваться</a>
+                  <a href="{% url 'login' %}" class="btn text-bg-gray rounded-pill">Войти</a>
+               </div>
+            {% endif %}
+         {% endif %}
+      </div>
+      <div class="d-none d-md-block col-md-5 col-lg-4 col-xl-3">
+         <form method="get">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+               <h4 class="fw-bold text-primary mb-0">Поиск</h4>
+               <button type="submit" class="btn btn-sm rounded-pill btn-primary fw-bold px-3">Искать</button>
+            </div>
+            <div class="input-group mb-3">
+               <span class="input-group-text" id="basic-addon1"><i class="fa-solid fa-magnifying-glass"></i></span>
+               <input type="text" name="q" class="form-control" value="{{ search_text }}">
+            </div>
+            <div class="form-check form-switch mb-2">
+               <input class="form-check-input" type="checkbox" role="switch" name="users" {% if search_users %}checked{% endif %}>
+               <label class="form-check-label" for="flexSwitchCheckDefault">Пользователи</label>
+            </div>
+            <div class="form-check form-switch mb-2">
+               <input class="form-check-input" type="checkbox" role="switch" name="groups" {% if search_groups %}checked{% endif %}>
+               <label class="form-check-label" for="flexSwitchCheckDefault">Сообщества</label>
+            </div>
+            <div class="form-check form-switch">
+               <input class="form-check-input" type="checkbox" role="switch" name="posts" {% if search_posts %}checked{% endif %}>
+               <label class="form-check-label" for="flexSwitchCheckDefault">Посты</label>
+            </div>
+         </form>
+         {% if users_result %}
+            <div class="mt-5 mb-5">
+               <h5 class="fw-bold text-primary mb-3">Пользователи</h5>
+               {% for person in users_result %}
+                  <div class="d-flex align-items-center mb-2">
+                     <a href="{{ person.get_absolute_url }}">
+                        <img src="{{ person.profile.get_profile_pic }}" class="profile-photo me-3" style="width: 45px; height: 45px;">
+                     </a>
+                     <div>
+                        <a class="common-link fw-bold mb-0" href="{{ person.get_absolute_url }}">{{ person.username }}</a>
+                        <p class="text-muted small limit-str mb-0" style="--num-lines: 1;">{{ person.first_name }} {{ person.last_name }}</p>
+                     </div>
+                  </div>
+               {% endfor %}
+            </div>
+         {% endif %}
+         <div style="font-size: 0.8em; color: rgb(204,204,204)" class="mt-4">
+            <span><a href="{% url 'docs-index' %}" class="common-link">Информация</a> · </span>
+            <span><a href="#" class="common-link">Рейтинг аккаунтов</a> · </span>
+            <span><a href="#" class="common-link">Хэштэги</a> · </span>
+            <span><a href="#" class="common-link">Места</a></span>
+            <p class="mb-0 mt-2"><i class="fa-regular fa-copyright"></i> 2023 BABUSHKA FROM BSUIR</p>
+         </div>
+      </div>
+   </div>
+{% endblock %}
+{% block footer %}{% endblock %}

@@ -25,10 +25,26 @@
             <label for="id_is_allow_comments">В архив</label>
          </div>
       </div>
-      <div class="mb-3">
+      <div class="mb-4">
          <div class="form-check form-switch">
             {{ form.is_allow_comments }}
             <label for="id_is_allow_comments">Разрешить комментарии</label>
+         </div>
+      </div>
+      <a type="button" data-bs-toggle="modal" data-bs-target="#delete-post-modal" class="btn btn-sm btn-danger rounded-pill px-3">Удалить</a>
+
+      <div class="modal fade" id="delete-post-modal" data-bs-backdrop="static" tabindex="-1" aria-hidden="true">
+         <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-5 p-4">
+               <div class="modal-header border-0 pb-1">
+                  <h5 class="modal-title text-danger"><i class="fa-solid fa-trash me-1"></i> Удалить публикацию?</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+               </div>
+               <div class="modal-body">
+                  <p class="fs-5">Вы можете архивировать публикацию и не удалять ее. Другие пользователи не увидят те фотографии, которые вы добавили в архив.</p>
+                  <input type="submit" name="delete_post" value="Удалить публикацию" class="btn btn-danger rounded-pill">
+               </div>
+            </div>
          </div>
       </div>
    </form>

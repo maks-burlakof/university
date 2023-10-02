@@ -4,7 +4,7 @@ from django.db.models.signals import post_save, pre_delete, pre_save
 from django.contrib.auth.models import User
 from django.dispatch import receiver
 
-from .models import Profile
+from .models import Profile, Post, Group
 
 logger = logging.getLogger(__name__)
 
@@ -33,9 +33,20 @@ def delete_directory_if_empty(directory_path):
 
 
 @receiver(pre_delete, sender=Profile)
-def delete_image(sender, instance, **kwargs):
+@receiver(pre_delete, sender=Group)
+def delete_profile_pic(sender, instance, **kwargs):
     if instance.profile_pic:
         filepath = instance.profile_pic.path
+        if os.path.isfile(filepath):
+            os.remove(filepath)
+        directory_path = os.path.dirname(filepath)
+        delete_directory_if_empty(directory_path)
+
+
+@receiver(pre_delete, sender=Post)
+def delete_image(sender, instance, **kwargs):
+    if instance.image:
+        filepath = instance.image.path
         if os.path.isfile(filepath):
             os.remove(filepath)
         directory_path = os.path.dirname(filepath)

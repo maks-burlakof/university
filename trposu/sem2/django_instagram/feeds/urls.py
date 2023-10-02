@@ -15,6 +15,7 @@ urlpatterns = [
     path('explore/', views.explore, name='explore'),
     path('explore/users/', views.explore_users, name='explore-users'),
     path('explore/groups/', views.explore_groups, name='explore-groups'),
+    path('search/', views.search, name='search'),
     path('profile-edit/info/', views.profile_settings_info, name='profile-settings'),
     path('profile-edit/security/', auth.ChangePasswordView.as_view(), name='profile-settings-security'),
     path('profile-bookmarks/', views.profile, name='profile-bookmarks'),

@@ -24,10 +24,13 @@
             </a>
          </div>
          <div>
-            <form>
+            <form method="get" action="{% url 'search' %}">
                <div class="d-flex align-items-center">
                   <button class="btn" type="submit"><i class="fa-solid fa-magnifying-glass"></i></button>
-                  <input class="form-control form-control-sm border-0 bg-transparent" type="search" placeholder="Поиск..." aria-label="Поиск..."/>
+                  <input name="q" class="form-control form-control-sm border-0 bg-transparent" type="search" placeholder="Поиск..." aria-label="Поиск..."/>
+                  <input class="d-none" type="checkbox" role="switch" name="users" checked>
+                  <input class="d-none" type="checkbox" role="switch" name="groups" checked>
+                  <input class="d-none" type="checkbox" role="switch" name="posts" checked>
                </div>
             </form>
          </div>

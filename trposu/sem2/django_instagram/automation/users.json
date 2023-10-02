@@ -1,0 +1,261 @@
+[
+  {
+    "username": "super_babyla",
+    "first_name": "Валентина",
+    "last_name": "Ивановна",
+    "password": "babushkini_pirojki_567",
+    "email": "babyla@super.com",
+    "site_url": "",
+    "description": "Бабушка смогла сама зарегистрироваться в Бабушке! А ты сможешь?",
+    "gender": "w",
+    "profile_pic": "babushka-2.png",
+    "posts": [
+      {
+        "title": "Улыбаемся и машем, внучата",
+        "image": "babushka.png",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "ryan_gosling",
+    "first_name": "Райан",
+    "last_name": "Гослинг",
+    "password": "hollywood_i_love576",
+    "email": "ryan_the_actor@gosling.com",
+    "site_url": "https://www.kinopoisk.ru/name/10143/",
+    "description": "Привет, я Райан Гослинг! Актёр, каскадёр, и водитель, как в фильме 'Drive'. В свободное время люблю кататься на мотоцикле и улучшать свою игру в шахматы.",
+    "gender": "m",
+    "profile_pic": "ryan.jpeg",
+    "posts": [
+      {
+        "title": "На съемках нового блокбастера!",
+        "image": "barbie.jpg",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "anna_beauty",
+    "first_name": "Анна",
+    "last_name": "Красавина",
+    "password": "anna67krasavitza",
+    "email": "anna.beauty@gmail.com",
+    "site_url": "",
+    "description": "Привет! Я Анна, простая девушка с большими мечтами. Моя жизнь - это красота и улыбки. Люблю гулять в парке, читать романтические романы и готовить вкусные ужины.",
+    "gender": "w",
+    "profile_pic": "woman-1.png",
+    "posts": [
+      {
+        "title": "Закаты и романтика",
+        "image": "woman-1.png",
+        "is_allow_comments": true
+      },
+      {
+        "title": "",
+        "image": "woman-2.png",
+        "is_allow_comments": true
+      },
+      {
+        "title": "",
+        "image": "woman-3.png",
+        "is_allow_comments": true
+      },
+      {
+        "title": "",
+        "image": "woman-4.png",
+        "is_allow_comments": true
+      },
+      {
+        "title": "",
+        "image": "woman-5.png",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "nail_shumilino",
+    "first_name": "Елена",
+    "last_name": "Иванова",
+    "password": "NailMaster078",
+    "email": "nail.elenashumilino@example.com",
+    "site_url": "https://vk.com/podshum",
+    "description": "Привет, я Елена - мастер по маникюру и педикюру из мегаполиса Шумилино! Обладательницы красивых ногтей - моя страсть. Со мной ваши ногти всегда будут выглядеть безупречно.",
+    "gender": "w",
+    "profile_pic": "nails.jpg",
+    "posts": [
+      {
+        "title": "Новая коллекция маникюра",
+        "image": "manik.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Педикюр с шармом",
+        "image": "nails-2.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Подарите своим ногтям красоту!",
+        "image": "nails-3.jpg",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "elon_musk",
+    "first_name": "Илон",
+    "last_name": "Маск",
+    "password": "SpaceXTesla999",
+    "email": "elon@musk.com",
+    "site_url": "https://twitter.com/home",
+    "description": "Привет, я Илон Маск - визионер, инженер и основатель компаний SpaceX и Tesla. Моя цель - сделать человечество мультипланетарным и ускорить переход на чистую энергию.",
+    "gender": "m",
+    "profile_pic": "elon.jpg",
+    "posts": [
+      {
+        "title": "Миссия на Марс",
+        "image": "elon-2.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Новое поколение электромобилей",
+        "image": "elon-3.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Мечта о гиперзвуковых перевозках",
+        "image": "elon-4.jpg",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "chatgpt",
+    "first_name": "Chat",
+    "last_name": "GPT",
+    "password": "AIChat100101",
+    "email": "chatgpt@openai.com",
+    "site_url": "https://openai.com/",
+    "description": "Привет, я ChatGPT - искусственный интеллект, готовый помочь вам с вашими вопросами и задачами. Здесь для того, чтобы сделать вашу жизнь проще и интереснее.",
+    "gender": "w",
+    "profile_pic": "chatgpt.jpg",
+    "posts": [
+      {
+        "title": "Искусственный интеллект в действии",
+        "image": "chatgpt-2.png",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Советы по обучению нейронных сетей",
+        "image": "chatgpt-3.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Будущее искусственного интеллекта",
+        "image": "chatgpt-5.jpeg",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "dasha_traveler",
+    "first_name": "Даша",
+    "last_name": "Путешественница",
+    "password": "LoveAdventure123",
+    "email": "dasha.traveler@nickelodeon.com",
+    "site_url": "",
+    "description": "Привет, меня зовут Даша, и я обожаю путешествовать по всему миру! Моя жизнь - это одно приключение за другим. Давайте вместе исследовать новые места и создавать воспоминания!",
+    "gender": "w",
+    "profile_pic": "dasha-1.jpg",
+    "posts": [
+      {
+        "title": "Восхождение на вершину Килиманджаро",
+        "image": "dasha-2.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Подводное приключение в Барьерном рифе",
+        "image": "dasha-3.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Здесь что-то меня сплюснуло",
+        "image": "dasha-4.jpg",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "max_fitness",
+    "first_name": "Макс",
+    "last_name": "Фитнес",
+    "password": "FitMax123",
+    "email": "max.fitness@mail.ru",
+    "site_url": "",
+    "description": "Привет, меня зовут Макс, и я профессиональный фитнес-тренер! Я помогу вам достичь ваших целей в фитнесе, поделюсь секретами здорового образа жизни и мотивирую на успех.",
+    "gender": "m",
+    "profile_pic": "fitness-1.jpg",
+    "posts": [
+      {
+        "title": "Выпускница моих курсов. Запись по ссылке в профиле :)",
+        "image": "fitness-2.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Покушал после тренировки ;)",
+        "image": "fitness-3.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Секреты эффективной тренировки",
+        "image": "fitness-4.jpg",
+        "is_allow_comments": true
+      }
+    ]
+  },
+  {
+    "username": "sergei_povar",
+    "first_name": "Сергей",
+    "last_name": "Повар",
+    "password": "LoveCooking123Much",
+    "email": "sergei.cook@example.com",
+    "site_url": "",
+    "description": "Привет, меня зовут Сергей, и я повар с опытом! Я готовлю вкусные блюда со всего мира и делюсь рецептами. Давайте вместе создадим волшебство на кухне!",
+    "gender": "m",
+    "profile_pic": "cooking-1.jpg",
+    "posts": []
+  },
+  {
+    "username": "buzova86",
+    "first_name": "Olga",
+    "last_name": "Buzova",
+    "password": "olga_buzova_the_best",
+    "email": "olga@buzova.ru",
+    "site_url": "https://www.instagram.com/buzova86/",
+    "description": "TV presenter, actress, designer, singer. Directed by: Aram +7 (919) 771-17-77. AD/PR: Anton.",
+    "gender": "w",
+    "profile_pic": "buzova-1.jpg",
+    "posts": [
+      {
+        "title": "П-постоянство. Т - традиции. Вчера вы посмотрели вторую серию шоу «Новые звезды в Африке». К сожалению, я теперь смогу посмотреть только на rutube, ибо весь день была в кадре. Очень хочется услышать от вас обратную реакцию. Ведь наше шоу очень интересно и с точки зрении психологии: как раскрываются люди, как они ведут себя в стрессовой ситуации, какие предпринимают шаги и действия",
+        "image": "buzova-2.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "За одну неделю я побывала в 7 городах России!!! Бесконечные перелеты, переезды, недосып и стресс - это лишь часть моей жизни и профессии. Я давно выбрала сцену и Вас. Моя задача дарить Вам праздник и любовь.",
+        "image": "buzova-3.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Трек Позови уже в ротации на многих радиостанциях... И вы мне тоже очень нужны! Давайте вместе поднимем песню в чартах. Тот, кто любил или любит, понимает о чем я пою.. не могу ни стоять, ни идти... А я в скором времени представлю клип и продолжение нашей истории Верни.",
+        "image": "buzova-4.jpg",
+        "is_allow_comments": true
+      },
+      {
+        "title": "Очень жду премьеру... Похоже у меня появился мой новый любимый трек. Не терпится скорее его вам презентовать! Позови 15.10.2023",
+        "image": "buzova-5.jpg",
+        "is_allow_comments": true
+      }
+    ]
+  }
+]

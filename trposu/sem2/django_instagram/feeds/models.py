@@ -68,7 +68,7 @@ class Profile(models.Model):
         verbose_name='Фото профиля',
     )
     description = models.CharField(
-        max_length=128,
+        max_length=256,
         null=True,
         blank=True,
         verbose_name='О себе',

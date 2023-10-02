@@ -56,7 +56,7 @@
                <a href="{{ recommended_group.get_absolute_url }}" class="fs-5 fw-bold common-link mb-0">{{ recommended_group.groupname }}</a>
                <p class="mb-0 limit-str" style="--num-lines: 1;">{{ recommended_group.title }}</p>
                <p class="text-muted small mb-2 limit-str" style="--num-lines: 1;">{{ recommended_group.description|default:"" }}</p>
-               <span data-group-id="{{ group.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+               <span data-group-id="{{ recommended_group.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
             </div>
          </div>
       {% endfor %}

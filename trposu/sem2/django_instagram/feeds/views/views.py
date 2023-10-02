@@ -96,6 +96,64 @@ def explore_groups(request):
     return render(request, 'explore_groups.html', context)
 
 
+def search(request):
+    search_text = request.GET.get('q', '')
+    search_users = request.GET.get('users', '')
+    search_groups = request.GET.get('groups', '')
+    search_posts = request.GET.get('posts', '')
+
+    if search_users:
+        users_result = User.objects.filter(
+            Q(username__contains=search_text) |
+            Q(first_name__contains=search_text) |
+            Q(last_name__contains=search_text) |
+            Q(profile__site_url__contains=search_text) |
+            Q(profile__description__contains=search_text),
+        ).select_related('profile').order_by('-id')
+    else:
+        users_result = None
+
+    if search_groups:
+        groups_result = Group.objects.filter(
+            Q(title__contains=search_text) |
+            Q(groupname__contains=search_text) |
+            Q(site_url__contains=search_text) |
+            Q(description__contains=search_text),
+        ).select_related(*GROUP_SR).order_by('-id')
+    else:
+        groups_result = None
+
+    if search_posts:
+        posts_result = Post.objects.filter(
+            Q(title__contains=search_text) |
+            Q(created__contains=search_text) |
+            Q(group__groupname__contains=search_text) |
+            Q(group__title__contains=search_text) |
+            Q(user_profile__user__username__contains=search_text) |
+            Q(user_profile__user__first_name__contains=search_text) |
+            Q(user_profile__user__last_name__contains=search_text),
+            is_archived=False,
+        ).select_related(*POST_SR).prefetch_related(*POST_PR).order_by('-created')
+    else:
+        posts_result = None
+
+    if not search_text:
+        users_result = None
+        groups_result = None
+        posts_result = None
+
+    context = {
+        'search_text': search_text,
+        'search_users': search_users,
+        'search_groups': search_groups,
+        'search_posts': search_posts,
+        'users_result': users_result,
+        'groups_result': groups_result,
+        'posts_result': posts_result,
+    }
+    return render(request, 'search_results.html', context)
+
+
 def profile(request, username=None):
     if not username or request.user.username == username:
         if request.user.is_authenticated:
@@ -364,6 +422,12 @@ def post_edit(request, post_pk):
 
     if request.method == 'POST':
         form = EditPostForm(request.POST, instance=post)
+
+        if request.POST.get('delete_post') == 'Удалить публикацию':
+            post.delete()
+            messages.success(request, mark_safe('<i class="fa-regular fa-face-frown"></i> Публикация удалена. Давай загрузим новую!'))
+            return redirect('index')
+
         if form.is_valid():
             form.save()
             return redirect('post', post.pk)
