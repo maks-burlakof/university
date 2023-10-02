@@ -3,15 +3,17 @@
 <table cellpadding="0">
     <tr style="padding: 0">
         <td valign="top">Социальная сеть для обмена фотографиями</td>
-        <td valign="top"><img src="assets/images/logo.png" style="object-fit: cover; max-height: 50px;"></td>
+        <td valign="top"><img src="assets/images/logo.png" style="object-fit: cover; height: 40px;"></td>
     </tr>
 </table>
 
-<div style="display: flex; height: 50px">
-    <img src="assets/images/python.png" style="object-fit: cover; padding-right: 10px;">
-    <img src="assets/images/django.svg" style="object-fit: cover; padding-right: 10px;">
-    <img src="assets/images/bootstrap.png" style="object-fit: cover">
-</div>
+<table cellpadding="0">
+    <tr style="padding: 0">
+        <td valign="top"><img src="assets/images/python.png" style="object-fit: cover; height: 50px;"></td>
+        <td valign="top"><img src="assets/images/django.svg" style="object-fit: cover; height: 50px;"></td>
+        <td valign="top"><img src="assets/images/bootstrap.png" style="object-fit: cover; height: 50px;"></td>
+    </tr>
+</table>
 
 Python, Django | Bootstrap
 
