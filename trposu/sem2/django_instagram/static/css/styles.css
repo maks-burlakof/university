@@ -2,6 +2,9 @@
 .toast-container>:not(:last-child) {
     --bs-toast-spacing: 0.8rem;
 }
+.toast-notification {
+    z-index: 5000!important;
+}
 
 /* Override ImageUploaderWidget */
 .iuw-root {

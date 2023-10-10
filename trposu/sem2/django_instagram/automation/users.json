@@ -78,21 +78,21 @@
     "first_name": "Елена",
     "last_name": "Иванова",
     "password": "NailMaster078",
-    "email": "nail.elenashumilino@example.com",
+    "email": "nail.elena@shumilino.com",
     "site_url": "https://vk.com/podshum",
     "description": "Привет, я Елена - мастер по маникюру и педикюру из мегаполиса Шумилино! Обладательницы красивых ногтей - моя страсть. Со мной ваши ногти всегда будут выглядеть безупречно.",
     "gender": "w",
     "profile_pic": "nails.jpg",
     "posts": [
       {
-        "title": "Новая коллекция маникюра",
+        "title": "",
         "image": "manik.jpg",
-        "is_allow_comments": true
+        "is_allow_comments": false
       },
       {
-        "title": "Педикюр с шармом",
+        "title": "",
         "image": "nails-2.jpg",
-        "is_allow_comments": true
+        "is_allow_comments": false
       },
       {
         "title": "Подарите своим ногтям красоту!",

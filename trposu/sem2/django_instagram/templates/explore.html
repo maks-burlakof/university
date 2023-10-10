@@ -21,6 +21,13 @@
          {% for post in posts %}
             {% include 'includes/post_only_image.html' %}
          {% endfor %}
+         {% if not posts %}
+            <div class="text-muted opacity-50 p-4 mx-auto">
+               <h1 class="fw-bold" style="font-size: 4.5rem">Так-так... <i class="fa-regular fa-snowflake fa-spin-pulse ms-1"></i></h1>
+               <h5 class="mb-4">Здесь пока пусто, но именно ты можешь все <strong>исправить</strong>!</h5>
+               <a href="{% url 'post-create' %}" class="btn text-bg-gray rounded-pill">Запостить первым!</a>
+            </div>
+         {% endif %}
       </div>
    {% endblock %}
 {% endblock %}

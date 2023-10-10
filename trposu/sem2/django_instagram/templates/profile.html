@@ -99,6 +99,9 @@
       {% for post in posts %}
          {% include 'includes/post_only_image.html' %}
       {% endfor %}
+      {% if not posts %}
+      	<span class="opacity-50 small text-center mt-3 mb-5">Похоже, здесь ничего нет <i class="fa-regular fa-circle fa-flip ms-1"></i></span>
+      {% endif %}
    </div>
    {% include 'includes/post_modals.html' %}
    {% include 'includes/follow_list.html' %}
@@ -116,3 +119,4 @@
     });
 </script>
 {% endblock %}
+{% block footer %}{% endblock %}

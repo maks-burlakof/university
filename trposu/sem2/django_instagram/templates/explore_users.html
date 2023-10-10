@@ -14,10 +14,16 @@
             <div class="ms-4">
                <a href="{{ recommended_user.get_absolute_url }}" class="fs-5 fw-bold common-link mb-0">{{ recommended_user.username }}</a>
                <p class="mb-0 limit-str" style="--num-lines: 1;">{{ recommended_user.first_name }} {{ recommended_user.last_name }}</p>
-               <p class="text-muted small mb-2 limit-str" style="--num-lines: 1;">{{ recommended_user.profile.description|default:"" }}</p>
-               <span data-user-id="{{ person.id }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+               <p class="text-muted small mt-2 mb-2 limit-str" style="--num-lines: 2;">{{ recommended_user.profile.description|default:"" }}</p>
             </div>
          </div>
       {% endfor %}
+      {% if not users %}
+         <div class="text-muted opacity-50 p-4 mx-auto">
+            <h1 class="fw-bold" style="font-size: 4.5rem">Хм... <i class="fa-regular fa-circle fa-flip ms-1"></i></h1>
+            <h5 class="mb-4">Станьте первым зарегистрированным пользователем!</h5>
+            <a href="{% url 'register' %}" class="btn text-bg-gray rounded-pill">Регистрация</a>
+         </div>
+      {% endif %}
    </div>
 {% endblock %}

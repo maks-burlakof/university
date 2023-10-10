@@ -45,20 +45,21 @@
    <div class="text-center mb-5">
       <a href="{% url 'group-create' %}" class="btn btn-primary fw-bold rounded-pill">Создать сообщество</a>
    </div>
-   <h1 class="fw-bold text-muted text-center mb-3">Рекомендации</h1>
-   <div class="row row-cols-2 g-5">
-      {% for recommended_group in recommended_groups %}
-         <div class="col d-flex align-items-center">
-            <a href="{{ recommended_group.get_absolute_url }}">
-               <img src="{{ recommended_group.get_profile_pic }}" class="profile-photo" style="width: 110px; height: 110px;">
-            </a>
-            <div class="ms-4">
-               <a href="{{ recommended_group.get_absolute_url }}" class="fs-5 fw-bold common-link mb-0">{{ recommended_group.groupname }}</a>
-               <p class="mb-0 limit-str" style="--num-lines: 1;">{{ recommended_group.title }}</p>
-               <p class="text-muted small mb-2 limit-str" style="--num-lines: 1;">{{ recommended_group.description|default:"" }}</p>
-               <span data-group-id="{{ recommended_group.pk }}" class="submit-follow {% if is_following %}follow-followed{% endif %} btn btn-sm rounded-pill fw-bold px-3">{% if is_following %}Подписка{% else %}Подписаться{% endif %}</span>
+   {% if recommended_groups %}
+      <h1 class="fw-bold text-muted text-center mb-3">Рекомендации</h1>
+      <div class="row row-cols-2 g-5">
+         {% for recommended_group in recommended_groups %}
+            <div class="col d-flex align-items-center">
+               <a href="{{ recommended_group.get_absolute_url }}">
+                  <img src="{{ recommended_group.get_profile_pic }}" class="profile-photo" style="width: 110px; height: 110px;">
+               </a>
+               <div class="ms-4">
+                  <a href="{{ recommended_group.get_absolute_url }}" class="fs-5 fw-bold common-link mb-0">{{ recommended_group.groupname }}</a>
+                  <p class="mb-0 limit-str" style="--num-lines: 1;">{{ recommended_group.title }}</p>
+                  <p class="text-muted small mt-2 mb-2 limit-str" style="--num-lines: 2;">{{ recommended_group.description|default:"" }}</p>
+               </div>
             </div>
-         </div>
-      {% endfor %}
-   </div>
+         {% endfor %}
+      </div>
+   {% endif %}
 {% endblock %}
