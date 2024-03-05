@@ -1,0 +1,132 @@
+body {
+    overflow-x: hidden;
+}
+p, a, span {
+    font-size: 16px!important;
+}
+a {
+    text-decoration: none!important;
+    color: #2F91B6!important;
+}
+h1 {
+    font-size: 84px!important;
+}
+h2 {
+    font-size: 40px!important;
+}
+h6 {
+    font-size: 20px!important;
+}
+h5, h6 {
+    font-weight: 400!important;
+}
+.small {
+    font-size: .875em!important;
+}
+.container-fluid {
+    padding-left: 0!important;
+    padding-right: 0!important;
+}
+.navbar {
+    background: #1B1C1E;
+    padding: 70px 30px 70px 6.25vw!important;
+}
+.navbar a {
+    font-weight: 500;
+    color: #fff!important;
+    line-height: 1.2;
+    font-size: 14px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+}
+.left-sidebar {
+    background: #1B1C1E;
+    width: 6.25vw;
+    padding: 120px 15px 60px 15px;
+    z-index: 1;
+}
+.left-sidebar span {
+    display: block;
+    min-width: 20px;
+    width: 25px;
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    white-space: nowrap;
+    letter-spacing: 0.340em;
+    color: #888;
+}
+.left-sidebar .divider {
+    margin: 25px 0;
+    height: 70px;
+    width: 1px;
+    border-left: 1px solid #fff;
+}
+.right-content {
+    background-size: cover;
+    color: #fff;
+}
+.background-dark {
+    background: #1B1C1E;
+    color: #fff!important;
+}
+footer {
+    margin-top: 1px;
+    padding: 100px 300px;
+}
+footer h6 {
+    font-size: 14px!important;
+    font-weight: 700!important;
+    color: #888;
+    letter-spacing: 0.12em;
+    margin-bottom: 20px;
+}
+footer p {
+    margin-bottom: 2px;
+    color: #888;
+}
+footer a i {
+    margin-right: 10px;
+}
+.image-cover {
+    min-height: 302px;
+}
+
+/* Toasts */
+.toast-container>:not(:last-child) {
+    --bs-toast-spacing: 0.8rem;
+}
+.toast-notification {
+    position: fixed;
+    z-index: 5000;
+    @media (min-width: 576px) {
+        bottom: 1rem;
+    }
+    @media (max-width: 575px) {
+        bottom: 1rem;
+    }
+    right: 1rem;
+    width: 300px;
+}
+.toast-notification .text-bg-danger {
+    background: linear-gradient(to right, #fa3a3a, #c2010a);
+}
+
+/* Modals */
+.modal-content {
+    background: linear-gradient(to right, #243B55, #141E30);
+    border-radius: 2rem;
+    padding: 1.5rem;
+}
+.modal-header {
+    padding-bottom: 0;
+    border: 0;
+}
+.code-div {
+    background-color: #ECECEC;
+    border: 1px solid #dee2e6;
+    border-radius: 10px;
+    padding-left: 25px;
+}
+code {
+    white-space: break-spaces;
+}

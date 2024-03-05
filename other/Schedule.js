@@ -206,7 +206,7 @@ function addInlineSchedule(pairs, widget) {
   let stack = addSubStack();
   pairs.pairs.forEach(pair => {
     if (pair.weekNumber.includes(pairs.weekNum)&& ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0)) {
-      sizeRequired = 8*2 + 15 + 4 + (pair.subject.length * 9) + 2;
+      sizeRequired = 8*2 + 15 + 4 + (pair.subject.length * 9) + 2 + 5;
       if (sizeBusy + sizeRequired > 305 && stackNum === 1 && pairsCurrentCount < 4) {
         stack = addSubStack();
         sizeBusy = 0;

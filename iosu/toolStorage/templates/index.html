@@ -1,0 +1,67 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block content %}
+   <div class="d-flex">
+      <div class="left-sidebar d-flex flex-column align-items-center">
+         <span class="small text-uppercase fw-bold text-center">Инструментальный склад</span>
+         <div class="divider"></div>
+         <span>БГУИР 2024</span>
+      </div>
+      <div class="right-content w-100" style="background-image: url({% static 'img/home-01-slide-01.jpg' %});">
+         <div class="p-5 m-5" style="width: 60%;">
+            <h1>Где каждая деталь — ключ к успешному производству.</h1>
+            <h4 class="mt-5">Инструментальный склад в онлайне: легкость поиска, надежность хранения, идеальная организация. Для тех, кто ценит свое время и качество инструментов.</h4>
+         </div>
+      </div>
+   </div>
+   <div class="d-flex justify-content-end align-items-center" style="margin: 120px 0px">
+      <div class="me-5 pe-5" style="width: 40%;">
+         <h2>Бизнес-логика</h2>
+         <ul>
+            <li>Увеличение степени износа инструментов после изготовления.</li>
+            <li>Разделение прав доступа администратор / сотрудник.</li>
+            <li>При создании записи изготовления кол-во требуемых инструментов не должно превышать количество имеющихся.</li>
+            <li>При создании записи изготовления требуемое количество инструментов резервируется на время всего изготовления.</li>
+         </ul>
+         <h2>Ограничения</h2>
+         <ul>
+            <li>Все даты не могут быть позже, чем текущая дата.</li>
+            <li>Дата конца производства должна быть позже, чем дата его начала.</li>
+            <li>Последнее обслуживание оборудования не может быть раньше, чем дата ввода его в эксплуатацию.</li>
+            <li>Поля во всех таблицах обязательны к заполнению, кроме записей об ответственных сотрудниках, датах окончания изготовления, количестве брака.</li>
+            <li>Количество инструментов, среднее время изготовления являются целыми неотрицательными числами.</li>
+            <li>Степень износа является целым числом в диапазоне 0 ÷ 1000.</li>
+         </ul>
+      </div>
+      <img class="me-3" src="{% static 'img/rabochie.png' %}" width="526" height="526" alt="">
+      <img src="{% static 'img/home-02-485x526.jpg' %}" width="485" height="526" alt="">
+   </div>
+   <div id="login" class="background-dark" style="padding: 150px 125px">
+      <div class="row">
+         <div class="col px-5 mx-5">
+            <h2>Авторизация</h2>
+            <h6 class="mt-4">Учетная запись связана с сотрудником OneToOne. Добавлять сотрудников и их аккаунты может только администратор.</h6>
+         </div>
+         <div class="col">
+            {% if not user.is_authenticated %}
+               <form class="mx-auto" method="post" style="max-width: 450px">
+                  {% csrf_token %}
+                  <div class="mb-3">
+                     <label for="id_username" class="form-label">Имя пользователя</label>
+                     {{ login_form.username }}
+                  </div>
+                  <div class="mb-4">
+                     <label for="id_password" class="form-label">Пароль</label>
+                     {{ login_form.password }}
+                  </div>
+                  <button type="submit" class="btn btn-primary px-5">Войти</button>
+               </form>
+            {% else %}
+               <div class="text-center">
+                  <a href="{% url 'employee' %}" class="btn text-bg-primary px-4 py-4">Перейти в личный<br>кабинет сотрудника</a>
+               </div>
+            {% endif %}
+         </div>
+      </div>
+   </div>
+{% endblock %}

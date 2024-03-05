@@ -1,0 +1,324 @@
+{% extends 'employees_page.html' %}
+{% block employee_content %}
+   {% if responsible_equipment or responsible_production %}
+      <hr>
+   {% endif %}
+   <div class="mx-5 px-5 my-4 py-4">
+      <h1 class="mb-3">Сотрудники</h1>
+      <div class="d-flex align-items-start">
+         <div class="w-100">
+            <table class="table table-hover">
+               <thead>
+               <tr>
+                  <th scope="col">#</th>
+                  <th scope="col">ФИО</th>
+                  <th scope="col">Должность</th>
+                  <th scope="col"></th>
+               </tr>
+               </thead>
+               <tbody>
+               {% for employee in employees %}
+                  <tr>
+                     <th scope="row">{{ employee.id }}</th>
+                     <td>{{ employee }}</td>
+                     <td>{{ employee.position }}</td>
+                     <td>
+                        <a href="{% url 'admin:storage_employee_change' employee.id %}" class="me-2"><i class="fa-solid fa-pencil"></i></a>
+                        <a href="{% url 'admin:storage_employee_delete' employee.id %}"><i class="fa-solid fa-trash"></i></a>
+                     </td>
+                  </tr>
+               {% endfor %}
+               </tbody>
+            </table>
+            <div class="collapse" id="collapseCreateEmployee">
+               <div class="pt-3">
+                  <div class="card card-body">
+                     <code>
+                        SELECT * FROM EMPLOYEE;
+                        CREATE EMPLOYEE ();
+                     </code>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <form method="post" class="ms-5 p-5 background-dark">
+            {% csrf_token %}
+            {{ create_employee_form }}
+            <div class="mb-2">
+               <label for="floatingInput">Имя пользователя:</label>
+               {{ create_employee_form.login_form.username }}
+            </div>
+            <div class="mb-3">
+               <label for="floatingInput">Пароль:</label>
+               {{ create_employee_form.login_form.password }}
+            </div>
+            <button class="btn btn-primary px-4 me-2" type="submit">Добавить</button>
+            <button class="btn btn-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapseCreateEmployee" aria-expanded="false" aria-controls="collapseCreateEmployee"><i class="fa-solid fa-chevron-down"></i></button>
+         </form>
+      </div>
+      <a href="{% url 'admin:index' %}" class="btn text-bg-secondary">Все таблицы...</a>
+      <h1 class="mt-3 mb-4">Отчеты</h1>
+      <div class="accordion" id="accordionExample">
+         <div class="accordion-item">
+            <h2 class="accordion-header">
+               <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                  <i class="fa-solid fa-fire me-2" style="color: #f83535;"></i>
+                  Инструмент с высокой степенью используемости
+               </button>
+            </h2>
+            <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+               <div class="accordion-body">
+                  <p class="fw-bold">Код на Python:</p>
+                  <div class="code-div mb-3">
+                     <code>
+high_usable_tools = Tools.objects.annotate(
+   usage_count=Count('technologicalmapstools__technological_map__production')
+).filter(usage_count__gt=0).order_by('-usage_count')[:5]
+                     </code>
+                  </div>
+                  <p class="fw-bold">SQL-запрос:</p>
+                  <div class="code-div mb-3">
+                     <code>
+SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree", COUNT("storage_production"."id") AS "usage_count" FROM "storage_tools" LEFT OUTER JOIN "storage_technologicalmapstools" ON ("storage_tools"."id" = "storage_technologicalmapstools"."tools_id") LEFT OUTER JOIN "storage_technologicalmap" ON ("storage_technologicalmapstools"."technological_map_id" = "storage_technologicalmap"."id") LEFT OUTER JOIN "storage_production" ON ("storage_technologicalmap"."id" = "storage_production"."technological_map_id") GROUP BY "storage_tools"."id" HAVING COUNT("storage_production"."id") > 0 ORDER BY 5 DESC LIMIT 5
+                     </code>
+                  </div>
+                  <p class="fw-bold">Результат:</p>
+                  <table class="table table-hover">
+                     <thead>
+                     <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Инструмент</th>
+                        <th scope="col">Число использований</th>
+                        <th scope="col">Степень износа</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for tool in high_usable_tools %}
+                        <tr>
+                           <th scope="row">{{ forloop.counter }}</th>
+                           <td>{{ tool.name }}</td>
+                           <td>{{ tool.usage_count }}</td>
+                           <td>{{ tool.wear_degree }}</td>
+                        </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         <div class="accordion-item">
+            <h2 class="accordion-header">
+               <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                  <i class="fa-solid fa-wrench me-2" style="color: #40454f;"></i>
+                  Количество единиц инструмента для каждого оборудования
+               </button>
+            </h2>
+            <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+               <div class="accordion-body">
+                  <p class="fw-bold">Код на Python:</p>
+                  <div class="code-div mb-3">
+                     <code>
+unique_tools_num_for_equipment = Equipment.objects.annotate(
+   unique_tools_count=Count('technologicalmap__technologicalmapstools__tools', distinct=True)
+).order_by('-unique_tools_count')
+                     </code>
+                  </div>
+                  <p class="fw-bold">SQL-запрос:</p>
+                  <div class="code-div mb-3">
+                     <code>
+SELECT "storage_equipment"."id", "storage_equipment"."name", "storage_equipment"."type_id", "storage_equipment"."date_of_commissioning", "storage_equipment"."date_of_last_service", "storage_equipment"."responsible_employee_id", COUNT(DISTINCT "storage_technologicalmapstools"."tools_id") AS "unique_tools_count" FROM "storage_equipment" LEFT OUTER JOIN "storage_technologicalmap" ON ("storage_equipment"."id" = "storage_technologicalmap"."equipment_id") LEFT OUTER JOIN "storage_technologicalmapstools" ON ("storage_technologicalmap"."id" = "storage_technologicalmapstools"."technological_map_id") GROUP BY "storage_equipment"."id" ORDER BY 7 DESC
+                     </code>
+                  </div>
+                  <p class="fw-bold">Результат:</p>
+                  <table class="table table-hover">
+                     <thead>
+                     <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Оборудование</th>
+                        <th scope="col">Уникальных инструментов</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for equipment in unique_tools_num_for_equipment %}
+                        <tr>
+                           <th scope="row">{{ forloop.counter }}</th>
+                           <td>{{ equipment.name }}</td>
+                           <td>{{ equipment.unique_tools_count }}</td>
+                        </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         <div class="accordion-item">
+            <h2 class="accordion-header">
+               <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                  <i class="fa-solid fa-heart-crack me-2" style="color: #f34f78;"></i>
+                  Список инструментов, подверженных повышенному износу
+               </button>
+            </h2>
+            <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+               <div class="accordion-body">
+                  <p class="fw-bold">Код на Python:</p>
+                  <div class="code-div mb-3">
+                     <code>
+high_wear_tools = Tools.objects.filter(wear_degree__lt=1000).order_by('wear_degree')[:5]
+                     </code>
+                  </div>
+                  <p class="fw-bold">SQL-запрос:</p>
+                  <div class="code-div mb-3">
+                     <code>
+SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree" FROM "storage_tools" WHERE "storage_tools"."wear_degree" < 1000 ORDER BY "storage_tools"."wear_degree" ASC LIMIT 5
+                     </code>
+                  </div>
+                  <p class="fw-bold">Результат:</p>
+                  <table class="table table-hover">
+                     <thead>
+                     <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Инструмент</th>
+                        <th scope="col">Степень износа</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for tool in high_wear_tools %}
+                        <tr>
+                           <th scope="row">{{ forloop.counter }}</th>
+                           <td>{{ tool.name }}</td>
+                           <td>{{ tool.wear_degree }}</td>
+                        </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         <div class="accordion-item">
+            <h2 class="accordion-header">
+               <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                  <i class="fa-solid fa-hammer me-2" style="color: #323c4d;"></i>
+                  Количество единиц инструмента для токарного оборудования по технологическим картам
+               </button>
+            </h2>
+            <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+               <div class="accordion-body">
+                  <p class="fw-bold">Код на Python:</p>
+                  <div class="code-div mb-3">
+                     <code>
+tools_for_turning_equipment = Tools.objects.filter(
+   technologicalmapstools__technological_map__equipment__type_id=1
+).distinct()
+                     </code>
+                  </div>
+                  <p class="fw-bold">SQL-запрос:</p>
+                  <div class="code-div mb-3">
+                     <code>
+SELECT DISTINCT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree" FROM "storage_tools" INNER JOIN "storage_technologicalmapstools" ON ("storage_tools"."id" = "storage_technologicalmapstools"."tools_id") INNER JOIN "storage_technologicalmap" ON ("storage_technologicalmapstools"."technological_map_id" = "storage_technologicalmap"."id") INNER JOIN "storage_equipment" ON ("storage_technologicalmap"."equipment_id" = "storage_equipment"."id") WHERE "storage_equipment"."type_id" = 1
+                     </code>
+                  </div>
+                  <p class="fw-bold">Результат:</p>
+                  <table class="table table-hover">
+                     <thead>
+                     <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Инструмент</th>
+                        <th scope="col">Количество</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for tool in tools_for_turning_equipment %}
+                        <tr>
+                           <th scope="row">{{ forloop.counter }}</th>
+                           <td>{{ tool.name }}</td>
+                           <td>{{ tool.total_amount }}</td>
+                        </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         <div class="accordion-item">
+            <h2 class="accordion-header">
+               <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                  <i class="fa-solid fa-toolbox me-2" style="color: #fa8500;"></i>
+                  Общий список оборудования и инструментов
+               </button>
+            </h2>
+            <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+               <div class="accordion-body">
+                  <p class="fw-bold">Код на Python:</p>
+                  <div class="code-div mb-3">
+                     <code>
+equipment_with_tools = Equipment.objects.prefetch_related(
+   models.Prefetch(
+      'technologicalmap_set',
+      queryset=TechnologicalMap.objects.prefetch_related(
+         models.Prefetch(
+            'technologicalmapstools_set',
+            queryset=TechnologicalMapsTools.objects.select_related('tools')
+         )
+      )
+   )
+)
+                     </code>
+                  </div>
+                  <p class="fw-bold">SQL-запрос:</p>
+                  <div class="code-div mb-3">
+                     <code>
+SELECT "storage_equipment"."id", "storage_equipment"."name", "storage_equipment"."type_id", "storage_equipment"."date_of_commissioning", "storage_equipment"."date_of_last_service", "storage_equipment"."responsible_employee_id" FROM "storage_equipment"
+
+SELECT "storage_technologicalmap"."id", "storage_technologicalmap"."number", "storage_technologicalmap"."product_id", "storage_technologicalmap"."equipment_id" FROM "storage_technologicalmap" WHERE "storage_technologicalmap"."equipment_id" IN (2, 3, 1, 6, 10, 11, 12, 4, 5, 7, 8, 9, 13)
+
+SELECT "storage_technologicalmapstools"."id", "storage_technologicalmapstools"."technological_map_id", "storage_technologicalmapstools"."tools_id", "storage_technologicalmapstools"."number_of_required_tools", "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree" FROM "storage_technologicalmapstools" INNER JOIN "storage_tools" ON ("storage_technologicalmapstools"."tools_id" = "storage_tools"."id") WHERE "storage_technologicalmapstools"."technological_map_id" IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
+                     </code>
+                  </div>
+                  <p class="fw-bold">Результат:</p>
+                  <table class="table table-hover">
+                     <thead>
+                     <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Оборудование</th>
+                        <th scope="col">Инструменты</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for equipment in equipment_with_tools %}
+                        <tr>
+                           <th scope="row">{{ forloop.counter }}</th>
+                           <td>{{ equipment }}</td>
+                           <td>
+                              {% for technological_map in equipment.technologicalmap_set.all %}
+                                 <p class="fw-bold mb-0">{{ technological_map.number }}</p>
+                                 <ul>
+                                    {% for tool_info in technological_map.technologicalmapstools_set.all %}
+                                       <li>{{ tool_info.tools.name }} ({{ tool_info.number_of_required_tools }} шт.)</li>
+                                    {% endfor %}
+                                 </ul>
+                              {% endfor %}
+                           </td>
+                        </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+      </div>
+      <div class="card mt-4">
+         <div class="card-header">
+            <h6>Документы</h6>
+         </div>
+         <div class="card-body">
+            <p>Перечень изделий, произведенных в указанный период</p>
+            <div class="d-flex align-items-center">
+               <input type="date" placeholder="С" class="during-from form-control" style="width: 10rem">
+               <span class="mx-2">-</span>
+               <input type="date" placeholder="С" class="during-to form-control" style="width: 10rem">
+               <button data-doc-url="{% url 'docs-created-products-during-dates' %}" class="docs-during-button btn btn-primary ms-3">Показать</button>
+            </div>
+         </div>
+      </div>
+   </div>
+{% endblock %}

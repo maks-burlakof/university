@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="ru">
+<head>
+   <meta charset="UTF-8">
+   <meta name="viewport"
+         content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+   <title>Печать документа - перечень изделий, произведенных в указанный период</title>
+   <style>
+       body {
+           font-family: Arial, sans-serif;
+           margin: 1cm;
+       }
+       h1 {
+           text-align: center;
+       }
+       table {
+           width: 100%;
+           border-collapse: collapse;
+           margin-top: 20px;
+       }
+       table, th, td {
+           border: 1px solid black;
+       }
+       th, td {
+           padding: 8px;
+           text-align: left;
+       }
+       @media print {
+           @page {
+               margin: 0!important;
+               size: A4 portrait!important;
+           }
+           body {
+               margin: 1.6cm!important;
+           }
+       }
+   </style>
+</head>
+<body onload="window.print()">
+   <h1>Перечень изделий</h1>
+   {% if not production_list and messages %}
+      {% for message in messages %}
+         <p style="color: red">Ошибка: {{ message }}</p>
+      {% endfor %}
+   {% endif %}
+   <p>Изготовлено с <strong>{{ from_date }}</strong> по <strong>{{ to_date }}</strong></p>
+
+   <table>
+      <thead>
+      <tr>
+         <th>№</th>
+         <th>Наименование</th>
+         <th>Требуемое количество</th>
+         <th>Брак</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for production in production_list %}
+         <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>
+               <strong>{{ production.technological_map }}</strong> <br>
+               {{ production.technological_map.product }}
+            </td>
+            <td>{{ production.number_of_required_products }}</td>
+            <td>{{ production.number_of_defects }}</td>
+         </tr>
+      {% endfor %}
+      </tbody>
+   </table>
+</body>
+</html>

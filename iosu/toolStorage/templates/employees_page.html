@@ -1,0 +1,83 @@
+{% extends 'base_generic.html' %}
+{% load static %}
+{% block title %}{{ user.employee }}{% endblock %}
+{% block content %}
+   <div class="d-flex justify-content-end align-items-center image-cover" style="background-image: url({% static 'img/breadcrumbs-parallax-06.jpg' %});">
+      <div class="d-flex align-items-center p-5 me-5">
+         <div class="text-end">
+            <h2>{{ user.employee }}</h2>
+            <h4>{{ user.employee.position }}</h4>
+            {% if user.is_superuser %}
+            	<span class="badge text-bg-danger mt-2">Администратор</span>
+            {% endif %}
+         </div>
+         <div class="ps-5 ms-5 text-center">
+            <h1><i class="fa-solid fa-user-tie"></i></h1>
+            <form method="post" action="{% url 'logout' %}">
+               {% csrf_token %}
+               <button type="submit" class="btn"><i class="fa-solid fa-right-from-bracket"></i></button>
+            </form>
+         </div>
+      </div>
+   </div>
+   {% if responsible_equipment %}
+      <div class="mx-5 px-5 my-4 py-4">
+         <h1 class="mb-3">Оборудование</h1>
+         <table class="table table-hover">
+            <thead>
+            <tr>
+               <th scope="col">#</th>
+               <th scope="col">Тип</th>
+               <th scope="col">Наименование</th>
+               <th scope="col">Дата последнего обслуживания</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for equipment in responsible_equipment %}
+               <tr>
+                  <th scope="row">{{ equipment.id }}</th>
+                  <td>{{ equipment.type }}</td>
+                  <td>{{ equipment }}</td>
+                  <td class="d-flex align-items-center">
+                     {{ equipment.date_of_last_service }}
+                     <button data-equipment-id="{{ equipment.pk }}" class="service-equipment-button btn btn-sm btn-primary ms-4">Сейчас</button>
+                  </td>
+               </tr>
+            {% endfor %}
+            </tbody>
+         </table>
+      </div>
+   {% endif %}
+   {% if responsible_production %}
+      <div class="mx-5 px-5 my-4 py-4">
+         <h1 class="mb-3">Изготовления</h1>
+         <div class="row g-3">
+            {% for production in responsible_production %}
+               <div class="col-6 col-lg-4 col-xl-3">
+                  <div class="card card-body shadow-sm rounded-4 position-relative h-100">
+                     <h6 class="fw-bold">{{ production.technological_map }}</h6>
+                     <p class="lh-1 mb-2">{{ production.number_of_required_products }} шт. {{ production.technological_map.product }}</p>
+                     {% if production.is_finished %}
+                        <p class="mb-0 mb-2">Брак: {{ production.number_of_defects }} шт. ({{ production.amount_efficiency }})</p>
+                     	<span class="position-absolute top-0 end-0 fs-5 p-3"><i class="fa-solid fa-circle-check ms-2" style="color: #25d20f;"></i></span>
+                     {% else %}
+                        <div class="d-flex">
+                           <button data-production-id="{{ production.pk }}" class="finish-production-button btn btn-sm btn-primary w-100 me-2">Завершить изготовление</button>
+                           <input type="number" class="form-control form-control-sm" style="width: 4rem" placeholder="Брак">
+                        </div>
+                     {% endif %}
+                     <p class="small text-muted mb-0">
+                        {% if production.end_date and production.start_date|date:"d E, Y" == production.end_date|date:"d E, Y" %}
+                           {{ production.start_date|date:"d E, Y" }} ; {{ production.start_date|time:"H:i" }} - {{ production.end_date|time:"H:i" }} ; ({{ production.time_efficiency }})
+                        {% else %}
+                           {{ production.start_date }} - {{ production.end_date|default:'<i class="fa-solid fa-circle-notch fa-spin"></i>' }}
+                        {% endif %}
+                     </p>
+                  </div>
+               </div>
+            {% endfor %}
+         </div>
+      </div>
+   {% endif %}
+   {% block employee_content %}{% endblock %}
+{% endblock %}

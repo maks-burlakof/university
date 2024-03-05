@@ -1,0 +1,4 @@
+Django~=5.0.2
+python-dotenv~=1.0.1
+psycopg2~=2.9.9
+django-debug-toolbar==4.3.0
