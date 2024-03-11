@@ -71,4 +71,55 @@ $(document).ready(function() {
       let dateTo = $(this).parent().find('.during-to').val();
       window.open(`${docUrl}?from=${dateFrom}&to=${dateTo}`, '_blank');
    });
+
+   // Database
+
+   $('.model-name-select').change(function () {
+      let selectElem = $(this);
+      let delFieldsSelect = selectElem.parent().parent().find('#delete_field_name');
+      let addExistingFields = selectElem.parent().parent().parent().find('#add_field_existing_fields');
+
+      if (selectElem.val()) {
+         $.ajax({
+            url: `/ajax/model-fields/?model=${selectElem.val()}`,
+            type: 'GET',
+            success: function(response) {
+               if (response.is_success) {
+                  if (delFieldsSelect) {
+                     delFieldsSelectHTML = '';
+                     for (let i = 0; i < response.fields.length; i++) {
+                        delFieldsSelectHTML += `<option ${i ? '':'selected'} value="${response.fields[i]}">${response.fields[i]}</option>`;
+                     }
+                     delFieldsSelect.html(delFieldsSelectHTML);
+                  }
+                  if (addExistingFields) {
+                     let fieldsHTML = '';
+                     response.fields.forEach(function (elem) {
+                        fieldsHTML += `${elem}<br>`;
+                     });
+                     addExistingFields.html(`
+                        <div class="card card-body border-0 bg-secondary-subtle">
+                           <span class="fs-6 fw-bold">Имеющиеся поля</span>
+                           ${fieldsHTML}
+                        </div>
+                     `);
+                     addExistingFields.addClass('mt-3');
+                  }
+               } else {
+                  showMessage('error', response.message);
+               }
+            },
+            error: function(error) {
+               console.error('Error:', error);
+            }
+         });
+      } else {
+         if (delFieldsSelect)
+            delFieldsSelect.html('<option value=""></option>');
+         if (addExistingFields) {
+            addExistingFields.html('');
+            addExistingFields.removeClass('mt-3');
+         }
+      }
+   });
 });

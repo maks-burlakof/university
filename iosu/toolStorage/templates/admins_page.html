@@ -41,7 +41,7 @@
                </div>
             </div>
          </div>
-         <form method="post" class="ms-5 p-5 background-dark">
+         <form method="post" class="ms-5 p-5 rounded-3 shadow-lg background-dark">
             {% csrf_token %}
             {{ create_employee_form }}
             <div class="mb-2">
@@ -63,44 +63,41 @@
             <h2 class="accordion-header">
                <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
                   <i class="fa-solid fa-fire me-2" style="color: #f83535;"></i>
-                  Инструмент с высокой степенью используемости
+                  Инструмент с высокой степенью используемости <span class="ms-3 small text-muted">(условная выборка)</span>
                </button>
             </h2>
             <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
+                  <p class="text-muted">// Наибольшая степень износа</p>
                   <p class="fw-bold">Код на Python:</p>
                   <div class="code-div mb-3">
                      <code>
-high_usable_tools = Tools.objects.annotate(
-   usage_count=Count('technologicalmapstools__technological_map__production')
-).filter(usage_count__gt=0).order_by('-usage_count')[:5]
+high_usable_tool = Tools.objects.annotate(
+    usage_count=Count('technologicalmapstools__technological_map__production')
+).filter(usage_count__gt=0).order_by('wear_degree').first()
                      </code>
                   </div>
                   <p class="fw-bold">SQL-запрос:</p>
                   <div class="code-div mb-3">
                      <code>
-SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree", COUNT("storage_production"."id") AS "usage_count" FROM "storage_tools" LEFT OUTER JOIN "storage_technologicalmapstools" ON ("storage_tools"."id" = "storage_technologicalmapstools"."tools_id") LEFT OUTER JOIN "storage_technologicalmap" ON ("storage_technologicalmapstools"."technological_map_id" = "storage_technologicalmap"."id") LEFT OUTER JOIN "storage_production" ON ("storage_technologicalmap"."id" = "storage_production"."technological_map_id") GROUP BY "storage_tools"."id" HAVING COUNT("storage_production"."id") > 0 ORDER BY 5 DESC LIMIT 5
+SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree", COUNT("storage_production"."id") AS "usage_count" FROM "storage_tools" LEFT OUTER JOIN "storage_technologicalmapstools" ON ("storage_tools"."id" = "storage_technologicalmapstools"."tools_id") LEFT OUTER JOIN "storage_technologicalmap" ON ("storage_technologicalmapstools"."technological_map_id" = "storage_technologicalmap"."id") LEFT OUTER JOIN "storage_production" ON ("storage_technologicalmap"."id" = "storage_production"."technological_map_id") GROUP BY "storage_tools"."id" HAVING COUNT("storage_production"."id") > 0 ORDER BY "storage_tools"."wear_degree" ASC LIMIT 1
                      </code>
                   </div>
                   <p class="fw-bold">Результат:</p>
                   <table class="table table-hover">
                      <thead>
                      <tr>
-                        <th scope="col">#</th>
                         <th scope="col">Инструмент</th>
                         <th scope="col">Число использований</th>
                         <th scope="col">Степень износа</th>
                      </tr>
                      </thead>
                      <tbody>
-                     {% for tool in high_usable_tools %}
-                        <tr>
-                           <th scope="row">{{ forloop.counter }}</th>
-                           <td>{{ tool.name }}</td>
-                           <td>{{ tool.usage_count }}</td>
-                           <td>{{ tool.wear_degree }}</td>
-                        </tr>
-                     {% endfor %}
+                     <tr>
+                        <td>{{ high_usable_tool.name }}</td>
+                        <td>{{ high_usable_tool.usage_count }}</td>
+                        <td>{{ high_usable_tool.wear_degree }}</td>
+                     </tr>
                      </tbody>
                   </table>
                </div>
@@ -110,7 +107,7 @@ SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amou
             <h2 class="accordion-header">
                <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
                   <i class="fa-solid fa-wrench me-2" style="color: #40454f;"></i>
-                  Количество единиц инструмента для каждого оборудования
+                  Количество единиц инструмента для каждого оборудования <span class="ms-3 small text-muted">(итоговый запрос)</span>
                </button>
             </h2>
             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -155,7 +152,7 @@ SELECT "storage_equipment"."id", "storage_equipment"."name", "storage_equipment"
             <h2 class="accordion-header">
                <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
                   <i class="fa-solid fa-heart-crack me-2" style="color: #f34f78;"></i>
-                  Список инструментов, подверженных повышенному износу
+                  Список инструментов, подверженных повышенному износу <span class="ms-3 small text-muted">(параметрический запрос)</span>
                </button>
             </h2>
             <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -198,23 +195,28 @@ SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amou
             <h2 class="accordion-header">
                <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                   <i class="fa-solid fa-hammer me-2" style="color: #323c4d;"></i>
-                  Количество единиц инструмента для токарного оборудования по технологическим картам
+                  Количество единиц инструмента для токарного оборудования по технологическим картам <span class="ms-3 small text-muted">(перекрестный запрос)</span>
                </button>
             </h2>
             <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
+               <p class="text-muted">// Сколько произведено изделий по месяцам</p>
                   <p class="fw-bold">Код на Python:</p>
                   <div class="code-div mb-3">
                      <code>
-tools_for_turning_equipment = Tools.objects.filter(
-   technologicalmapstools__technological_map__equipment__type_id=1
-).distinct()
+production_for_turning_equipment = Production.objects.filter(
+    technological_map__equipment__type_id=1
+).annotate(
+    month=ExtractMonth('start_date')
+).values('month').annotate(
+    total_products=Count('id')
+)
                      </code>
                   </div>
                   <p class="fw-bold">SQL-запрос:</p>
                   <div class="code-div mb-3">
                      <code>
-SELECT DISTINCT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree" FROM "storage_tools" INNER JOIN "storage_technologicalmapstools" ON ("storage_tools"."id" = "storage_technologicalmapstools"."tools_id") INNER JOIN "storage_technologicalmap" ON ("storage_technologicalmapstools"."technological_map_id" = "storage_technologicalmap"."id") INNER JOIN "storage_equipment" ON ("storage_technologicalmap"."equipment_id" = "storage_equipment"."id") WHERE "storage_equipment"."type_id" = 1
+SELECT EXTRACT(MONTH FROM "storage_production"."start_date" AT TIME ZONE 'Europe/Moscow') AS "month", COUNT("storage_production"."id") AS "total_products" FROM "storage_production" INNER JOIN "storage_technologicalmap" ON ("storage_production"."technological_map_id" = "storage_technologicalmap"."id") INNER JOIN "storage_equipment" ON ("storage_technologicalmap"."equipment_id" = "storage_equipment"."id") WHERE "storage_equipment"."type_id" = 1 GROUP BY 1
                      </code>
                   </div>
                   <p class="fw-bold">Результат:</p>
@@ -222,16 +224,16 @@ SELECT DISTINCT "storage_tools"."id", "storage_tools"."name", "storage_tools"."t
                      <thead>
                      <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Инструмент</th>
-                        <th scope="col">Количество</th>
+                        <th scope="col">Месяц</th>
+                        <th scope="col">Количество изделий</th>
                      </tr>
                      </thead>
                      <tbody>
-                     {% for tool in tools_for_turning_equipment %}
+                     {% for item in production_for_turning_equipment %}
                         <tr>
                            <th scope="row">{{ forloop.counter }}</th>
-                           <td>{{ tool.name }}</td>
-                           <td>{{ tool.total_amount }}</td>
+                           <td>{{ item.month }}</td>
+                           <td>{{ item.total_products }}</td>
                         </tr>
                      {% endfor %}
                      </tbody>
@@ -243,7 +245,7 @@ SELECT DISTINCT "storage_tools"."id", "storage_tools"."name", "storage_tools"."t
             <h2 class="accordion-header">
                <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
                   <i class="fa-solid fa-toolbox me-2" style="color: #fa8500;"></i>
-                  Общий список оборудования и инструментов
+                  Общий список оборудования и инструментов <span class="ms-3 small text-muted">(запрос на объединение)</span>
                </button>
             </h2>
             <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
@@ -251,7 +253,61 @@ SELECT DISTINCT "storage_tools"."id", "storage_tools"."name", "storage_tools"."t
                   <p class="fw-bold">Код на Python:</p>
                   <div class="code-div mb-3">
                      <code>
-equipment_with_tools = Equipment.objects.prefetch_related(
+equipment_union_tools = Equipment.objects.annotate(
+    type_name=Value('Оборудование', output_field=CharField())
+).annotate(
+    display_name=Cast('name', CharField())
+).values('type_name', 'display_name').union(
+    Tools.objects.annotate(
+        type_name=Value('Инструмент', output_field=CharField())
+    ).annotate(
+        display_name=Concat('name', Value(' - '), 'wear_degree', Value(', '), 'total_amount', Value(' шт.'), output_field=CharField())
+    ).values('type_name', 'display_name'),
+    all=True
+)
+                     </code>
+                  </div>
+                  <p class="fw-bold">SQL-запрос:</p>
+                  <div class="code-div mb-3">
+                     <code>
+(SELECT 'Оборудование' AS "type_name", ("storage_equipment"."name")::varchar AS "display_name" FROM "storage_equipment") UNION ALL (SELECT 'Инструмент' AS "type_name", CONCAT(("storage_tools"."name")::text, (CONCAT((' - ')::text, (CONCAT(("storage_tools"."wear_degree")::text, (CONCAT((', ')::text, (CONCAT(("storage_tools"."total_amount")::text, (' шт.')::text))::text))::text))::text))::text) AS "display_name" FROM "storage_tools")
+                     </code>
+                  </div>
+                  <p class="fw-bold">Результат:</p>
+                  <table class="table table-hover">
+                     <thead>
+                     <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Тип</th>
+                        <th scope="col">Наименование</th>
+                     </tr>
+                     </thead>
+                     <tbody>
+                     {% for item in equipment_union_tools %}
+                        <tr>
+                           <th scope="row">{{ forloop.counter }}</th>
+                           <td>{{ item.type_name }}</td>
+                           <td>{{ item.display_name }}</td>
+                        </tr>
+                     {% endfor %}
+                     </tbody>
+                  </table>
+               </div>
+            </div>
+         </div>
+         <div class="accordion-item">
+            <h2 class="accordion-header">
+               <button class="accordion-button collapsed fs-5" type="button" data-bs-toggle="collapse" data-bs-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                  <i class="fa-solid fa-toolbox me-2" style="color: #fa8500;"></i>
+                  (Доп) Общий список оборудования и инструментов по технологическим картам
+               </button>
+            </h2>
+            <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
+               <div class="accordion-body">
+                  <p class="fw-bold">Код на Python:</p>
+                  <div class="code-div mb-3">
+                     <code>
+equipment_with_tools_extra = Equipment.objects.prefetch_related(
    models.Prefetch(
       'technologicalmap_set',
       queryset=TechnologicalMap.objects.prefetch_related(
@@ -284,7 +340,7 @@ SELECT "storage_technologicalmapstools"."id", "storage_technologicalmapstools"."
                      </tr>
                      </thead>
                      <tbody>
-                     {% for equipment in equipment_with_tools %}
+                     {% for equipment in equipment_with_tools_extra %}
                         <tr>
                            <th scope="row">{{ forloop.counter }}</th>
                            <td>{{ equipment }}</td>
@@ -318,6 +374,55 @@ SELECT "storage_technologicalmapstools"."id", "storage_technologicalmapstools"."
                <input type="date" placeholder="С" class="during-to form-control" style="width: 10rem">
                <button data-doc-url="{% url 'docs-created-products-during-dates' %}" class="docs-during-button btn btn-primary ms-3">Показать</button>
             </div>
+         </div>
+      </div>
+
+      <h1 id="database" class="mt-5 mb-4">База данных</h1>
+      <div class="card card-body">
+         <div class="row">
+            <form class="col" method="post" action="{% url 'add_db_field' %}">
+               {% csrf_token %}
+               <div class="w-100 text-center bg-success-subtle rounded-3 mb-3">Добавить поле</div>
+               <div class="d-flex">
+                  <div class="w-50 me-5">
+                     <label for="add_field_name">Название поля</label>
+                     <input class="form-control" type="text" id="add_field_name" name="field_name" required>
+                  </div>
+                  <div class="w-50">
+                     <label for="add_table_name">Таблица</label>
+                     <select class="form-select model-name-select" id="add_table_name" name="table_name" required>
+                        <option value=""></option>
+                        {% for model in models %}
+                        	<option value="{{ model }}">{{ model }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+               </div>
+               <div id="add_field_existing_fields"></div>
+               <button class="btn btn-success mt-3" type="submit">Добавить поле</button>
+            </form>
+            <form class="col" method="post" action="{% url 'remove_db_field' %}">
+               {% csrf_token %}
+               <div class="w-100 text-center bg-danger-subtle rounded-3 mb-3">Удалить поле</div>
+               <div class="d-flex">
+                  <div class="w-50 me-5">
+                     <label for="delete_field_name">Поле</label>
+                     <select class="form-select" id="delete_field_name" name="field_name" required>
+                        <option value=""></option>
+                     </select>
+                  </div>
+                  <div class="w-50">
+                     <label for="delete_table_name">Таблица</label>
+                     <select class="form-select model-name-select" id="delete_table_name" name="table_name" required>
+                        <option value=""></option>
+                        {% for model in models %}
+                        	<option value="{{ model }}">{{ model }}</option>
+                        {% endfor %}
+                     </select>
+                  </div>
+               </div>
+               <button class="btn btn-danger mt-3" type="submit">Удалить поле</button>
+            </form>
          </div>
       </div>
    </div>

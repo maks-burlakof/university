@@ -1,11 +1,15 @@
 from functools import wraps
 
+from django.apps import apps
+from django.core.exceptions import FieldDoesNotExist
+from django.core.management import call_command
 from django.db import connection, reset_queries
-from django.db.models import Count, F
+from django.db.models import Count, Max, Value, CharField
+from django.db.models.functions import Concat, Cast, ExtractMonth
 from django.shortcuts import render, redirect
-from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login
 from django.contrib import messages
+from django.urls import reverse
 
 from storage.models import *
 from storage.forms import LoginForm, CreateEmployeeForm
@@ -90,9 +94,9 @@ def employee(request):
 
         # Queries
 
-        high_usable_tools = Tools.objects.annotate(
+        high_usable_tool = Tools.objects.annotate(
             usage_count=Count('technologicalmapstools__technological_map__production')
-        ).filter(usage_count__gt=0).order_by('-usage_count')[:5]
+        ).filter(usage_count__gt=0).order_by('wear_degree').first()
 
         unique_tools_num_for_equipment = Equipment.objects.annotate(
             unique_tools_count=Count('technologicalmap__technologicalmapstools__tools', distinct=True)
@@ -100,11 +104,28 @@ def employee(request):
 
         high_wear_tools = Tools.objects.filter(wear_degree__lt=1000).order_by('wear_degree')[:5]
 
-        tools_for_turning_equipment = Tools.objects.filter(
-            technologicalmapstools__technological_map__equipment__type_id=1
-        ).distinct()
+        production_for_turning_equipment = Production.objects.filter(
+            technological_map__equipment__type_id=1
+        ).annotate(
+            month=ExtractMonth('start_date')
+        ).values('month').annotate(
+            total_products=Count('id')
+        )
 
-        equipment_with_tools = Equipment.objects.prefetch_related(
+        equipment_union_tools = Equipment.objects.annotate(
+            type_name=Value('Оборудование', output_field=CharField())
+        ).annotate(
+            display_name=Cast('name', CharField())
+        ).values('type_name', 'display_name').union(
+            Tools.objects.annotate(
+                type_name=Value('Инструмент', output_field=CharField())
+            ).annotate(
+                display_name=Concat('name', Value(' - '), 'wear_degree', Value(', '), 'total_amount', Value(' шт.'), output_field=CharField())
+            ).values('type_name', 'display_name'),
+            all=True
+        )
+
+        equipment_with_tools_extra = Equipment.objects.prefetch_related(
             models.Prefetch(
                 'technologicalmap_set',
                 queryset=TechnologicalMap.objects.prefetch_related(
@@ -120,11 +141,14 @@ def employee(request):
             'employees': Employee.objects.select_related('position').all(),
             'create_employee_form': create_employee_form,
             # Queries
-            'high_usable_tools': high_usable_tools,
+            'high_usable_tool': high_usable_tool,
             'unique_tools_num_for_equipment': unique_tools_num_for_equipment,
             'high_wear_tools': high_wear_tools,
-            'tools_for_turning_equipment': tools_for_turning_equipment,
-            'equipment_with_tools': equipment_with_tools,
+            'production_for_turning_equipment': production_for_turning_equipment,
+            'equipment_union_tools': equipment_union_tools,
+            'equipment_with_tools_extra': equipment_with_tools_extra,
+            # Database
+            'models': [model.__name__ for model in apps.get_app_config('storage').get_models()],
         })
 
         return render(request, 'admins_page.html', context)
@@ -153,3 +177,57 @@ def docs_created_products_during_dates(request):
         'to_date': to_date,
     }
     return render(request, 'documents/created_products_during_dates.html', context)
+
+
+def add_field(request):
+    field_types = {
+        'str': models.CharField(max_length=100, null=True, blank=True, default=None),
+        'int': models.IntegerField(null=True, blank=True, default=None),
+        'bool': models.BooleanField(null=True, blank=True, default=None),
+    }
+    if request.method == 'POST':
+        field_name = request.POST.get('field_name')
+        field_type = field_types['str']  # request.POST.get('field_type')
+        table_name = request.POST.get('table_name')
+        try:
+            table = globals()[table_name]
+            table._meta.get_field(field_name)
+            messages.error(request, f"Поле '{field_name}' уже существует в таблице '{table_name}'.")
+        except FieldDoesNotExist:
+            table.add_to_class(field_name, field_type)
+            messages.success(request, f"Поле '{field_name}' успешно добавлено в таблицу '{table_name}'.")
+            call_command('makemigrations', 'storage')
+            call_command('migrate')
+            messages.success(request, 'Миграции применены.')
+
+    return redirect(f"{reverse('employee')}#database")
+
+
+def remove_field(request):
+    from django.db import DEFAULT_DB_ALIAS, connections
+    from django.db.utils import OperationalError
+
+    response = redirect(f"{reverse('employee')}#database")
+    if request.method == 'POST':
+        field_name = request.POST.get('field_name')
+        table_name = request.POST.get('table_name')
+
+        try:
+            table = globals()[table_name]
+            field = table._meta.get_field(field_name)
+        except FieldDoesNotExist:
+            messages.error(request, f"Поле '{field_name}' не существует в таблице '{table_name}'.")
+            return response
+
+        try:
+            with connections[DEFAULT_DB_ALIAS].schema_editor() as schema_editor:
+                schema_editor.remove_field(table, field)
+            messages.success(request, f"Поле '{field_name}' успешно удалено из таблицы '{table_name}'.")
+            call_command('makemigrations', 'storage')
+            call_command('migrate')
+            messages.success(request, 'Миграции применены.')
+        except OperationalError:
+            messages.error(request, 'Ошибка при удалении поля из БД.')
+            return response
+
+    return response

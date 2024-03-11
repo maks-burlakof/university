@@ -64,7 +64,7 @@
                {{ production.technological_map.product }}
             </td>
             <td>{{ production.number_of_required_products }}</td>
-            <td>{{ production.number_of_defects }}</td>
+            <td>{{ production.number_of_defects|default:"0" }}</td>
          </tr>
       {% endfor %}
       </tbody>
