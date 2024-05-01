@@ -60,7 +60,7 @@ async function getPairs(widget) {
       let pairStartTime = new Date(date);
       let pairEndTime = new Date(date);
       pairsData[weekDay].forEach(pair => {
-        if (pair.weekNumber.includes(weekNum)&& ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0)) {
+        if (pair.weekNumber.includes(weekNum) && ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0) && !["Экзамен", "Консультация"].includes(pair.lessonTypeAbbrev)) {
           pairsCount++;
       pairStartTime.setHours(...pair.startLessonTime.split(":").map(Number),0,0);
       pairEndTime.setHours(...pair.endLessonTime.split(":").map(Number),0,0);
@@ -121,7 +121,7 @@ function addTableSchedule(pairs, widget) {
   stack.layoutVertically();
   stack.spacing = 5;
   pairs.pairs.forEach(pair => {
-    if (pair.weekNumber.includes(pairs.weekNum)&& ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0)) {
+    if (pair.weekNumber.includes(pairs.weekNum)&& ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0) && !["Экзамен", "Консультация"].includes(pair.lessonTypeAbbrev)) {
       // main stack
       let pairMainStack = stack.addStack();
       pairMainStack.backgroundColor = Color.dynamic(new Color("#f3f2f8"), new Color("#2c2c2e"));
@@ -205,8 +205,8 @@ function addInlineSchedule(pairs, widget) {
   let stackNum = 1, sizeBusy = 0, sizeRequired = 0;
   let stack = addSubStack();
   pairs.pairs.forEach(pair => {
-    if (pair.weekNumber.includes(pairs.weekNum)&& ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0)) {
-      sizeRequired = 8*2 + 15 + 4 + (pair.subject.length * 9) + 2 + 5;
+    if (pair.weekNumber.includes(pairs.weekNum)&& ((pair.numSubgroup === 0 || pair.numSubgroup === subgroupNum) || subgroupNum === 0) && !["Экзамен", "Консультация"].includes(pair.lessonTypeAbbrev)) {
+      sizeRequired = 8*2 + 15 + 4 + (pair.subject.length * 10) + 2 + 5;
       if (sizeBusy + sizeRequired > 305 && stackNum === 1 && pairsCurrentCount < 4) {
         stack = addSubStack();
         sizeBusy = 0;

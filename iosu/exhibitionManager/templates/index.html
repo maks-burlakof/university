@@ -1,0 +1,394 @@
+{% extends 'base_generic.html' %}
+{% load custom_tags %}
+{% block content %}
+   <h1 class="text-center">Выставка продукции</h1>
+   <hr>
+   {% if not user.is_authenticated %}
+      <div class="d-flex justify-content-center">
+         <div class="alert alert-primary p-4" style="max-width: 540px">
+            <div class="alert alert-light" role="alert">
+               Войдите в аккаунт как администратор, чтобы редактировать данные
+            </div>
+            <form method="post">
+               {% csrf_token %}
+               <div class="mb-3">
+                  <label for="id_username" class="form-label">Имя пользователя</label>
+                  {{ login_form.username }}
+               </div>
+               <div class="mb-4">
+                  <label for="id_password" class="form-label">Пароль</label>
+                  {{ login_form.password }}
+               </div>
+               <button type="submit" class="btn btn-primary px-5">Войти</button>
+            </form>
+         </div>
+      </div>
+   {% endif %}
+   <h1 class="text-center mb-3">Аренда мест</h1>
+   <div class="d-flex justify-content-between mb-3">
+      <div>
+         <form method="post" class="d-flex">
+            {% csrf_token %}
+            {{ exhibition_form }}
+         </form>
+      </div>
+      {% if exhibition %}
+         <div class="text-container ms-3">
+            <span class="text-muted small">Даты проведения</span>
+            <p class="mb-0">{{ exhibition.start_date }} - {{ exhibition.end_date }}</p>
+         </div>
+         <div class="text-container ms-3">
+            <span class="text-muted small">Адрес</span>
+            <p class="mb-0">{{ exhibition.address }}</p>
+         </div>
+      {% endif %}
+   </div>
+   {% if exhibition_places %}
+      <p class="fw-bold mb-2">Выбор места:</p>
+      <div class="d-flex gap-2">
+         {% for place in exhibition_places %}
+         	<button type="button" class="btn bg-secondary-subtle" style="width: 3rem; height: 3rem" data-bs-toggle="modal" data-bs-target="#placeModal-{{ place.number }}">
+               {{ place.number }}
+            </button>
+            <div class="modal fade" id="placeModal-{{ place.number }}" tabindex="-1" aria-hidden="true">
+               <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+                  <div class="modal-content">
+                     <div class="modal-header">
+                        <div>
+                           <h1 class="modal-title fs-5 mb-0">Место №{{ place.number }}</h1>
+                           <p class="text-muted fw-bold small mb-0">{{ exhibition.name }}</p>
+                        </div>
+                        <button type="button" class="btn-close align-self-center me-2" data-bs-dismiss="modal" aria-label="Close"></button>
+                     </div>
+                     <div class="modal-body">
+                        {% for rent in place.rentexhibitionplace_set.all %}
+                           <div class="text-container mb-3">
+                              <p class="text-muted small mb-1">{{ rent.start_date }} - {{ rent.end_date }}</p>
+                              <figure>
+                                 <blockquote class="blockquote">
+                                    <p>{{ rent.participation.company.name }}</p>
+                                 </blockquote>
+                                 <figcaption class="blockquote-footer mb-0">
+                                    {{ rent.participation.company.address }}, <cite>{{ rent.participation.company.email }}</cite>
+                                 </figcaption>
+                              </figure>
+                              {% for advertisement in rent.participation.advertisement_set.all %}
+                                 <div class="card card-body mt-2 mb-2">
+                                    <p class="lh-sm mb-1">
+                                       <span class="badge text-bg-primary me-2">Реклама</span>
+                                       {{ advertisement.type }},
+                                       <span class="text-muted">{{ advertisement.price }} р.</span>
+                                    </p>
+                                    <p class="small text-muted mb-0">{{ advertisement.start_date }} - {{ advertisement.end_date }}</p>
+                                 </div>
+                              {% endfor %}
+                               <a target="_blank" class="text-decoration-none" href="{% url 'document' rent.pk %}"><i class="bi bi-printer"></i></a>
+                           </div>
+                        {% endfor %}
+                        {% if not place.rentexhibitionplace_set.all %}
+                           <div class="mb-3">
+                              <p class="mb-0">Это место еще не занято</p>
+                           </div>
+                        {% endif %}
+                        <p class="lh-1 mb-1">
+                           <a class="text-decoration-none" href="{% url 'admin:exhibitions_rentexhibitionplace_add' %}"><i class="bi bi-plus"></i> Добавить запись об аренде</a>
+                        </p>
+                     </div>
+                  </div>
+               </div>
+            </div>
+         {% endfor %}
+         <a class="lh-1" href="{% url 'admin:exhibitions_exhibitionplace_add' %}" style="font-size: 3rem"><i class="bi bi-plus-square-dotted"></i></a>
+      </div>
+   {% elif not exhibition %}
+      <p class="text-muted">Выберите выставку</p>
+   {% endif %}
+
+   {% if exhibition %}
+      <p class="fw-bold mt-4 mb-2">Предприятия, участвующие в выставке:</p>
+      {% if exhibition.participationexhibition_set.all %}
+         <table class="table table-hover mb-2">
+            <thead>
+            <tr>
+               <th class="fw-normal" scope="col">#</th>
+               <th class="fw-normal" scope="col">Предприятие</th>
+               <th class="fw-normal" scope="col">Адрес</th>
+               <th class="fw-normal" scope="col">Email</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for participation in exhibition.participationexhibition_set.all %}
+               <tr>
+                  <td>{{ forloop.counter }}</td>
+                  <td>{{ participation.company.name }}</td>
+                  <td>{{ participation.company.address }}</td>
+                  <td>{{ participation.company.email }}</td>
+               </tr>
+            {% endfor %}
+            </tbody>
+         </table>
+      {% endif %}
+      <a class="lh-1 text-decoration-none" href="{% url 'admin:exhibitions_participationexhibition_add' %}"><i class="bi bi-plus"></i> Добавить участие</a>
+   {% endif %}
+
+   <h1 class="mt-5 text-center mb-3">Запросы</h1>
+
+   <h4 class="mb-3"><i class="bi bi-chevron-right"></i> Предприятия, арендовавшие наибольшие выставочные площади (условная выборка)</h4>
+   <div class="code-div gap-3 mb-3">
+      <code>
+max_rent_number = ParticipationExhibition.objects.annotate(
+    rent_count=Count('rentexhibitionplace')
+).aggregate(
+    max_count=Max('rent_count')
+)['max_count']
+
+companies_with_max_rent = ParticipationExhibition.objects.annotate(
+    rent_count=Count('rentexhibitionplace')
+).filter(rent_count=max_rent_number, rent_count__gt=0)
+      </code>
+   </div>
+   <div class="code-div gap-3 mb-3">
+      <code>
+SELECT MAX("rent_count")
+  FROM (
+        SELECT COUNT("exhibitions_rentexhibitionplace"."id") AS "rent_count"
+          FROM "exhibitions_participationexhibition"
+          LEFT OUTER JOIN "exhibitions_rentexhibitionplace"
+            ON ("exhibitions_participationexhibition"."id" = "exhibitions_rentexhibitionplace"."participation_id")
+         GROUP BY "exhibitions_participationexhibition"."id"
+       ) subquery
+
+SELECT "exhibitions_participationexhibition"."id",
+       "exhibitions_participationexhibition"."exhibition_id",
+       "exhibitions_participationexhibition"."company_id",
+       COUNT("exhibitions_rentexhibitionplace"."id") AS "rent_count"
+  FROM "exhibitions_participationexhibition"
+  LEFT OUTER JOIN "exhibitions_rentexhibitionplace"
+    ON ("exhibitions_participationexhibition"."id" = "exhibitions_rentexhibitionplace"."participation_id")
+ GROUP BY "exhibitions_participationexhibition"."id"
+HAVING (COUNT("exhibitions_rentexhibitionplace"."id") = {{ max_rent_number }} AND COUNT("exhibitions_rentexhibitionplace"."id") > 0)
+      </code>
+   </div>
+   <table class="table table-hover">
+      <thead>
+      <tr>
+         <th scope="col">#</th>
+         <th scope="col">Предприятие</th>
+         <th scope="col">Количество арендованных мест</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for participation in companies_with_max_rent %}
+         <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ participation.company.name }}</td>
+            <td>{{ participation.rent_count }}</td>
+         </tr>
+      {% endfor %}
+      </tbody>
+   </table>
+
+   <h4 class="mt-5 mb-3"><i class="bi bi-chevron-right"></i> Сводка по продукции/предприятиям (итоговый запрос)</h4>
+   <div class="code-div gap-3 mb-3">
+      <code>
+num_products_per_company = Company.objects.annotate(
+    num_of_products=Count('products')
+).order_by('pk').all()
+      </code>
+   </div>
+   <div class="code-div gap-3 mb-3">
+      <code>
+SELECT `exhibitions_company`.`id`,
+       `exhibitions_company`.`name`,
+       `exhibitions_company`.`address`,
+       `exhibitions_company`.`email`,
+       COUNT(`exhibitions_products`.`id`) AS `num_of_products`
+  FROM `exhibitions_company`
+  LEFT OUTER JOIN `exhibitions_products`
+    ON (`exhibitions_company`.`id` = `exhibitions_products`.`company_id`)
+ GROUP BY `exhibitions_company`.`id`
+ ORDER BY `exhibitions_company`.`id` ASC
+      </code>
+   </div>
+   <table class="table table-hover">
+      <thead>
+      <tr>
+         <th scope="col">#</th>
+         <th scope="col">Предприятие</th>
+         <th scope="col">Количество различной продукции</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for company in num_products_per_company %}
+         <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ company }}</td>
+            <td>{{ company.num_of_products }}</td>
+         </tr>
+      {% endfor %}
+      </tbody>
+   </table>
+
+   <h4 class="mt-5 mb-3"><i class="bi bi-chevron-right"></i> Продукция заданного предприятия (параметрический запрос)</h4>
+   <div class="code-div gap-3 mb-3">
+      <code>
+products_of_company = Products.objects.filter(company__name=company_name).all() if company_name else None
+      </code>
+   </div>
+   <div class="code-div gap-3 mb-3">
+      <code>
+SELECT `exhibitions_company`.`id`,
+       `exhibitions_company`.`name`,
+       `exhibitions_company`.`address`,
+       `exhibitions_company`.`email`
+  FROM `exhibitions_company`
+ WHERE `exhibitions_company`.`id` = 2
+      </code>
+   </div>
+   <form method="post" class="d-flex mb-3">
+      {% csrf_token %}
+      {{ company_form }}
+   </form>
+   {% if products_of_company %}
+      <table class="table table-hover">
+         <thead>
+         <tr>
+            <th scope="col">#</th>
+            <th scope="col">Наименование</th>
+            <th scope="col">Количество</th>
+            <th scope="col">Цена, руб.</th>
+         </tr>
+         </thead>
+         <tbody>
+         {% for product in products_of_company %}
+            <tr>
+               <th scope="row">{{ forloop.counter }}</th>
+               <td>{{ product.name }}</td>
+               <td>{{ product.amount }}</td>
+               <td>{{ product.price }}</td>
+            </tr>
+         {% endfor %}
+         </tbody>
+      </table>
+   {% elif company_name %}
+      <p class="text-muted">У предприятия нет продукции</p>
+   {% elif not company_name %}
+      <p class="text-muted">Выберите предприятие</p>
+   {% endif %}
+
+   <h4 class="mt-5 mb-3"><i class="bi bi-chevron-right"></i> Количество выставляемой продукции по предприятиям (перекрестный запрос)</h4>
+   <div class="code-div gap-3 mb-3">
+      <code>
+products = Products.objects.all()
+product_annotations = {}
+for product in products:
+    product_annotations[f'product_{product.pk}'] = Sum(
+        Case(
+            When(
+                products=product,
+                then=F('products__amount')
+            ),
+            default=0,
+            output_field=IntegerField()
+        )
+    )
+products_per_companies = Company.objects.annotate(
+    **product_annotations
+)
+      </code>
+   </div>
+   <div class="code-div gap-3 mb-3">
+      <code>
+SELECT "exhibitions_company"."id",
+       "exhibitions_company"."name",
+       "exhibitions_company"."address",
+       "exhibitions_company"."email",
+       SUM(CASE WHEN "exhibitions_products"."id" = 1 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_1",
+       SUM(CASE WHEN "exhibitions_products"."id" = 2 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_2",
+       SUM(CASE WHEN "exhibitions_products"."id" = 3 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_3",
+       SUM(CASE WHEN "exhibitions_products"."id" = 4 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_4",
+       SUM(CASE WHEN "exhibitions_products"."id" = 5 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_5",
+       SUM(CASE WHEN "exhibitions_products"."id" = 6 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_6",
+       SUM(CASE WHEN "exhibitions_products"."id" = 7 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_7",
+       SUM(CASE WHEN "exhibitions_products"."id" = 8 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_8",
+       SUM(CASE WHEN "exhibitions_products"."id" = 9 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_9",
+       SUM(CASE WHEN "exhibitions_products"."id" = 10 THEN "exhibitions_products"."amount" ELSE 0 END) AS "product_10",
+       ...
+  FROM "exhibitions_company"
+  LEFT OUTER JOIN "exhibitions_products"
+    ON ("exhibitions_company"."id" = "exhibitions_products"."company_id")
+ GROUP BY "exhibitions_company"."id"
+      </code>
+   </div>
+   <div class="table-responsive">
+      <table class="table table-hover">
+         <thead>
+         <tr>
+            <th scope="col">#</th>
+            <th scope="col">Предприятие</th>
+            {% for product in products %}
+               <th scope="col">{{ product.name }}</th>
+            {% endfor %}
+         </tr>
+         </thead>
+         <tbody>
+         {% for company in products_per_companies %}
+            <tr>
+               <th scope="row">{{ forloop.counter }}</th>
+               <td>{{ company.name }}</td>
+               {% for product in products %}
+                  <td>{{ company|get_products_count:product.pk }}</td>
+               {% endfor %}
+            </tr>
+         {% endfor %}
+         </tbody>
+      </table>
+   </div>
+   
+   <h4 class="mt-5 mb-3"><i class="bi bi-chevron-right"></i> Общий список продукции и предприятий (запрос на объединение)</h4>
+   <div class="code-div gap-3 mb-3">
+      <code>
+companies_union_products = Company.objects.annotate(
+    type_name=Value('Предприятие', output_field=CharField())
+).values('name', 'type_name').union(
+    Products.objects.annotate(
+        type_name=Value('Продукция', output_field=CharField())
+    ).values('name', 'type_name'),
+    all=True,
+)
+      </code>
+   </div>
+   <div class="code-div gap-3 mb-3">
+      <code>
+SELECT `exhibitions_company`.`name` AS `col1`,
+        'Предприятие' AS `type_name`
+   FROM `exhibitions_company`
+  ORDER BY `exhibitions_company`.`id` ASC
+)
+UNION ALL (
+SELECT `exhibitions_products`.`name` AS `col1`,
+       'Продукция' AS `type_name`
+  FROM `exhibitions_products`
+      </code>
+   </div>
+   <table class="table table-hover">
+      <thead>
+      <tr>
+         <th scope="col">#</th>
+         <th scope="col">Тип</th>
+         <th scope="col">Наименование</th>
+      </tr>
+      </thead>
+      <tbody>
+      {% for object in companies_union_products %}
+         <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ object.type_name }}</td>
+            <td>{{ object.name }}</td>
+         </tr>
+      {% endfor %}
+      </tbody>
+   </table>
+
+   <h1 class="text-center">Документы</h1>
+{% endblock %}

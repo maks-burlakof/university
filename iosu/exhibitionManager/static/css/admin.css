@@ -1,0 +1,13 @@
+.db-action {
+    color: #fff;
+    padding: .4rem .6rem;
+    border: none;
+    border-radius: .7rem;
+    cursor: pointer;
+}
+.db-action-add {
+    background-color: #198754;
+}
+.db-action-del {
+    background-color: #dc3545;
+}

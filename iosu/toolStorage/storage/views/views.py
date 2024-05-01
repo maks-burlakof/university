@@ -4,7 +4,7 @@ from django.apps import apps
 from django.core.exceptions import FieldDoesNotExist
 from django.core.management import call_command
 from django.db import connection, reset_queries
-from django.db.models import Count, Max, Value, CharField
+from django.db.models import Count, Max, Value, CharField, F, Sum, Case, When, IntegerField
 from django.db.models.functions import Concat, Cast, ExtractMonth
 from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login
@@ -21,8 +21,8 @@ def log_queries(view_func):
         reset_queries()
         response = view_func(*args, **kwargs)
         queries = connection.queries
-        for query in queries:
-            print(query['sql'])
+        # for query in queries:
+        #     print(query['sql'])
         return response
     return wrapper
 
@@ -104,6 +104,21 @@ def employee(request):
 
         high_wear_tools = Tools.objects.filter(wear_degree__lt=1000).order_by('wear_degree')[:5]
 
+        tools = Tools.objects.all()
+        tool_annotations = dict((f'tool_{tool.pk}', Sum(
+            Case(
+                When(
+                    technologicalmap__tools=tool,
+                    then=F('technologicalmap__technologicalmapstools__number_of_required_tools')
+                ),
+                default=0,
+                output_field=IntegerField()
+            )
+        )) for tool in Tools.objects.all())
+        turning_equipment_with_used_tools = Equipment.objects.select_related('type').annotate(
+            **tool_annotations
+        ).filter(type=1)
+
         production_for_turning_equipment = Production.objects.filter(
             technological_map__equipment__type_id=1
         ).annotate(
@@ -144,6 +159,8 @@ def employee(request):
             'high_usable_tool': high_usable_tool,
             'unique_tools_num_for_equipment': unique_tools_num_for_equipment,
             'high_wear_tools': high_wear_tools,
+            'turning_equipment_with_used_tools': turning_equipment_with_used_tools,
+            'tools': tools,
             'production_for_turning_equipment': production_for_turning_equipment,
             'equipment_union_tools': equipment_union_tools,
             'equipment_with_tools_extra': equipment_with_tools_extra,

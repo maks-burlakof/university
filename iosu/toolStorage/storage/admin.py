@@ -64,13 +64,13 @@ class TechnologicalMapsToolsInline(admin.TabularInline):
 
 @admin.register(TechnologicalMap)
 class TechnologicalMapAdmin (admin.ModelAdmin):
-    list_display = ('__str__', 'product')
+    list_display = ('__str__', 'product', 'equipment_with_type')
     inlines = (TechnologicalMapsToolsInline,)
 
-
-# @admin.register(TechnologicalMapsTools)
-# class TechnologicalMapsToolsAdmin (admin.ModelAdmin):
-#     pass
+    def equipment_with_type(self, obj):
+        return '{} {}'.format(obj.equipment.type, obj.equipment)
+    
+    equipment_with_type.short_description = 'Оборудование'
 
 
 @admin.register(Production)

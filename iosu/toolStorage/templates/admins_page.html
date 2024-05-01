@@ -1,4 +1,5 @@
 {% extends 'employees_page.html' %}
+{% load custom_tags %}
 {% block employee_content %}
    {% if responsible_equipment or responsible_production %}
       <hr>
@@ -8,7 +9,7 @@
       <div class="d-flex align-items-start">
          <div class="w-100">
             <table class="table table-hover">
-               <thead>
+               <thead class="table-light">
                <tr>
                   <th scope="col">#</th>
                   <th scope="col">ФИО</th>
@@ -34,8 +35,7 @@
                <div class="pt-3">
                   <div class="card card-body">
                      <code>
-                        SELECT * FROM EMPLOYEE;
-                        CREATE EMPLOYEE ();
+
                      </code>
                   </div>
                </div>
@@ -70,29 +70,25 @@
                <div class="accordion-body">
                   <p class="text-muted">// Наибольшая степень износа</p>
                   <p class="fw-bold">Код на Python:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-python">
 high_usable_tool = Tools.objects.annotate(
     usage_count=Count('technologicalmapstools__technological_map__production')
 ).filter(usage_count__gt=0).order_by('wear_degree').first()
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">SQL-запрос:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-sql">
 SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree", COUNT("storage_production"."id") AS "usage_count" FROM "storage_tools" LEFT OUTER JOIN "storage_technologicalmapstools" ON ("storage_tools"."id" = "storage_technologicalmapstools"."tools_id") LEFT OUTER JOIN "storage_technologicalmap" ON ("storage_technologicalmapstools"."technological_map_id" = "storage_technologicalmap"."id") LEFT OUTER JOIN "storage_production" ON ("storage_technologicalmap"."id" = "storage_production"."technological_map_id") GROUP BY "storage_tools"."id" HAVING COUNT("storage_production"."id") > 0 ORDER BY "storage_tools"."wear_degree" ASC LIMIT 1
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">Результат:</p>
                   <table class="table table-hover">
-                     <thead>
+                     <thead class="table-light">
                      <tr>
                         <th scope="col">Инструмент</th>
                         <th scope="col">Число использований</th>
                         <th scope="col">Степень износа</th>
                      </tr>
                      </thead>
-                     <tbody>
+                     <tbody class="table-group-divider">
                      <tr>
                         <td>{{ high_usable_tool.name }}</td>
                         <td>{{ high_usable_tool.usage_count }}</td>
@@ -113,29 +109,25 @@ SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amou
             <div id="collapseTwo" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
                   <p class="fw-bold">Код на Python:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-python">
 unique_tools_num_for_equipment = Equipment.objects.annotate(
    unique_tools_count=Count('technologicalmap__technologicalmapstools__tools', distinct=True)
 ).order_by('-unique_tools_count')
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">SQL-запрос:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-sql">
 SELECT "storage_equipment"."id", "storage_equipment"."name", "storage_equipment"."type_id", "storage_equipment"."date_of_commissioning", "storage_equipment"."date_of_last_service", "storage_equipment"."responsible_employee_id", COUNT(DISTINCT "storage_technologicalmapstools"."tools_id") AS "unique_tools_count" FROM "storage_equipment" LEFT OUTER JOIN "storage_technologicalmap" ON ("storage_equipment"."id" = "storage_technologicalmap"."equipment_id") LEFT OUTER JOIN "storage_technologicalmapstools" ON ("storage_technologicalmap"."id" = "storage_technologicalmapstools"."technological_map_id") GROUP BY "storage_equipment"."id" ORDER BY 7 DESC
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">Результат:</p>
                   <table class="table table-hover">
-                     <thead>
+                     <thead class="table-light">
                      <tr>
                         <th scope="col">#</th>
                         <th scope="col">Оборудование</th>
                         <th scope="col">Уникальных инструментов</th>
                      </tr>
                      </thead>
-                     <tbody>
+                     <tbody class="table-group-divider">
                      {% for equipment in unique_tools_num_for_equipment %}
                         <tr>
                            <th scope="row">{{ forloop.counter }}</th>
@@ -158,27 +150,30 @@ SELECT "storage_equipment"."id", "storage_equipment"."name", "storage_equipment"
             <div id="collapseThree" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
                   <p class="fw-bold">Код на Python:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-python">
 high_wear_tools = Tools.objects.filter(wear_degree__lt=1000).order_by('wear_degree')[:5]
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">SQL-запрос:</p>
-                  <div class="code-div mb-3">
-                     <code>
-SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree" FROM "storage_tools" WHERE "storage_tools"."wear_degree" < 1000 ORDER BY "storage_tools"."wear_degree" ASC LIMIT 5
-                     </code>
-                  </div>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-sql">
+SELECT "storage_tools"."id",
+       "storage_tools"."name",
+       "storage_tools"."total_amount",
+       "storage_tools"."wear_degree"
+  FROM "storage_tools"
+ WHERE "storage_tools"."wear_degree" < 1000
+ ORDER BY "storage_tools"."wear_degree" ASC
+ LIMIT 5
+                  </code></pre>
                   <p class="fw-bold">Результат:</p>
                   <table class="table table-hover">
-                     <thead>
+                     <thead class="table-light">
                      <tr>
                         <th scope="col">#</th>
                         <th scope="col">Инструмент</th>
                         <th scope="col">Степень износа</th>
                      </tr>
                      </thead>
-                     <tbody>
+                     <tbody class="table-group-divider">
                      {% for tool in high_wear_tools %}
                         <tr>
                            <th scope="row">{{ forloop.counter }}</th>
@@ -200,44 +195,101 @@ SELECT "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amou
             </h2>
             <div id="collapseFour" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
-               <p class="text-muted">// Сколько произведено изделий по месяцам</p>
                   <p class="fw-bold">Код на Python:</p>
-                  <div class="code-div mb-3">
-                     <code>
-production_for_turning_equipment = Production.objects.filter(
-    technological_map__equipment__type_id=1
-).annotate(
-    month=ExtractMonth('start_date')
-).values('month').annotate(
-    total_products=Count('id')
-)
-                     </code>
-                  </div>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-python">
+tools = Tools.objects.all()
+
+tool_annotations = dict((f'tool_{tool.pk}', Sum(
+    Case(
+        When(
+            technologicalmap__tools=tool,
+            then=F('technologicalmap__technologicalmapstools__number_of_required_tools')
+        ),
+        default=0,
+        output_field=IntegerField()
+    )
+)) for tool in Tools.objects.all())
+
+turning_equipment_with_used_tools = Equipment.objects.annotate(
+    **tool_annotations
+).filter(type=1)
+                  </code></pre>
                   <p class="fw-bold">SQL-запрос:</p>
-                  <div class="code-div mb-3">
-                     <code>
-SELECT EXTRACT(MONTH FROM "storage_production"."start_date" AT TIME ZONE 'Europe/Moscow') AS "month", COUNT("storage_production"."id") AS "total_products" FROM "storage_production" INNER JOIN "storage_technologicalmap" ON ("storage_production"."technological_map_id" = "storage_technologicalmap"."id") INNER JOIN "storage_equipment" ON ("storage_technologicalmap"."equipment_id" = "storage_equipment"."id") WHERE "storage_equipment"."type_id" = 1 GROUP BY 1
-                     </code>
-                  </div>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-sql">
+SELECT "storage_equipment"."id",
+       "storage_equipment"."name",
+       "storage_equipment"."type_id",
+       "storage_equipment"."date_of_commissioning",
+       "storage_equipment"."date_of_last_service",
+       "storage_equipment"."responsible_employee_id",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 3 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_3",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 4 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_4",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 5 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_5",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 7 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_7",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 8 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_8",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 9 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_9",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 10 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_10",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 11 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_11",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 17 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_17",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 19 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_19",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 21 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_21",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 23 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_23",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 28 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_28",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 1 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_1",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 29 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_29",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 2 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_2",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 12 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_12",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 22 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_22",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 26 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_26",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 27 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_27",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 20 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_20",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 25 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_25",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 18 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_18",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 24 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_24",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 13 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_13",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 14 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_14",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 15 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_15",
+       SUM(CASE WHEN "storage_technologicalmapstools"."tools_id" = 16 THEN "storage_technologicalmapstools"."number_of_required_tools" ELSE 0 END) AS "tool_16",
+       "storage_equipmenttype"."id",
+       "storage_equipmenttype"."name"
+  FROM "storage_equipment"
+  LEFT OUTER JOIN "storage_technologicalmap"
+    ON ("storage_equipment"."id" = "storage_technologicalmap"."equipment_id")
+  LEFT OUTER JOIN "storage_technologicalmapstools"
+    ON ("storage_technologicalmap"."id" = "storage_technologicalmapstools"."technological_map_id")
+ INNER JOIN "storage_equipmenttype"
+    ON ("storage_equipment"."type_id" = "storage_equipmenttype"."id")
+ WHERE "storage_equipment"."type_id" = 1
+ GROUP BY "storage_equipment"."id",
+          "storage_equipmenttype"."id"
+                  </code></pre>
                   <p class="fw-bold">Результат:</p>
+                  <div class="table-responsive">
                   <table class="table table-hover">
-                     <thead>
+                     <thead class="table-light">
                      <tr>
                         <th scope="col">#</th>
-                        <th scope="col">Месяц</th>
-                        <th scope="col">Количество изделий</th>
+                        <th scope="col">Оборудование</th>
+                        <th scope="col">Тип</th>
+                        {% for tool in tools %}
+                           <th scope="col" style="writing-mode: vertical-lr;" class="fw-normal text-end">{{ tool.name }}</th>
+                        {% endfor %}
                      </tr>
                      </thead>
-                     <tbody>
-                     {% for item in production_for_turning_equipment %}
+                     <tbody class="table-group-divider">
+                     {% for equipment in turning_equipment_with_used_tools %}
                         <tr>
-                           <th scope="row">{{ forloop.counter }}</th>
-                           <td>{{ item.month }}</td>
-                           <td>{{ item.total_products }}</td>
+                           <td>{{ forloop.counter }}</td>
+                           <td>{{ equipment.name }}</td>
+                           <td>{{ equipment.type }}</td>
+                           {% for tool in tools %}
+                              <td>{{ equipment|get_tool_count:tool.pk }}</td>
+                           {% endfor %}
                         </tr>
                      {% endfor %}
                      </tbody>
                   </table>
+                  </div>
                </div>
             </div>
          </div>
@@ -251,8 +303,7 @@ SELECT EXTRACT(MONTH FROM "storage_production"."start_date" AT TIME ZONE 'Europe
             <div id="collapseFive" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
                   <p class="fw-bold">Код на Python:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-python">
 equipment_union_tools = Equipment.objects.annotate(
     type_name=Value('Оборудование', output_field=CharField())
 ).annotate(
@@ -265,14 +316,20 @@ equipment_union_tools = Equipment.objects.annotate(
     ).values('type_name', 'display_name'),
     all=True
 )
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">SQL-запрос:</p>
-                  <div class="code-div mb-3">
-                     <code>
-(SELECT 'Оборудование' AS "type_name", ("storage_equipment"."name")::varchar AS "display_name" FROM "storage_equipment") UNION ALL (SELECT 'Инструмент' AS "type_name", CONCAT(("storage_tools"."name")::text, (CONCAT((' - ')::text, (CONCAT(("storage_tools"."wear_degree")::text, (CONCAT((', ')::text, (CONCAT(("storage_tools"."total_amount")::text, (' шт.')::text))::text))::text))::text))::text) AS "display_name" FROM "storage_tools")
-                     </code>
-                  </div>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-sql">
+(
+        SELECT 'Оборудование' AS "type_name",
+               ("storage_equipment"."name")::varchar AS "display_name"
+          FROM "storage_equipment"
+       )
+UNION ALL (
+        SELECT 'Инструмент' AS "type_name",
+               CONCAT(("storage_tools"."name")::text, (CONCAT((' - ')::text, (CONCAT(("storage_tools"."wear_degree")::text, (CONCAT((', ')::text, (CONCAT(("storage_tools"."total_amount")::text, (' шт.')::text))::text))::text))::text))::text) AS "display_name"
+          FROM "storage_tools"
+       )
+                  </code></pre>
                   <p class="fw-bold">Результат:</p>
                   <table class="table table-hover">
                      <thead>
@@ -305,8 +362,7 @@ equipment_union_tools = Equipment.objects.annotate(
             <div id="collapseSix" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                <div class="accordion-body">
                   <p class="fw-bold">Код на Python:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-python">
 equipment_with_tools_extra = Equipment.objects.prefetch_related(
    models.Prefetch(
       'technologicalmap_set',
@@ -318,18 +374,15 @@ equipment_with_tools_extra = Equipment.objects.prefetch_related(
       )
    )
 )
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">SQL-запрос:</p>
-                  <div class="code-div mb-3">
-                     <code>
+                  <pre class="theme-intellij-light-min mb-3"><code class="language-sql">
 SELECT "storage_equipment"."id", "storage_equipment"."name", "storage_equipment"."type_id", "storage_equipment"."date_of_commissioning", "storage_equipment"."date_of_last_service", "storage_equipment"."responsible_employee_id" FROM "storage_equipment"
 
 SELECT "storage_technologicalmap"."id", "storage_technologicalmap"."number", "storage_technologicalmap"."product_id", "storage_technologicalmap"."equipment_id" FROM "storage_technologicalmap" WHERE "storage_technologicalmap"."equipment_id" IN (2, 3, 1, 6, 10, 11, 12, 4, 5, 7, 8, 9, 13)
 
 SELECT "storage_technologicalmapstools"."id", "storage_technologicalmapstools"."technological_map_id", "storage_technologicalmapstools"."tools_id", "storage_technologicalmapstools"."number_of_required_tools", "storage_tools"."id", "storage_tools"."name", "storage_tools"."total_amount", "storage_tools"."wear_degree" FROM "storage_technologicalmapstools" INNER JOIN "storage_tools" ON ("storage_technologicalmapstools"."tools_id" = "storage_tools"."id") WHERE "storage_technologicalmapstools"."technological_map_id" IN (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13)
-                     </code>
-                  </div>
+                  </code></pre>
                   <p class="fw-bold">Результат:</p>
                   <table class="table table-hover">
                      <thead>
@@ -426,4 +479,7 @@ SELECT "storage_technologicalmapstools"."id", "storage_technologicalmapstools"."
          </div>
       </div>
    </div>
+{% endblock %}
+{% block extrajs %}
+	<script>hljs.highlightAll();</script>
 {% endblock %}

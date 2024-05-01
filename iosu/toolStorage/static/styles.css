@@ -121,12 +121,12 @@ footer a i {
     padding-bottom: 0;
     border: 0;
 }
-.code-div {
-    background-color: #ECECEC;
+pre {
     border: 1px solid #dee2e6;
     border-radius: 10px;
-    padding-left: 25px;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
 }
 code {
-    white-space: break-spaces;
+    padding-left: 25px!important;
+    background-color: #F8F9FA!important;
 }
