@@ -1,0 +1,40 @@
+# name: toolstorage
+
+services:
+  
+  django:
+    build: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+  postgres:
+    image: postgres:16
+    restart: always
+    user: postgres
+    secrets:
+      - db-password
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=toolStorage
+      - POSTGRES_PASSWORD_FILE=/run/secrets/db-password
+    expose:
+      - 5432
+    healthcheck:
+      test: [ "CMD", "pg_isready" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  
+volumes:
+  postgres-data:
+
+secrets:
+  db-password:
+    file: db-password.txt
