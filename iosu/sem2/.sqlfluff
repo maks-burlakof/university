@@ -1,0 +1,5 @@
+[sqlfluff]
+dialect = oracle
+
+[rules]
+ignore = PRS, AM04, LT05

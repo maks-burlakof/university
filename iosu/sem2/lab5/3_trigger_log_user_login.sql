@@ -1,0 +1,54 @@
+-- 3. Trigger to log user login / logout activity
+
+-- Grant permission
+-- GRANT ADMINISTER DATABASE TRIGGER TO TOOLSTORAGE;
+
+
+-- Create table LOG3
+
+CREATE TABLE LOG3 (
+    USERNAME VARCHAR2(30),
+    ACTIVITY_TYPE VARCHAR2(10),
+    ACTIVITY_DATE TIMESTAMP,
+    RECORD_COUNT NUMBER
+);
+
+
+-- Triggers
+
+CREATE OR REPLACE TRIGGER TRG_USER_LOGON
+AFTER LOGON ON DATABASE
+DECLARE
+    v_username VARCHAR2(30);
+    v_record_count NUMBER;
+BEGIN
+    SELECT USER INTO v_username FROM DUAL;
+
+    SELECT COUNT(*) INTO v_record_count FROM PRODUCTION;
+
+    INSERT INTO LOG3 (
+        USERNAME, ACTIVITY_TYPE, ACTIVITY_DATE, RECORD_COUNT
+    ) VALUES (
+        v_username, 'LOGON', SYSTIMESTAMP, v_record_count
+    );
+END;
+/
+
+
+CREATE OR REPLACE TRIGGER TRG_USER_LOGOFF
+BEFORE LOGOFF ON DATABASE
+DECLARE
+    v_username VARCHAR2(30);
+    v_record_count NUMBER;
+BEGIN
+    SELECT USER INTO v_username FROM DUAL;
+
+    SELECT COUNT(*) INTO v_record_count FROM PRODUCTION;
+
+    INSERT INTO LOG3 (
+        USERNAME, ACTIVITY_TYPE, ACTIVITY_DATE, RECORD_COUNT
+    ) VALUES (
+        v_username, 'LOGOFF', SYSTIMESTAMP, v_record_count
+    );
+END;
+/

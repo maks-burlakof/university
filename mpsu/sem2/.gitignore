@@ -1,0 +1,9 @@
+# C compiler
+*.o
+Makefile
+*.eep
+*.elf
+*.hex
+*.lss
+*.map
+*.o.d
