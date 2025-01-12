@@ -1,0 +1,32 @@
+[tool.poetry]
+name = "stp-babushka-backend"
+version = "0.1.0"
+description = ""
+authors = ["maks-burlakof <maks.burlakof@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+djangorestframework = "^3.15.2"
+django-jazzmin = "^3.0.0"
+psycopg2-binary = "^2.9.9"
+django-cors-headers = "^4.4.0"
+djangorestframework-simplejwt = "^5.3.1"
+setuptools = "^75.1.0"
+pillow = "^10.4.0"
+pydantic-settings = "^2.5.2"
+drf-spectacular = "^0.27.2"
+drf-spectacular-sidecar = "^2024.7.1"
+django = "5.0.1"
+boto3 = "^1.35.63"
+django-storages = "^1.14.4"
+
+[tool.poetry.group.dev.dependencies]
+black = "^24.8.0"
+isort = "^5.13.2"
+pre-commit = "^3.8.0"
+pre-commit-hooks = "^4.6.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

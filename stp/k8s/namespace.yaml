@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: stpbabushka-prod
+
+---
+
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ingress-nginx

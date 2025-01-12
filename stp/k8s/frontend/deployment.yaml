@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: stpbabushka-prod
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      type: frontend
+      service: stp-babushka
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  minReadySeconds: 3
+  template:
+    metadata:
+      labels:
+        type: frontend
+        service: stp-babushka
+    spec:
+      containers:
+        - name: frontend
+          image: <IMAGE>
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: stpbabushka-prod
+  labels:
+    type: frontend
+    service: stp-babushka
+spec:
+  type: ClusterIP
+  selector:
+    type: frontend
+    service: stp-babushka
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8011
+      targetPort: 80
