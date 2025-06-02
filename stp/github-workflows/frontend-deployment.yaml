@@ -1,0 +1,55 @@
+name: Frontend deployment
+
+run-name: Deploy frontend to DigitalOcean Kubernetes by @${{ github.actor }}
+
+on:
+  workflow_run:
+    workflows:
+      - Frontend CI
+    branches:
+      - main
+    types:
+      - completed
+
+jobs:
+  build-push-deploy:
+    name: Deploy to DigitalOcean Kubernetes
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: ubuntu-latest
+    env:
+      DOCR_IMAGE: registry.digitalocean.com/containerregistry-registry/stpbabushka-prod-frontend
+      K8S_CLUSTER_NAME: kubernetes-cluster
+      K8S_NAMESPACE: stpbabushka-prod
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install doctl
+        uses: digitalocean/action-doctl@v2
+        with:
+          token: ${{ secrets.digitalocean_token }}
+
+      - name: Log in to DigitalOcean Container Registry with short-lived credentials
+        run: doctl registry login --expiry-seconds 1200
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: frontend/
+          file: frontend/Dockerfile.prod
+          push: true
+          tags: |
+            ${{ env.DOCR_IMAGE }}:${{ github.sha }}
+
+      - name: Update deployment file
+        run: sed -i 's|<IMAGE>|${{ env.DOCR_IMAGE }}:${{ github.sha }}|g' ${{ github.workspace }}/k8s/frontend/deployment.yaml
+
+      - name: Save DigitalOcean kubeconfig with short-lived credentials
+        run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ env.K8S_CLUSTER_NAME }}
+
+      - name: Deploy to DigitalOcean Kubernetes
+        run: kubectl apply -f ${{ github.workspace }}/k8s/frontend/deployment.yaml
+
+      - name: Verify deployment
+        run: kubectl rollout status deployment/frontend -n ${{ env.K8S_NAMESPACE }} --timeout 60s
