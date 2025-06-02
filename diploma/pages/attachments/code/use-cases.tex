@@ -1,0 +1,294 @@
+\noindent
+Реализация сценариев использования:
+
+\begin{lstlisting}[style=pythonstyle]
+class ApproveWorkspaceOccupationRequestUseCase:
+    def __init__(
+        self,
+        employee_repository: EmployeeRepository,
+        workspace_repository: WorkspaceRepository,
+        workspace_occupation_repository: WorkspaceOccupationRepository,
+        occupation_request_repository: OccupationRequestRepository,
+    ):
+        self._employee_repository = employee_repository
+        self._workspace_repository = workspace_repository
+        self._workspace_occupation_repository = workspace_occupation_repository
+        self._occupation_request_repository = occupation_request_repository
+
+    async def __call__(
+        self, request_id: UUID, approver_employee: Employee, approver_comment: str
+    ) -> None:
+        occupation_request = await self._occupation_request_repository.get(
+            id=request_id
+        )
+        await self._validate_occupation_request(occupation_request)
+
+        requested_workspace = await self._workspace_repository.get(
+            id=occupation_request.object_id
+        )
+        self._validate_workspace(requested_workspace)
+
+        occupation_request.status = OccupationRequestStatusOption.approved
+        occupation_request.approver_employee_id = approver_employee.id
+        occupation_request.approver_comment = approver_comment
+        occupation_request.modified_at = datetime.now()
+
+        occupation = WorkspaceOccupation(
+            type=occupation_request.occupation_type,
+            workspace_id=occupation_request.object_id,
+            employee_id=occupation_request.requester_employee_id,
+            start_date=occupation_request.start_date,
+            end_date=occupation_request.end_date,
+        )
+        occupation = await self._workspace_occupation_repository.create(occupation)
+        await self._occupation_request_repository.update(occupation_request)
+        await self._workspace_repository.update(
+            id=occupation_request.object_id,
+            status=WorkspaceStatusOption.occupied,
+            modified_at=datetime.now(),
+        )
+
+    async def _validate_occupation_request(
+        self, occupation_request: OccupationRequest
+    ) -> None:
+        if occupation_request.is_archived:
+            raise OccupationRequestArchivedError
+        if occupation_request.status != OccupationRequestStatusOption.in_progress:
+            raise OccupationRequestInvalidStatusError(
+                f"Occupation request status is {occupation_request.status}, expected IN_PROGRESS"
+            )
+        if occupation_request.request_type != OccupationRequestTypeOption.workspace:
+            raise OccupationRequestInvalidTypeError(
+                f"Occupation request type is {occupation_request.request_type}, expected WORKSPACE"
+            )
+        if occupation_request.start_date > occupation_request.end_date:
+            raise OccupationRequestInvalidDateError(
+                f"Occupation request start date {occupation_request.start_date} is after end date {occupation_request.end_date}"
+            )
+
+        existing_occupation = await self._workspace_occupation_repository.get_current()
+        if existing_occupation:
+            raise OccupationRequestAlreadyOccupiedError(
+                "There is already an existing occupation for this workspace"
+            )
+
+        requester_employee = await self._employee_repository.get(
+            id=occupation_request.requester_employee_id
+        )
+        if requester_employee.is_archived:
+            raise EmployeeArchivedError(f"Requested employee is archived")
+        if requester_employee.is_blocked:
+            raise EmployeeBlockedError(f"Requested employee is blocked")
+
+    def _validate_workspace(self, workspace: Workspace) -> None:
+        if not workspace:
+            raise WorkspaceDoesNotExistError(
+                f"Requested workspace with ID {occupation_request.object_id} does not exist"
+            )
+        if workspace.is_archived:
+            raise WorkspaceArchivedError
+        if workspace.status != WorkspaceStatusOption.free:
+            raise WorkspaceInvalidStatusError(f"Requested workspace is not free")
+
+class JWTAuthenticationUseCase:
+    ALGORITHM = "HS256"
+
+    def __init__(self, settings: BaseSettings):
+        self._access_token_secret_key: SecretStr = (
+            settings.app.jwt_access_token_secret_key
+        )
+        self._access_token_expire_minutes: int = (
+            settings.app.jwt_access_token_expire_minutes
+        )
+        self._refresh_token_secret_key: SecretStr = (
+            settings.app.jwt_refresh_token_secret_key
+        )
+        self._refresh_token_expire_minutes: int = (
+            settings.app.jwt_refresh_token_expire_minutes
+        )
+
+    def create_access_token(self, employee: Employee) -> str:
+        return self._create_jwt_token(
+            employee,
+            self._access_token_secret_key.get_secret_value(),
+            self._access_token_expire_minutes,
+        )
+
+    def create_refresh_token(self, employee: Employee) -> str:
+        return self._create_jwt_token(
+            employee,
+            self._refresh_token_secret_key.get_secret_value(),
+            self._refresh_token_expire_minutes,
+        )
+
+    def verify_access_token(self, token: str) -> tuple[UUID, int]:
+        return self._verify_jwt_token(
+            token,
+            self._access_token_secret_key.get_secret_value(),
+        )
+
+    def verify_refresh_token(self, token: str) -> tuple[UUID, int]:
+        return self._verify_jwt_token(
+            token,
+            self._refresh_token_secret_key.get_secret_value(),
+        )
+
+    @property
+    def token_type(self) -> str:
+        return "bearer"
+
+    def _create_jwt_token(
+        self, employee: Employee, secret_key: str, expire_minutes: int
+    ) -> str:
+        expire = datetime.now(tz=timezone.utc) + timedelta(minutes=expire_minutes)
+        to_encode = {
+            "id": str(employee.id),
+            "role": employee.role,
+            "exp": expire,
+        }
+        encoded_jwt = encode(to_encode, secret_key, algorithm=self.ALGORITHM)
+        return encoded_jwt
+
+    def _verify_jwt_token(self, token: str, secret_key: str) -> tuple[UUID, int]:
+        try:
+            payload = decode(token, secret_key, algorithms=[self.ALGORITHM])
+            user_id = UUID(payload.get("id"))
+            expire = int(payload.get("exp"))
+
+            if user_id is None:
+                raise JWTInvalidError
+        except ExpiredSignatureError:
+            raise JWTExpiredError
+        except (TypeError, ValueError, InvalidTokenError):
+            raise JWTInvalidError
+        return user_id, expire
+
+class RevokeTokenUseCase:
+    ACCESS_TOKEN_PREFIX = "access"
+    REFRESH_TOKEN_PREFIX = "refresh"
+    RESET_PASSWORD_TOKEN_PREFIX = "reset-password"
+
+    def __init__(self, token_repository: TokenRepository):
+        self._token_repository = token_repository
+
+    async def revoke_access_token(self, token: str, expire: int) -> None:
+        await self._token_repository.create(
+            self.ACCESS_TOKEN_PREFIX, token, self._calc_expire_in(expire)
+        )
+
+    async def is_access_token_revoked(self, token: str) -> bool:
+        return (
+            await self._token_repository.get(self.ACCESS_TOKEN_PREFIX, token)
+            is not None
+        )
+
+    async def revoke_refresh_token(self, token: str, expire: int) -> None:
+        await self._token_repository.create(
+            self.REFRESH_TOKEN_PREFIX, token, self._calc_expire_in(expire)
+        )
+
+    async def is_refresh_token_revoked(self, token: str) -> bool:
+        return (
+            await self._token_repository.get(self.REFRESH_TOKEN_PREFIX, token)
+            is not None
+        )
+
+    async def revoke_reset_password_token(self, token: str, expire: int) -> None:
+        await self._token_repository.create(
+            self.RESET_PASSWORD_TOKEN_PREFIX, token, self._calc_expire_in(expire)
+        )
+
+    async def is_reset_password_token_revoked(self, token: str) -> bool:
+        return (
+            await self._token_repository.get(self.RESET_PASSWORD_TOKEN_PREFIX, token)
+            is not None
+        )
+
+    @staticmethod
+    def _calc_expire_in(expire: int) -> int:
+        return expire - int(datetime.now(tz=timezone.utc).timestamp())
+\end{lstlisting}
+
+
+\noindent
+Определение классов возможных исключений, вызываемых в системе:
+
+\begin{lstlisting}[style=pythonstyle]
+class NotAuthorizedError(Exception):
+    def __str__(self) -> str:
+        return "Not authorized"
+
+class JWTMissingError(NotAuthorizedError):
+    def __str__(self) -> str:
+        return "Missing authentication credentials"
+
+class JWTInvalidError(NotAuthorizedError):
+    def __str__(self) -> str:
+        return "Invalid authentication credentials"
+
+class JWTExpiredError(NotAuthorizedError):
+    def __str__(self) -> str:
+        return "Token expired"
+
+class UserPermissionError(Exception):
+    def __str__(self) -> str:
+        return "User permission error"
+
+class EmployeeIncorrectError(Exception):
+    def __str__(self) -> str:
+        return "User incorrect error"
+
+class EmployeeConflictError(Exception):
+    def __str__(self) -> str:
+        return "User conflict error"
+
+class UserDoNotHavePermissionError(UserPermissionError):
+    def __str__(self) -> str:
+        return "You do not have permission to perform this action"
+
+class EmployeeIsBlockedError(UserPermissionError):
+    def __str__(self) -> str:
+        return "User is blocked"
+
+class EmployeeDoesNotExistError(EmployeeIncorrectError):
+    def __str__(self) -> str:
+        return "Employee does not exist"
+
+class EmployeeInvalidEmailError(EmployeeIncorrectError):
+    def __init__(self, email: str):
+        self.email = email
+
+    def __str__(self) -> str:
+        return f"Invalid email: {self.email}"
+
+class EmployeeInvalidNameError(EmployeeIncorrectError):
+    def __init__(self, name: str):
+        self.name = name
+
+    def __str__(self) -> str:
+        return (
+            f"Invalid name: {self.name}. It should contain only letters "
+            f"and be between 2 and 50 characters long"
+        )
+
+class EmployeeInvalidPhoneNumberError(EmployeeIncorrectError):
+    def __init__(self, phone_number: str):
+        self.phone_number = phone_number
+
+    def __str__(self) -> str:
+        return f"Invalid phone number: {self.phone_number}"
+
+class EmployeeEmailAlreadyExistsError(EmployeeConflictError):
+    def __init__(self, email: str):
+        self.email = email
+
+    def __str__(self) -> str:
+        return f"User with this email already exists: {self.email}"
+
+class EmployeePhoneNumberAlreadyExistsError(EmployeeConflictError):
+    def __init__(self, phone_number: str):
+        self.phone_number = phone_number
+
+    def __str__(self) -> str:
+        return f"User with this phone number already exists: {self.phone_number}"
+\end{lstlisting}

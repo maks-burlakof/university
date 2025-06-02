@@ -1,0 +1,695 @@
+\noindent
+Модели сущностей системы:
+
+\begin{lstlisting}[style=pythonstyle]
+class Model(AsyncAttrs, DeclarativeBase):
+    pass
+
+class AccessDeviceModel(Model):
+    __tablename__ = "access_device"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    serial_number: Mapped[str] = mapped_column(String(100), nullable=False)
+    type: Mapped[AccessDeviceTypeOption] = mapped_column(
+        Enum(AccessDeviceTypeOption), nullable=False
+    )
+    model: Mapped[str] = mapped_column(String(255), nullable=False)
+    access_zone_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("access_zone.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    ip_address: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    mac_address: Mapped[Optional[str]] = mapped_column(String(45), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class AccessEventModel(Model):
+    __tablename__ = "access_event"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    access_device_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("access_device.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    employee_identifier_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee_personal_identifier.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    type: Mapped[AccessEventTypeOption] = mapped_column(
+        Enum(AccessEventTypeOption), nullable=False
+    )
+    status: Mapped[AccessEventStatusOption] = mapped_column(
+        Enum(AccessEventStatusOption), nullable=False
+    )
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    details: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class AccessPermissionModel(Model):
+    __tablename__ = "access_permission"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    employee_identifier_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee_personal_identifier.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    access_zone_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("access_zone.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    end_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    time_restrictions: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class AccessZoneModel(Model):
+    __tablename__ = "access_zone"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    type: Mapped[AccessZoneTypeOption] = mapped_column(
+        Enum(AccessZoneTypeOption), nullable=False
+    )
+    office_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("office.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    parent_zone_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("access_zone.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    floor_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("floor.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    room_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("room.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class ActivityLogModel(Model):
+    __tablename__ = "activity_log"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    activity_type: Mapped[ActivityLogActivityTypeOption] = mapped_column(
+        Enum(ActivityLogActivityTypeOption), nullable=False
+    )
+    entity_type: Mapped[ActivityLogEntityTypeOption] = mapped_column(
+        Enum(ActivityLogEntityTypeOption), nullable=False
+    )
+    entity_id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), nullable=False)
+    timestamp: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    details: Mapped[Optional[dict]] = mapped_column(JSONB, nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class AddressModel(Model):
+    __tablename__ = "address"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    street: Mapped[str] = mapped_column(String(255), nullable=False)
+    street_type: Mapped[AddressStreetTypeOption] = mapped_column(
+        Enum(AddressStreetTypeOption), nullable=False
+    )
+    building_number: Mapped[str] = mapped_column(String(50), nullable=False)
+    city_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("city.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    subbuilding_number: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    subbuilding_type: Mapped[Optional[AddressSubbuildingTypeOption]] = mapped_column(
+        Enum(AddressSubbuildingTypeOption), nullable=True
+    )
+    postcode: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class AnnouncementModel(Model):
+    __tablename__ = "announcement"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    title: Mapped[str] = mapped_column(String(255), nullable=False)
+    content: Mapped[str] = mapped_column(String(10000), nullable=False)
+    author_employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    status: Mapped[AnnouncementStatusOption] = mapped_column(
+        Enum(AnnouncementStatusOption), nullable=False
+    )
+    target: Mapped[AnnouncementTargetOption] = mapped_column(
+        Enum(AnnouncementTargetOption), nullable=False
+    )
+    target_department_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("department.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    target_office_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("office.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    target_employee_ids: Mapped[Optional[list[UUID]]] = mapped_column(
+        ARRAY(pgUUID(as_uuid=True)), nullable=True
+    )
+    publish_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    expiry_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    attachment_urls: Mapped[Optional[list[str]]] = mapped_column(
+        ARRAY(String), nullable=True
+    )
+    is_pinned: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_important: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class CityModel(Model):
+    __tablename__ = "city"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    type: Mapped[CityTypeOption] = mapped_column(Enum(CityTypeOption), nullable=False)
+    country_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("country.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class CountryModel(Model):
+    __tablename__ = "country"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class DepartmentModel(Model):
+    __tablename__ = "department"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EmployeeModel(Model):
+    __tablename__ = "employee"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    first_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    last_name: Mapped[str] = mapped_column(String(50), nullable=False)
+    middle_name: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    email: Mapped[str] = mapped_column(String(127), nullable=False, unique=True)
+    phone_number: Mapped[Optional[str]] = mapped_column(
+        String(20), nullable=True, unique=True
+    )
+    role: Mapped[EmployeeRoleOption] = mapped_column(
+        Enum(EmployeeRoleOption), nullable=False, default=EmployeeRoleOption.employee
+    )
+    department_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("department.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    position_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee_position.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    professional_level_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee_professional_level.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    picture: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_blocked: Mapped[bool] = mapped_column(Boolean, default=False)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EquipmentAssignmentModel(Model):
+    __tablename__ = "equipment_assignment"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    equipment_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("equipment.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    assigned_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    status: Mapped[EquipmentAssignmentStatusOption] = mapped_column(
+        Enum(EquipmentAssignmentStatusOption), nullable=False
+    )
+    returned_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    assigned_by_employee_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    return_condition: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class MaintenanceRequestModel(Model):
+    __tablename__ = "maintenance_request"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    type: Mapped[MaintenanceRequestTypeOption] = mapped_column(
+        Enum(MaintenanceRequestTypeOption), nullable=False
+    )
+    status: Mapped[MaintenanceRequestStatusOption] = mapped_column(
+        Enum(MaintenanceRequestStatusOption), nullable=False
+    )
+    priority: Mapped[MaintenanceRequestPriorityOption] = mapped_column(
+        Enum(MaintenanceRequestPriorityOption), nullable=False
+    )
+    description: Mapped[str] = mapped_column(String(255), nullable=False)
+    reporter_employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    office_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("office.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    issue_date: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    floor_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("floor.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    room_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("room.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    assigned_to_employee_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    external_contractor: Mapped[Optional[str]] = mapped_column(
+        String(255), nullable=True
+    )
+    estimated_cost: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    actual_cost: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    scheduled_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    due_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    completion_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    attachment_urls: Mapped[Optional[list[str]]] = mapped_column(
+        ARRAY(String), nullable=True
+    )
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EquipmentMaintenanceModel(Model):
+    __tablename__ = "equipment_maintenance"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    equipment_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("equipment.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    type: Mapped[EquipmentMaintenanceTypeOption] = mapped_column(
+        Enum(EquipmentMaintenanceTypeOption), nullable=False
+    )
+    status: Mapped[EquipmentMaintenanceStatusOption] = mapped_column(
+        Enum(EquipmentMaintenanceStatusOption), nullable=False
+    )
+    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=False)
+    end_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    description: Mapped[str] = mapped_column(String(255), nullable=False)
+    technician_name: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    performed_by_employee_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    provider: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    cost: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    invoice_number: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    attachment_urls: Mapped[Optional[list[str]]] = mapped_column(
+        ARRAY(String), nullable=True
+    )
+    result: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    next_maintenance_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EquipmentModel(Model):
+    __tablename__ = "equipment"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    type: Mapped[EquipmentTypeOption] = mapped_column(
+        Enum(EquipmentTypeOption), nullable=False
+    )
+    status: Mapped[EquipmentStatusOption] = mapped_column(
+        Enum(EquipmentStatusOption), nullable=False
+    )
+    model: Mapped[str] = mapped_column(String(255), nullable=False)
+    serial_number: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    inventory_number: Mapped[Optional[str]] = mapped_column(String(100), nullable=True)
+    manufacturer: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    purchase_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    warranty_end_date: Mapped[Optional[datetime]] = mapped_column(
+        DateTime, nullable=True
+    )
+    cost: Mapped[Optional[float]] = mapped_column(Float, nullable=True)
+    office_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("office.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    floor_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True), ForeignKey("floor.id", ondelete="SET NULL"), nullable=True
+    )
+    room_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True), ForeignKey("room.id", ondelete="SET NULL"), nullable=True
+    )
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EmployeePersonalIdentifierModel(Model):
+    __tablename__ = "employee_personal_identifier"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    type: Mapped[EmployeePersonalIdentifierTypeOption] = mapped_column(
+        Enum(EmployeePersonalIdentifierTypeOption), nullable=False
+    )
+    identifier_id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), nullable=False)
+    employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EmployeePositionModel(Model):
+    __tablename__ = "employee_position"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class EmployeeProfessionalLevelModel(Model):
+    __tablename__ = "employee_professional_level"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    name: Mapped[str] = mapped_column(String(255), nullable=False)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class FloorModel(Model):
+    __tablename__ = "floor"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    number: Mapped[str] = mapped_column(String(50), nullable=False)
+    office_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("office.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class NotificationModel(Model):
+    __tablename__ = "notification"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+    title: Mapped[str] = mapped_column(String(100), nullable=False)
+    content: Mapped[str] = mapped_column(String(1000), nullable=False)
+    type: Mapped[NotificationTypeOption] = mapped_column(
+        Enum(NotificationTypeOption), nullable=False
+    )
+    priority: Mapped[NotificationPriorityOption] = mapped_column(
+        Enum(NotificationPriorityOption), nullable=False
+    )
+    is_read: Mapped[bool] = mapped_column(Boolean, default=False)
+    entity_type: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    entity_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True), nullable=True
+    )
+    read_at: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    expiry_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    action_url: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class OccupationRequestModel(Model):
+    __tablename__ = "occupation_request"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    status: Mapped[OccupationRequestStatusOption] = mapped_column(
+        Enum(OccupationRequestStatusOption), nullable=False
+    )
+    request_type: Mapped[OccupationRequestRequestTypeOption] = mapped_column(
+        Enum(OccupationRequestRequestTypeOption), nullable=False
+    )
+    occupation_type: Mapped[OccupationRequestOccupationTypeOption] = mapped_column(
+        Enum(OccupationRequestOccupationTypeOption), nullable=False
+    )
+    object_id: Mapped[UUID] = mapped_column(pgUUID(as_uuid=True), nullable=False)
+    requester_employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    start_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    end_date: Mapped[datetime] = mapped_column(DateTime, nullable=True)
+    approver_employee_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    requester_comment: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    approver_comment: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class OfficeModel(Model):
+    __tablename__ = "office"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    address_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("address.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    name: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    description: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    phone_number: Mapped[Optional[str]] = mapped_column(String(20), nullable=True)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class PersonalCardIdentifierModel(Model):
+    __tablename__ = "personal_card_identifier"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    number: Mapped[str] = mapped_column(String(50), nullable=False)
+    type: Mapped[PersonalCardIdentifierTypeOption] = mapped_column(
+        Enum(PersonalCardIdentifierTypeOption), nullable=False
+    )
+    status: Mapped[PersonalCardIdentifierStatusOption] = mapped_column(
+        Enum(PersonalCardIdentifierStatusOption), nullable=False
+    )
+    uid: Mapped[str] = mapped_column(String(100), nullable=False)
+    employee_identifier_id: Mapped[Optional[UUID]] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee_personal_identifier.id", ondelete="SET NULL"),
+        nullable=True,
+    )
+    bit_format: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    manufacturer: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    serial_number: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    issue_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    expiry_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class RoomModel(Model):
+    __tablename__ = "room"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    number: Mapped[str] = mapped_column(String(50), nullable=False)
+    type: Mapped[RoomTypeOption] = mapped_column(Enum(RoomTypeOption), nullable=False)
+    floor_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("floor.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class WorkspaceModel(Model):
+    __tablename__ = "workspace"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    number: Mapped[str] = mapped_column(String(50), nullable=False)
+    status: Mapped[WorkspaceStatusOption] = mapped_column(
+        Enum(WorkspaceStatusOption), nullable=False
+    )
+    room_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("room.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    coordinates: Mapped[tuple[Decimal]] = mapped_column(ARRAY(Numeric), nullable=False)
+    rotate_degree: Mapped[int] = mapped_column(Integer, nullable=False)
+    notes: Mapped[Optional[str]] = mapped_column(String(255), nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+
+class WorkspaceOccupationModel(Model):
+    __tablename__ = "workspace_occupation"
+
+    id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True), primary_key=True, default=uuid4
+    )
+    type: Mapped[WorkspaceOccupationTypeOption] = mapped_column(
+        Enum(WorkspaceOccupationTypeOption), nullable=False
+    )
+    workspace_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("workspace.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    employee_id: Mapped[UUID] = mapped_column(
+        pgUUID(as_uuid=True),
+        ForeignKey("employee.id", ondelete="RESTRICT"),
+        nullable=False,
+    )
+    start_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    end_date: Mapped[Optional[datetime]] = mapped_column(DateTime, nullable=True)
+    is_archived: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+    modified_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now)
+\end{lstlisting}

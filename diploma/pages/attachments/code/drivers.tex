@@ -1,0 +1,126 @@
+\noindent
+Реализация REST-драйвера с использованием фреймворка FastAPI:
+
+\begin{lstlisting}[style=pythonstyle]
+def get_postgres_async_engine(
+    settings: Annotated[BaseSettings, Depends(get_settings)],
+) -> AsyncEngine:
+    try:
+        async_engine: AsyncEngine = create_async_engine(
+            URL.create(
+                "postgresql+asyncpg",
+                username=settings.app.database_username,
+                password=settings.app.database_password.get_secret_value(),
+                host=settings.app.database_hostname,
+                port=settings.app.database_port,
+                database=settings.app.database_name,
+            ),
+        )
+    except SQLAlchemyError as e:
+        raise DatabaseError(e)
+
+    return async_engine
+
+async def get_postgres_session(
+    settings: Annotated[BaseSettings, Depends(get_settings)],
+) -> AsyncGenerator[AsyncSession, None]:
+    async_session = async_sessionmaker(
+        bind=get_postgres_async_engine(settings),
+        autoflush=False,
+        expire_on_commit=False,
+    )
+    async with async_session() as c:
+        try:
+            yield c
+        except SQLAlchemyError as e:
+            raise DatabaseError(e)
+
+async def get_redis_client(
+    settings: Annotated[BaseSettings, Depends(get_settings)],
+) -> AsyncGenerator[redis.Redis, None]:
+    try:
+        redis_client = await redis.from_url(settings.app.redis_uri)
+        yield redis_client
+        await redis_client.aclose()
+    except RedisError as e:
+        raise DatabaseError(e)
+
+def get_employee_repository(
+    postgres_client: Annotated[AsyncSession, Depends(get_postgres_session)],
+) -> EmployeeRepository:
+    return EmployeePostgresRepository(postgres_client)
+
+def get_token_repository(
+    redis_client: Annotated[Redis, Depends(get_redis_client)],
+) -> TokenRepository:
+    return TokenRedisRepository(redis_client)
+
+async def get_user(
+    employee_repository: Annotated[
+        EmployeeRepository, Depends(get_employee_repository)
+    ],
+    jwt_authentication_use_case: Annotated[
+        JWTAuthenticationUseCase, Depends(get_jwt_authentication_use_case)
+    ],
+    revoke_token_use_case: Annotated[
+        RevokeTokenUseCase, Depends(get_revoke_token_use_case)
+    ],
+    token: str = Depends(auth_schema),
+) -> Employee:
+    employee_id, expire = jwt_authentication_use_case.verify_access_token(token)
+    if await revoke_token_use_case.is_access_token_revoked(token):
+        raise JWTInvalidError
+    employee = await employee_repository.get(id=employee_id)
+    if not employee:
+        raise EmployeeDoesNotExistError
+    if employee.is_blocked:
+        raise EmployeeIsBlockedError
+    return employee
+
+def get_jwt_authentication_use_case(
+    settings: Annotated[BaseSettings, Depends(get_settings)],
+) -> JWTAuthenticationUseCase:
+    return JWTAuthenticationUseCase(settings)
+
+def get_revoke_token_use_case(
+    token_repository: Annotated[TokenRepository, Depends(get_token_repository)],
+) -> RevokeTokenUseCase:
+    return RevokeTokenUseCase(token_repository)
+
+router = APIRouter()
+
+@router.get(
+    "/employee/me", status_code=status.HTTP_200_OK, response_model=EmployeeOutMe
+)
+async def get_me(employee: Annotated[Employee, Depends(get_user)]) -> Employee:
+    return employee
+
+class EmployeeOutMe(BaseModel):
+    id: UUID
+    first_name: str
+    last_name: str
+    middle_name: str | None
+    email: str
+    phone_number: str | None
+    role: EmployeeRoleOption
+    department_id: UUID
+    position_id: UUID
+    professional_level_id: UUID
+    picture: str | None
+    created_at: datetime
+    modified_at: datetime
+
+auth_schema = OAuth2PasswordBearer(tokenUrl="login", scheme_name="JWT Auth")
+
+app = FastAPI(
+    title="Office management API",
+)
+
+middleware_container(app)
+
+app.include_router(employee.router, prefix="/api")
+
+@app.get("/healthcheck")
+async def healthcheck() -> dict[str, str]:
+    return {"status": "ok"}
+\end{lstlisting}

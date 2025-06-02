@@ -1,0 +1,33 @@
+\lstdefinelanguage{JavaScript}{
+    morekeywords={
+        break,case,catch,class,const,continue,debugger,default,delete,do,else,export,extends,finally,for,function,if,import,in,instanceof,let,new,return,super,switch,this,throw,try,typeof,var,void,while,with,yield,async,await
+    },
+    keywordstyle=\bfseries\color{bluekeywords},
+    sensitive=true,
+    morecomment=[l][\color{greencomments}]{//},
+    morecomment=[s][\color{greencomments}]{/*}{*/},
+    morestring=[b]",
+    morestring=[b]',
+    stringstyle=\color{redstrings},
+}
+
+\lstdefinestyle{jsstyle}{
+    xleftmargin=0ex,
+    language=JavaScript,
+    basicstyle=\footnotesize\ttfamily,
+    breaklines=true,
+    columns=fullflexible,
+}
+
+\lstdefinestyle{jsinlinestyle} {
+    language=JavaScript,
+    breaklines=true,
+    columns=fullflexible,
+    basicstyle=\footnotesize\ttfamily,
+}
+
+\lstdefinestyle{jsframestyle}{
+    language=JavaScript,
+    frame=lr,
+    rulecolor=\color{blue!80!black},
+}

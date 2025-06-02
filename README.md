@@ -112,7 +112,7 @@
 
 # 🎓 Дипломный проект
 
-- ### [Система управления операционными процессами в офисном пространстве](/diploma/)
+- ### [Система управления офисными информационными процессами](/diploma/)
   ![Python](https://img.shields.io/badge/-Python-3670A0?logo=python&logoColor=FFD343)
   ![FastAPI](https://img.shields.io/badge/-FastAPI-009688?logo=fastapi&logoColor=white)
   ![PostgreSQL](https://img.shields.io/badge/-PostgreSQL-336791?logo=postgresql&logoColor=FFFFFF)

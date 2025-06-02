@@ -1,0 +1,35 @@
+\lstdefinelanguage{Python}{
+    morekeywords={
+        False,None,True,and,as,assert,async,await,break,class,continue,def,del,elif,
+        else,except,finally,for,from,global,if,import,in,is,lambada,nonlocal,not,or,
+        pass,raise,return,try,while,with,yield
+    },
+    keywordstyle=\bfseries\color{bluekeywords},
+    sensitive=true,
+    morecomment=[l][\color{greencomments}]{\#},
+    morestring=[b]",
+    morestring=[s]{'''}{'''},
+    morestring=[s]{"""}{"""},
+    stringstyle=\color{redstrings},
+}
+
+\lstdefinestyle{pythonstyle}{
+    xleftmargin=0ex,
+    language=Python,
+    basicstyle=\footnotesize\ttfamily,
+    breaklines=true,
+    columns=fullflexible,
+}
+
+\lstdefinestyle{pythoninlinestyle} {
+    language=Python,
+    breaklines=true,
+    columns=fullflexible,
+    basicstyle=\footnotesize\ttfamily,
+}
+
+\lstdefinestyle{pythonframestyle}{
+    language=Python,
+    frame=lr,
+    rulecolor=\color{blue!80!black},
+}

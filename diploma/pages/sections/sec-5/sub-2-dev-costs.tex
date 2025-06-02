@@ -1,0 +1,187 @@
+\subsection{Расчёт затрат на разработку программного средства}
+\label{sec:economics:dev-costs}
+
+% Begin calculations
+\newcommand{\byn}{р.}
+
+\FPeval{\Kpr}{1.5}
+\FPeval{\KprPercent}{50}
+\FPeval{\SalaryTechnicProgrammer}{1235}  % variable
+\FPeval{\SalaryEngineerProgrammer}{1735}  % variable
+\FPeval{\WorkingHours}{168}
+\FPeval{\SalaryTechnicProgrammerPerHour}{round(\SalaryTechnicProgrammer / \WorkingHours, 1)}
+\FPeval{\SalaryEngineerProgrammerPerHour}{round(\SalaryEngineerProgrammer / \WorkingHours, 1)}
+\FPeval{\IntensityTechnicProgrammer}{120}
+\FPeval{\IntensityEngineerProgrammer}{100}
+\FPeval{\TotalSalaryTechnicProgrammer}{round(\SalaryTechnicProgrammerPerHour * \IntensityTechnicProgrammer, 1)}
+\FPeval{\TotalSalaryEngineerProgrammer}{round(\SalaryEngineerProgrammerPerHour * \IntensityEngineerProgrammer, 1)}
+\FPeval{\TotalSalaries}{round(\TotalSalaryTechnicProgrammer + \TotalSalaryEngineerProgrammer, 1)}
+\FPeval{\TotalBonuses}{round(\TotalSalaries * \KprPercent / 100, 1)}
+\FPeval{\TotalSalariesWithBonuses}{round(\TotalSalaries + \TotalBonuses, 1)}
+\FPeval{\Zo}{\TotalSalariesWithBonuses}
+
+\FPeval{\NdPercent}{10}
+\FPeval{\Zd}{round(\Zo * \NdPercent / 100, 1)}
+
+\FPeval{\NsocPercent}{35}
+\FPeval{\Rsoc}{round((\Zo + \Zd) * \NsocPercent / 100, 1)}
+
+\FPeval{\NpzPercent}{50}
+\FPeval{\Rpz}{round(\Zo * \NpzPercent / 100, 1)}
+
+\FPeval{\Zr}{round(\Zo + \Zd + \Rsoc + \Rpz, 1)}
+% End calculations
+
+Расчёт единовременных затрат на разработку осуществляется на основании расчётов затрат на основную заработную плату разработчиков, дополнительную заработную плату разработчиков, отчислений на социальные нужды и прочих расходов.
+
+Расчёт основной заработной платы происходит по формуле:
+
+\begin{equation}
+    \label{eq:economics:dev-costs:salary}
+    \text{З}_\text{о} = \text{К}_\text{пр} \sum_\text{i = 1}^\text{n} \text{З}_\text{ч.i} \cdot \text{t}_\text{i} \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{K}_\text{пр} $ & коэффициент, учитывающий процент премий и иных стимулирующих выплат (\num{\Kpr}); \\
+\end{explanation}
+\begin{explanation}
+    \hspace{0.85cm}
+    & $ \text{n} $ & количество категорий исполнителей, занятых разработкой программного средства; \\
+    & $ \text{З}_\text{чi} $ & часовая заработная плата исполнителя i-й категории,~\byn; \\
+    & $ \text{t}_\text{i} $ & трудоемкость работ, выполняемых исполнителем i-й категории, ч.
+\end{explanation}
+
+В настоящий момент тарифная ставка техника-программиста без разряда на предприятии составляет \SalaryTechnicProgrammer~\byn, инженера-программиста без категории \SalaryEngineerProgrammer~\byn~Информация взята из таблицы тарифных окладов руководителей, специалистов и других служащих (технических исполнителей) ЧТПУП «Автомаш Современные Системы». Таблица тарифных окладов размещена на внутреннем информационном ресурсе предприятия. Представленная информация является актуальной на апрель 2025 года. Количество рабочих часов в месяце примем равным \WorkingHours~часам. Расчёт основной заработной платы согласно формуле (\ref{eq:economics:dev-costs:salary}) представлен в таблице~\ref{table:economics:dev-costs:salaries}.
+
+\begingroup
+\singlespacing
+\vspace{-\baselineskip}
+\begin{longtable}{| >{\centering\arraybackslash}m{0.17\textwidth} 
+                  | >{\centering\arraybackslash}m{0.22\textwidth} 
+                  | >{\centering\arraybackslash}m{0.12\textwidth} 
+                  | >{\centering\arraybackslash}m{0.12\textwidth} 
+                  | >{\centering\arraybackslash}m{0.12\textwidth} 
+                  | >{\centering\arraybackslash}m{0.10\textwidth}|}
+    \caption{Расчет основной заработной платы работников} \label{table:economics:dev-costs:salaries} \\ \hline
+    Наименова\-ние дол\-жнос\-ти раз\-ра\-бот\-чи\-ка & Вид выполняемой работы & Месячная заработная плата,~\byn & Часовая заработная плата,~\byn & Трудо\-ём\-кос\-ть ра\-бот, ч. & Сумма,\newline \byn \\ \hline
+    \endfirsthead
+    \multicolumn{6}{@{}l}{\noindent Продолжение таблицы~\thetable} \\ \hline
+    1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+    \endhead
+    1 & 2 & 3 & 4 & 5 & 6 \\ \hline
+    \raggedright 1. Техник-программист & 
+    Разработка и тестирование программного средства & 
+    \num{\SalaryTechnicProgrammer} & 
+    \num{\SalaryTechnicProgrammerPerHour} &
+    \num{\IntensityTechnicProgrammer} &
+    \num{\TotalSalaryTechnicProgrammer} \\
+    \hline
+    \raggedright 2. Инже\-нер-прог\-рам\-мист & 
+    Проектирование архитектуры программного средства, курирование процессом разработки & 
+    \num{\SalaryEngineerProgrammer} & 
+    \num{\SalaryEngineerProgrammerPerHour} &
+    \num{\IntensityEngineerProgrammer} &
+    \num{\TotalSalaryEngineerProgrammer} \\
+    \hline
+    % --- Summary rows ---
+    \multicolumn{5}{|l|}{Итого} &
+    \num{\TotalSalaries} \\
+    \hline
+    \multicolumn{5}{|l|}{Премия и иные стимулирующие выплаты (\KprPercent \%)} &
+    \num{\TotalBonuses} \\
+    \hline
+    \multicolumn{5}{|l|}{Всего основная заработная плата} &
+    \num{\TotalSalariesWithBonuses} \\
+    \hline
+\end{longtable}
+\endgroup
+
+
+Затраты на дополнительную заработную плату разработчиков включают выплаты, предусмотренные законодательством о труде (оплата трудовых отпусков, льготных часов, времени выполнения государственных обязанностей и других выплат, не связанных с основной деятельностью исполнителей), и определяются по формуле:
+
+\begin{equation}
+    \label{eq:economics:dev-costs:bonus-salary}
+    \text{З}\text{д} = \frac{\text{З}\text{о} \cdot \text{Н}\text{д}}{100} \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{Н}\text{д} $ & норматив дополнительной заработной платы (\NdPercent \%).
+\end{explanation}
+
+Дополнительная заработная плата согласно формуле (\ref{eq:economics:dev-costs:bonus-salary}) составит:
+
+\begin{equation*}
+    \text{З}\text{д} = \frac{\num{\Zo} \cdot \num{\NdPercent}}{100} = \num{\Zd}~\text{\byn}
+\end{equation*}
+
+
+Отчисления на социальные нужды (в фонд социальной защиты населения и на обязательное страхование) определяются в соответствии с действующими законодательными актами. Информация об актуальной процентной ставке взята из методических указаний по экономическому обоснованию дипломных проектов~\cite{book_bsuir_economics}. Отчисления вычисляются по формуле:
+
+\begin{equation}
+    \label{eq:economics:dev-costs:social}
+    \text{Р}\text{соц} = \frac{(\text{З}\text{о} + \text{З}\text{д}) \cdot \text{Н}\text{соц}}{100} \text{,} 
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{Н}\text{соц} $ & норматив отчислений в ФСЗН и Белгосстрах (в соответствии с действующим законодательством – \NsocPercent \%).
+\end{explanation}
+
+Обязательные отчисления в фонд социальной защиты населения и на страхование согласно формуле (\ref{eq:economics:dev-costs:social}) составят:
+
+\begin{equation*}
+    \text{Р}\text{соц} = \frac{(\num{\Zo} + \num{\Zd}) \cdot \num{\NsocPercent}}{100} = \num{\Rsoc}~\text{\byn} 
+\end{equation*}
+
+
+Прочие затраты включают затраты, как напрямую связанные с разработкой программного продукта (в соответствии с планируемой суммой затрат на эти мероприятия), так и затраты, связанные с функционированием организации-разработчика в целом (например, затраты на аренду офисных помещений, освещение, отопление, амортизацию основных производственных средств и т.д.). Данные затраты включаются в себестоимость разработки в процентах от затрат на основную заработную плату разработчиков по формуле:
+
+\begin{equation}
+    \label{eq:economics:dev-costs:other}
+    \text{Р}\text{пз} = \frac{\text{З}\text{о} \cdot \text{Н}\text{пз}}{100} \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{Н}_\text{пз} $ & норматив прочих затрат (\NpzPercent \%).
+\end{explanation}
+
+Прочие затраты согласно формуле (\ref{eq:economics:dev-costs:other}) составят:
+
+\begin{equation*}
+    \label{eq:economics:dev-costs:other}
+    \text{Р}\text{пз} = \frac{\num{\Zo} \cdot \NpzPercent}{100} = \num{\Rpz}~\text{\byn} 
+\end{equation*}
+
+
+Общая сумма расходов на разработку программного средства вычисляется по формуле:
+
+\begin{equation}
+    \label{eq:economics:dev-costs:total}
+    \text{З}\text{р} = \text{З}\text{о} + \text{З}\text{д} + \text{Р}\text{соц} + \text{Р}\text{пр} .
+\end{equation}
+
+Расчёт общей суммы затрат на разработку представлен в таблице~\ref{table:economics:dev-costs:total}.
+
+\begin{longtable}{| >{\raggedright}m{0.75\textwidth} 
+                  | >{\centering\arraybackslash}m{0.2\textwidth}|}
+    \caption{Общая сумма затрат на разработку} \label{table:economics:dev-costs:total} \\ \hline
+    \centering Наименование статьи затрат & Сумма,~\byn \\ \hline
+    \endfirsthead
+    \multicolumn{2}{@{}l}{\noindent Продолжение таблицы~\thetable} \\ \hline
+    Наименование статьи затрат & Сумма,~\byn \\ \hline
+    \endhead
+    1. Основная заработная плата разработчиков & 
+    \num{\Zo} \\
+    \hline
+    2. Дополнительная заработная плата разработчиков & 
+    \num{\Zd} \\
+    \hline
+    3. Отчисления на социальные нужды & 
+    \num{\Rsoc} \\
+    \hline
+    4. Прочие затраты & 
+    \num{\Rpz} \\
+    \hline
+    Общая сумма затрат на разработку & 
+    \num{\Zr} \\
+    \hline
+\end{longtable}

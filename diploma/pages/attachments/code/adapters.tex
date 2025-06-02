@@ -1,0 +1,156 @@
+\noindent
+Адаптеры системы:
+
+\begin{lstlisting}[style=pythonstyle]
+Entity = TypeVar("Entity")
+
+class BasePostgresRepository(ABC):
+    entity_class: Type[Entity]
+    model_class: Type[Model]
+
+    def __init__(self, session: AsyncSession):
+        self.session = session
+
+    async def get(self, **filters: Any) -> Entity | None:
+        try:
+            model_obj = (
+                (
+                    await self.session.execute(
+                        select(self.model_class).filter_by(**filters)
+                    )
+                )
+                .scalars()
+                .first()
+            )
+            return self._to_entity(model_obj) if model_obj else None
+        except Exception as e:
+            raise DatabaseError(e)
+
+    async def get_many(
+        self,
+        filters: dict | None = None,
+        or_filters: dict | None = None,
+        or_ilike_filters: dict | None = None,
+        sort_by: (str | None) = None,
+        order_by: Literal["asc", "desc"] | None = "asc",
+        page: int = 1,
+        limit: int = 100,
+    ) -> tuple[int, list[Entity]]:
+        offset = (page - 1) * limit
+        limit = limit * page
+        query = select(self.model_class)
+
+        if filters:
+            query = query.filter_by(**filters)
+
+        if or_filters:
+            query = query.filter(
+                or_(
+                    *[
+                        getattr(self.model_class, key) == value
+                        for key, value in or_filters.items()
+                    ]
+                )
+            )
+
+        if or_ilike_filters:
+            query = query.filter(
+                or_(
+                    *[
+                        getattr(self.model_class, key).ilike(f"%{value}%")
+                        for key, value in or_ilike_filters.items()
+                    ]
+                )
+            )
+
+        query = query.order_by(getattr(getattr(self.model_class, sort_by), order_by)())
+
+        try:
+            count: int = await self.session.scalar(
+                select(func.count()).select_from(query.subquery())
+            )
+            return (
+                count,
+                [
+                    self._to_entity(model_obj)
+                    for model_obj in await self.session.scalars(
+                        query.limit(limit).offset(offset)
+                    )
+                ],
+            )
+        except Exception as e:
+            raise DatabaseError(e)
+
+    async def create(self, entity: Entity) -> Entity:
+        try:
+            model_obj = self._to_model(entity)
+            self.session.add(model_obj)
+            await self.session.commit()
+            await self.session.refresh(model_obj)
+            return self._to_entity(model_obj)
+        except Exception as e:
+            await self.session.rollback()
+            raise DatabaseError(e)
+
+    async def update(self, updated_entity: Entity, **filters: Any) -> Entity | None:
+        try:
+            model_obj = (
+                (
+                    await self.session.execute(
+                        select(self.model_class).filter_by(**filters)
+                    )
+                )
+                .scalars()
+                .first()
+            )
+            if model_obj:
+                for key, value in updated_entity.__dict__.items():
+                    setattr(model_obj, key, value)
+                await self.session.commit()
+                await self.session.refresh(model_obj)
+                return self._to_entity(model_obj)
+            return None
+        except Exception as e:
+            await self.session.rollback()
+            raise DatabaseError(e)
+
+    async def delete(self, **filters: Any) -> None:
+        try:
+            await self.session.execute(delete(self.model_class).filter_by(**filters))
+            await self.session.commit()
+        except Exception as e:
+            await self.session.rollback()
+            raise DatabaseError(e)
+
+    @staticmethod
+    @abstractmethod
+    def _to_entity(model_obj: Model) -> Entity:
+        pass
+
+    @staticmethod
+    @abstractmethod
+    def _to_model(entity: Entity) -> Model:
+        pass
+
+class EmployeePostgresRepository(BasePostgresRepository, EmployeeRepository):
+    entity_class: Employee
+    model_class: EmployeeModel
+
+    @staticmethod
+    def _to_entity(model_obj: EmployeeModel) -> Employee:
+        pass
+
+    @staticmethod
+    def _to_model(entity: Employee) -> EmployeeModel:
+        pass
+
+class DatabaseError(ExternalError):
+    def __init__(self, error: Exception | str):
+        self.error = error
+
+    def __str__(self) -> str:
+        return str(self.error)
+
+class ExternalError(Exception):
+    pass
+\end{lstlisting}

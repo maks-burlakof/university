@@ -1,0 +1,94 @@
+\subsection{Расчёт экономического эффекта от использования программного средства}
+\label{sec:economics:use-effect}
+
+% Begin calculations
+\FPeval{\trBezPS}{3}  % variable - (для экономии) трудоемкость до ПО
+\FPeval{\trSPS}{0.5}  % variable - (для экономии) трудоемкость после ПО
+\FPeval{\Tch}{5.7}  % variable - (для экономии) часовая ставка кто пользуется ПО
+\FPeval{\Np}{120}  % variable - (для экономии) норма работ кто пользуется ПО
+\FPeval{\Ezp}{round(\Kpr * (\trBezPS - \trSPS) * \Tch * \Np * (1 + (\NdPercent / 100)) * (1 + (\NsocPercent / 100)), 1)}
+
+\FPeval{\NpribPercent}{20}
+\FPeval{\Etek}{\Ezp}
+\FPeval{\ZosobPercent}{10}
+\FPeval{\Zosob}{round(\Zr * \ZosobPercent / 100, 1)}
+\FPeval{\ZsoprPercent}{15}
+\FPeval{\Zsopr}{round(\Zr * \ZsoprPercent / 100, 1)}
+\FPeval{\deltaZtekPS}{round(\Zosob + \Zsopr, 1)}
+\FPeval{\deltaPch}{round((\Etek - \deltaZtekPS) * (1 - (\NpribPercent / 100)), 1)}
+% End calculations
+
+Расчет ожидаемого прироста прибыли в результате внедрения программного средства осуществляется на основании расчета экономии на заработной плате и начислениях на заработную плату сотрудников за счёт снижения трудоёмкости работ.
+
+Экономия на заработной плате за счёт снижения трудоёмкости работ вычисляется по формуле:
+
+\begin{equation}
+    \label{eq:economics:use-effect:salary-economy}
+    \text{Э}_\text{з.п} = \text{К}_\text{пр} \cdot (\text{t}_\text{р}^\text{без п.с} - \text{t}_\text{р}^\text{с п.с}) \cdot \text{T}_\text{ч} \cdot \text{N}_\text{п} \cdot (1 + \frac{\text{Н}_\text{д}}{100}) \cdot (1 + \frac{\text{Н}_\text{соц}}{100}) \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{К}_\text{пр} $ & коэффициент премий (\num{\Kpr}); \\
+    & $ \text{t}_\text{р}^\text{без п.с} $ & трудоёмкость выполнения работ сотрудниками до внедрения программного средства, ч.; \\
+    & $ \text{t}_\text{р}^\text{с п.с} $ & трудоёмкость выполнения работ сотрудниками после внедрения программного средства, ч.; \\
+    & $ \text{Т}_\text{ч} $ & часовой оклад (часовая тарифная ставка) сотрудника, использующего программное средство,~\byn; \\
+    & $ \text{N}_\text{п} $ & плановый объём работ, выполняемый сотрудником; \\
+    & $ \text{Н}_\text{д} $ & норматив дополнительной заработной платы (\NdPercent \%); \\
+    & $ \text{Н}_\text{соц} $ & ставка отчислений от заработной платы, включаемых в себестоимость (в соответствии с законодательством \NsocPercent \%).
+\end{explanation}
+
+Экономия на текущих затратах при использовании программного средства согласно формуле~\eqref{eq:economics:use-effect:salary-economy} составит:
+
+\begin{equation*}
+    \text{Э}_\text{з.п} = \num{\Kpr} \cdot (\num{\trBezPS} - \num{\trSPS}) \cdot \num{\Tch} \cdot \num{\Np} \cdot (1 + \frac{\num{\NdPercent}}{100}) \cdot (1 + \frac{\num{\NsocPercent}}{100}) = \num{\Ezp}~\text{\byn}
+\end{equation*}
+
+
+Результатом является ожидаемый прирост прибыли вследствие внедрения программного продукта на основании экономии на заработной плате для сотрудников с повысившейся эффективностью труда. Экономическим эффектом при использовании программного средства является прирост чистой прибыли, полученной за счёт экономии на текущих затратах предприятия, который рассчитывается по формуле:
+
+\begin{equation}
+    \label{eq:economics:use-effect:profit}
+    \Delta \text{П}_\text{ч} = (\text{Э}_\text{тек} - \Delta \text{З}_\text{тек}^\text{п.с.}) (1 - \frac{\text{Н}_\text{п}}{100}) \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{Э}_\text{тек} $ & экономия на текущих затратах при использовании программного средства,~\byn; \\
+    & $ \Delta \text{З}_\text{тек}^\text{п.с.} $ & прирост текущих затрат, связанных с использованием программного средства; \\
+    & $ \text{Н}_\text{п} $ & ставка налога на прибыль согласно действующему законодательству (\NpribPercent \%).
+\end{explanation}
+
+Прирост текущих затрат, связанных с использованием программного средства, рассчитывается по формуле~\eqref{eq:economics:use-effect:spendings-growth}:
+
+\begin{equation}
+    \label{eq:economics:use-effect:spendings-growth}
+    \Delta \text{З}_\text{тек}^\text{п.с.} = \text{З}_\text{особ} + \text{З}_\text{сопр} \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{З}_\text{особ} $ & затраты на освоение и обучение,~\byn; \\
+    & $ \text{З}_\text{сопр} $ & затраты на сопровождение программного средства,~\byn
+\end{explanation}
+
+Затраты на освоение программного средства и обучение персонала приняты в размере \ZosobPercent\% затрат на разработку программного средства и составляют:
+
+\begin{equation*}
+    \text{З}_\text{особ} = \num{\Zr} \cdot \frac{\ZosobPercent}{100} = \num{\Zosob}~\text{\byn}
+\end{equation*}
+
+Затраты на сопровождение программного средства приняты в размере \ZsoprPercent\% от затрат на разработку программного средства и составляют:
+
+\begin{equation*}
+    \text{З}_\text{сопр} = \num{\Zr} \cdot \frac{\ZsoprPercent}{100} = \num{\Zsopr}~\text{\byn}
+\end{equation*}
+
+Прирост текущих затрат, связанных с использованием программного средства, составляет:
+
+\begin{equation*}
+    \Delta \text{З}_\text{тек}^\text{п.с.} = \num{\Zosob} + \num{\Zsopr} = \num{\deltaZtekPS}~\text{\byn}
+\end{equation*}
+
+Прирост чистой прибыли согласно формуле~\eqref{eq:economics:use-effect:profit} составит:
+
+\begin{equation*}
+    \Delta \text{П}_\text{ч} = (\num{\Etek} - \num{\deltaZtekPS}) (1 - \frac{\num{\NpribPercent}}{100}) = \num{\deltaPch}~\text{\byn}
+\end{equation*}

@@ -1,0 +1,169 @@
+\subsection{Расчёт показателей экономической эффективности разработки и использования программного средства в организации}
+\label{sec:economics:efficiency}
+
+% Begin calculations
+\FPeval{\En}{0.11}  % variable ?, change percent and non-percent values
+\FPeval{\EnPercent}{11}  % variable ?
+\FPeval{\tR}{1}
+\FPeval{\NumberOfYears}{4}  % modify table, alpha calculations on change
+\FPeval{\alphaFirst}{round(1 / (1 + \En)^(1 - \tR), 1)}
+\FPeval{\alphaSecond}{round(1 / (1 + \En)^(2 - \tR), 1)}
+\FPeval{\alphaThird}{round(1 / (1 + \En)^(3 - \tR), 2)}
+\FPeval{\alphaFourth}{round(1 / (1 + \En)^(4 - \tR), 2)}
+\FPeval{\alphaFifth}{round(1 / (1 + \En)^(5 - \tR), 2)}
+\FPeval{\discountedFirst}{round(\deltaPch * \alphaFirst, 2)}
+\FPeval{\discountedSecond}{round(\deltaPch * \alphaSecond, 2)}
+\FPeval{\discountedThird}{round(\deltaPch * \alphaThird, 2)}
+\FPeval{\discountedFourth}{round(\deltaPch * \alphaFourth, 2)}
+\FPeval{\discountedZr}{round(\Zr * \alphaFirst, 1)}
+\FPeval{\discountedIncomeFirst}{round(\discountedFirst - \discountedZr, 2)}
+\FPeval{\discountedGrossIncomeSecond}{round(\discountedIncomeFirst + \discountedSecond, 2)}
+\FPeval{\discountedGrossIncomeThird}{round(\discountedGrossIncomeSecond + \discountedThird, 2)}
+\FPeval{\discountedGrossIncomeFourth}{round(\discountedGrossIncomeThird + \discountedFourth, 2)}
+
+\FPeval{\Ri}{round(((1 / 3) * (\deltaPch + \deltaPch + \deltaPch) * 100) / \Zr, 1)}
+
+\FPeval{\DepositRate}{15}  % variable
+% End calculations
+
+Оценка экономической эффективности разработки и использования программного средства зависит от результата сравнения инвестиций на его разработку и полученного экономического эффекта (годового прироста чистой прибыли). Поскольку сумма инвестиций больше суммы годового экономического эффекта, то экономическая целесообразность инвестиций в разработку и использование программного средства осуществляется на основе расчета и оценки следующих показателей:
+
+\begin{itemize}
+    \item чистый дисконтированный доход;
+    \item срок окупаемости инвестиций;
+    \item индекс доходности инвестиций.
+\end{itemize}
+
+Так как приходится сравнивать разновременные результаты (экономический эффект) и затраты (инвестиции в разработку программного продукта), необходимо привести их к единому моменту времени – началу расчетного периода, что обеспечивает их сопоставимость.
+
+Для этого необходимо использовать дисконтирование путем умножения соответствующих результатов и затрат на коэффициент дисконтирования соответствующего года $ t $, который определяется по формуле:
+
+\begin{equation}
+    \label{eq:economics:efficiency:discount-coef}
+    \alpha_t = \frac{1}{(1 + \text{E}_\text{н})^{t - t_\text{р}}} \text{\,,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ \text{E}_\text{н} $ & требуемая норма дисконта (\num{\EnPercent} \%); \\
+    & $ t $ & порядковый номер года, доходы и затраты которого приводятся к расчётному году; \\
+    & $ t_\text{р} $ & расчётный год, к которому приводятся доходы и инвестиционные затраты (\num{\tR}).
+\end{explanation}
+
+Рассчитаем по формуле~\eqref{eq:economics:efficiency:discount-coef} коэффициенты дисконтирования на первые~\NumberOfYears~года:
+
+\begin{equation*}
+    \alpha_1 = \frac{1}{(1 + \num{\En})^{1 - \num{\tR}}} = \num{\alphaFirst} \text{,}
+\end{equation*}
+
+\begin{equation*}
+    \alpha_2 = \frac{1}{(1 + \num{\En})^{2 - \num{\tR}}} = \num{\alphaSecond} \text{,}
+\end{equation*}
+
+\begin{equation*}
+    \alpha_3 = \frac{1}{(1 + \num{\En})^{3 - \num{\tR}}} = \num{\alphaThird} \text{.}
+\end{equation*}
+
+\begin{equation*}
+    \alpha_4 = \frac{1}{(1 + \num{\En})^{4 - \num{\tR}}} = \num{\alphaFourth} \text{.}
+\end{equation*}
+
+Чистый дисконтированный доход рассчитывается по формуле:
+
+\begin{equation}
+    \label{eq:economics:efficiency:npv}
+    \text{ЧДД} = \sum_{t = 1}^{n} \Delta \text{П}_\text{чt} \cdot \alpha_t - \sum_{t = 1}^{n} \text{И}_t \cdot \alpha_t \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ n $ & расчетный период, лет; \\
+    & $ \Delta \text{П}_\text{чt} $ & прирост прибыли в году $ t $ в результате реализации проекта,~\byn; \\
+    & $ \text{И}_t $ & затраты на разработку в году $ t $,~\byn \\
+\end{explanation}
+
+Расчет показателей эффективности инвестиций представлен в таблице~\ref{table:economics:efficiency:per-years}.
+
+\begingroup
+\singlespacing
+\vspace{-\baselineskip}
+\begin{longtable}{| >{\raggedright}m{0.37\textwidth} 
+                  | >{\centering\arraybackslash}m{0.125\textwidth} 
+                  | >{\centering\arraybackslash}m{0.125\textwidth} 
+                  | >{\centering\arraybackslash}m{0.125\textwidth} 
+                  | >{\centering\arraybackslash}m{0.125\textwidth}|}
+    \caption{Расчет эффективности инвестиций в реализацию программного средства} \label{table:economics:efficiency:per-years} \\ 
+    \hline
+    \multicolumn{1}{|c|}{Показатель} & \multicolumn{4}{c|}{Значение по годам расчетного периода} \\
+    \hline
+    & 1-й год & 2-й год & 3-й год & 4-й год \\
+    \hline
+    \endfirsthead
+    
+    \multicolumn{4}{@{}l}{\noindent Продолжение таблицы~\thetable} \\
+    \hline
+    \multicolumn{1}{|c|}{Показатель} & \multicolumn{4}{c|}{Значение по годам расчетного периода} \\
+    \hline
+    & 1-й год & 2-й год & 3-й год & 4-й год \\
+    \hline
+    \endhead
+
+    \hline
+    \endfoot
+
+    \textbf{Результат} & & & & \\
+    \hline
+    1. Прирост чистой прибыли,~\byn & \num{\deltaPch} & \num{\deltaPch} & \num{\deltaPch} & \num{\deltaPch} \\
+    \hline
+    2. Коэффициент дисконтирования & \num{\alphaFirst} & \num{\alphaSecond} & \num{\alphaThird} & \num{\alphaFourth} \\
+    \hline
+    3. Дисконтированный результат,~\byn & \num{\discountedFirst} & \num{\discountedSecond} & \num{\discountedThird} & \num{\discountedFourth} \\
+    \hline
+    \textbf{Затраты (инвестиции)} & & & & \\
+    \hline
+    4. Инвестиции в реализацию программного средства,~\byn & \num{\Zr} & – & – & – \\
+    \hline
+    5. Дисконтированные инвестиции,~\byn & \num{\discountedZr} & – & – & – \\
+    \hline
+    6. Чистый дисконтированный доход по годам,~\byn & \num{\discountedIncomeFirst} & \num{\discountedSecond} & \num{\discountedThird} & \num{\discountedFourth} \\
+    \hline
+    7. Чистый дисконтированный доход нарастающим итогом,~\byn & \num{\discountedIncomeFirst} & \num{\discountedGrossIncomeSecond} & \num{\discountedGrossIncomeThird} & \num{\discountedGrossIncomeFourth} \\
+    \hline
+\end{longtable}
+\endgroup
+
+\newpage  % TODO: сделано по необходимости
+Рентабельность инвестиций рассчитывается по формуле:
+
+\begin{equation}
+    \label{eq:economics:efficiency:profitability}
+    \text{Р}_\text{и} = \frac{\frac{1}{n} \cdot \sum_{t = 1}^{n} \text{П}_\text{чt}}{\text{И}} \cdot 100 \text{,}
+\end{equation}
+\begin{explanation}
+    где
+    & $ n $ & расчётный период, лет; \\
+    & $ \text{П}_\text{чt} $ & чистая прибыль, полученная в году $ t $,~\byn; \\
+    & $ \text{И} $ & затраты на разработку,~\byn \\
+\end{explanation}
+
+Рассчитаем по формуле~\eqref{eq:economics:efficiency:profitability} рентабельность инвестиций:
+
+\begin{equation*}
+    \label{eq:economics:efficiency:profitability}
+    \text{Р}_\text{и} = \frac{\frac{1}{\num{\NumberOfYears}} \cdot (\num{\deltaPch} + \num{\deltaPch} + \num{\deltaPch} + \num{\deltaPch})}{\num{\Zr}} \cdot 100 = \num{\Ri} \% \text{.}
+\end{equation*}
+
+
+Ставка по депозитам по состоянию на апрель 2025 года – \DepositRate \%.
+
+По результатам расчёта можно сделать следующий вывод: затраты на разработку программного средства экономически эффективны, так как оценка экономической эффективности по формуле рентабельности инвестиций выше годовой ставки по депозитам.
+
+В результате технико-экономического обоснования разработки программного средства для управления офисными информационными процессами были получены следующие экономические показатели: 
+
+\begin{enumerate}
+    \item общая сумма затрат на разработку составит~\num{\Zr}~\byn;
+    \item среднегодовой прирост чистой прибыли составит~\num{\deltaPch}~\byn;
+    \item чистый дисконтированный доход за~\NumberOfYears~года эксплуатации программы составит~\num{\discountedGrossIncomeFourth}~\byn;
+    \item затраты на разработку программного средства окупятся на четвертый год его использования;
+    \item рентабельность инвестиций составляет~\num{\Ri}\%.
+\end{enumerate}
+
+Таким образом, разработка программного средства для управления офисными информационными процессами является экономически эффективной. 

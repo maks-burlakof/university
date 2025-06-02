@@ -1,0 +1,639 @@
+\noindent
+Модели сущностей системы:
+
+\begin{lstlisting}[style=pythonstyle]
+class AccessDeviceTypeOption(StrEnum):
+    reader = "READER"
+    controller = "CONTROLLER"
+    lock = "LOCK"
+    sensor = "SENSOR"
+
+@dataclass
+class AccessDevice:
+    name: str
+    serial_number: str
+    type: AccessDeviceTypeOption
+    model: str
+    access_zone_id: UUID
+    ip_address: Optional[str] = None
+    mac_address: Optional[str] = None
+    description: Optional[str] = None
+    is_active: bool = True
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class AccessEventTypeOption(StrEnum):
+    entry = "ENTRY"
+    exit = "EXIT"
+
+class AccessEventStatusOption(StrEnum):
+    granted = "GRANTED"
+    denied = "DENIED"
+
+@dataclass
+class AccessEvent:
+    access_device_id: UUID
+    employee_identifier_id: UUID
+    type: AccessEventTypeOption
+    status: AccessEventStatusOption
+    timestamp: datetime = field(default_factory=datetime.now)
+    details: Optional[str] = None
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class AccessPermission:
+    employee_identifier_id: UUID
+    access_zone_id: UUID
+    start_date: datetime
+    end_date: Optional[datetime] = None
+    time_restrictions: Optional[list[TimeRestriction]] = None
+    description: Optional[str] = None
+    is_active: bool = True
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class AccessZoneTypeOption(StrEnum):
+    office = "OFFICE"
+    conference_room = "CONFERENCE_ROOM"
+    coworking_room = "COWORKING_ROOM"
+    meeting_room = "MEETING_ROOM"
+    kitchen = "KITCHEN"
+    reception = "RECEPTION"
+    cafeteria = "CAFETERIA"
+    gym = "GYM"
+    lounge = "LOUNGE"
+    restroom = "RESTROOM"
+    elevator = "ELEVATOR"
+    stairwell = "STAIRWELL"
+    parking_lot = "PARKING_LOT"
+    storage_room = "STORAGE_ROOM"
+
+@dataclass
+class AccessZone:
+    name: str
+    type: AccessZoneTypeOption
+    office_id: UUID
+    parent_zone_id: Optional[UUID] = None
+    floor_id: Optional[UUID] = None
+    room_id: Optional[UUID] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class ActivityLogActivityTypeOption(StrEnum):
+    create = "CREATE"
+    update = "UPDATE"
+    delete = "DELETE"
+    view = "VIEW"
+    login = "LOGIN"
+    logout = "LOGOUT"
+
+class ActivityLogEntityTypeOption(StrEnum):
+    employee = "EMPLOYEE"
+    access_permission = "ACCESS_PERMISSION"
+    access_zone = "ACCESS_ZONE"
+    access_device = "ACCESS_DEVICE"
+    access_event = "ACCESS_EVENT"
+    personal_card = "PERSONAL_CARD"
+    workspace = "WORKSPACE"
+    workspace_occupation = "WORKSPACE_OCCUPATION"
+    room = "ROOM"
+    floor = "FLOOR"
+    office = "OFFICE"
+    occupation_request = "OCCUPATION_REQUEST"
+    address = "ADDRESS"
+    city = "CITY"
+    country = "COUNTRY"
+    equipment = "EQUIPMENT"
+    equipment_assignment = "EQUIPMENT_ASSIGNMENT"
+    equipment_maintenance = "EQUIPMENT_MAINTENANCE"
+    maintenance_request = "MAINTENANCE_REQUEST"
+    notification = "NOTIFICATION"
+    announcement = "ANNOUNCEMENT"
+
+@dataclass
+class ActivityLog:
+    employee_id: UUID
+    activity_type: ActivityLogActivityTypeOption
+    entity_type: ActivityLogEntityTypeOption
+    entity_id: UUID
+    timestamp: datetime = field(default_factory=datetime.now)
+    details: Optional[dict] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class AddressStreetTypeOption(StrEnum):
+    street = "STREET"
+    avenue = "AVENUE"
+    square = "SQUARE"
+    boulevard = "BOULEVARD"
+    lane = "LANE"
+    road = "ROAD"
+
+class AddressSubbuildingTypeOption(StrEnum):
+    korpus = "KORPUS"
+
+@dataclass
+class Address:
+    street: str
+    street_type: AddressStreetTypeOption
+    building_number: str
+    city_id: UUID
+    subbuilding_number: Optional[str] = None
+    subbuilding_type: Optional[AddressSubbuildingTypeOption] = None
+    postcode: Optional[str] = None
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class AnnouncementStatusOption(StrEnum):
+    draft = "DRAFT"
+    published = "PUBLISHED"
+    archived = "ARCHIVED"
+
+class AnnouncementTargetOption(StrEnum):
+    all_employees = "ALL_EMPLOYEES"
+    department = "DEPARTMENT"
+    office = "OFFICE"
+    custom = "CUSTOM"
+
+@dataclass
+class Announcement:
+    title: str
+    content: str
+    author_employee_id: UUID
+    status: AnnouncementStatusOption = AnnouncementStatusOption.draft
+    target: AnnouncementTargetOption = AnnouncementTargetOption.all_employees
+    target_department_id: Optional[UUID] = None
+    target_office_id: Optional[UUID] = None
+    target_employee_ids: Optional[List[UUID]] = None
+    publish_date: Optional[datetime] = None
+    expiry_date: Optional[datetime] = None
+    attachment_urls: Optional[List[str]] = None
+    is_pinned: bool = False
+    is_important: bool = False
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class CityTypeOption(StrEnum):
+    city = "CITY"  # город
+    village = "VILLAGE"  # деревня
+    settlement = "SETTLEMENT"  # поселок
+    urban_settlement = "URBAN_SETTLEMENT"  # посёлок городского типа
+
+@dataclass
+class City:
+    name: str
+    type: CityTypeOption
+    country_id: UUID
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class Country:
+    name: str
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class Department:
+    name: str
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class EmployeeRoleOption(StrEnum):
+    employee = "EMPLOYEE"
+    office_manager = "OFFICE_MANAGER"
+    facility_manager = "FACILITY_MANAGER"
+    it_support = "IT_SUPPORT"
+    receptionist = "RECEPTIONIST"
+    safety_officer = "SAFETY_OFFICER"
+    hr = "HR"
+    resource_manager = "RESOURCE_MANAGER"
+    admin = "ADMIN"
+
+@dataclass
+class Employee:
+    first_name: str
+    last_name: str
+    email: str
+    department_id: UUID
+    position_id: UUID
+    professional_level_id: UUID
+    phone_number: Optional[str] = None
+    role: EmployeeRoleOption = EmployeeRoleOption.employee
+    middle_name: Optional[str] = None
+    picture: Optional[str] = None
+    is_blocked: bool = False
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class EmployeePersonalIdentifierTypeOption(StrEnum):
+    card = "CARD"
+
+@dataclass
+class EmployeePersonalIdentifier:
+    type: EmployeePersonalIdentifierTypeOption
+    identifier_id: UUID
+    employee_id: UUID
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class EmployeePosition:
+    name: str
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class EmployeeProfessionalLevel:
+    name: str
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class EquipmentTypeOption(StrEnum):
+    laptop = "LAPTOP"
+    desktop = "DESKTOP"
+    monitor = "MONITOR"
+    keyboard = "KEYBOARD"
+    mouse = "MOUSE"
+    docking_station = "DOCKING_STATION"
+    headset = "HEADSET"
+    phone = "PHONE"
+    tablet = "TABLET"
+    printer = "PRINTER"
+    scanner = "SCANNER"
+    projector = "PROJECTOR"
+    tv = "TV"
+    camera = "CAMERA"
+    microphone = "MICROPHONE"
+    speaker = "SPEAKER"
+    chair = "CHAIR"
+    desk = "DESK"
+    cabinet = "CABINET"
+    other = "OTHER"
+
+class EquipmentStatusOption(StrEnum):
+    available = "AVAILABLE"
+    assigned = "ASSIGNED"
+    in_maintenance = "IN_MAINTENANCE"
+    under_repair = "UNDER_REPAIR"
+    reserved = "RESERVED"
+    decommissioned = "DECOMMISSIONED"
+    lost = "LOST"
+    stolen = "STOLEN"
+    disposed = "DISPOSED"
+
+@dataclass
+class Equipment:
+    name: str
+    type: EquipmentTypeOption
+    status: EquipmentStatusOption
+    model: str
+    serial_number: Optional[str] = None
+    inventory_number: Optional[str] = None
+    manufacturer: Optional[str] = None
+    purchase_date: Optional[datetime] = None
+    warranty_end_date: Optional[datetime] = None
+    cost: Optional[float] = None
+    office_id: Optional[UUID] = None
+    floor_id: Optional[UUID] = None
+    room_id: Optional[UUID] = None
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    is_active: bool = True
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class EquipmentAssignmentStatusOption(StrEnum):
+    active = "ACTIVE"
+    returned = "RETURNED"
+    lost = "LOST"
+    damaged = "DAMAGED"
+
+@dataclass
+class EquipmentAssignment:
+    equipment_id: UUID
+    employee_id: UUID
+    assigned_date: datetime
+    status: EquipmentAssignmentStatusOption
+    returned_date: Optional[datetime] = None
+    assigned_by_employee_id: Optional[UUID] = None
+    return_condition: Optional[str] = None
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class EquipmentMaintenanceTypeOption(StrEnum):
+    scheduled = "SCHEDULED"
+    repair = "REPAIR"
+    inspection = "INSPECTION"
+    upgrade = "UPGRADE"
+    cleaning = "CLEANING"
+    calibration = "CALIBRATION"
+    software_update = "SOFTWARE_UPDATE"
+    warranty_service = "WARRANTY_SERVICE"
+
+class EquipmentMaintenanceStatusOption(StrEnum):
+    scheduled = "SCHEDULED"
+    in_progress = "IN_PROGRESS"
+    completed = "COMPLETED"
+    cancelled = "CANCELLED"
+    delayed = "DELAYED"
+    failed = "FAILED"
+
+@dataclass
+class EquipmentMaintenance:
+    equipment_id: UUID
+    type: EquipmentMaintenanceTypeOption
+    status: EquipmentMaintenanceStatusOption
+    start_date: datetime
+    description: str
+    end_date: Optional[datetime] = None
+    technician_name: Optional[str] = None
+    performed_by_employee_id: Optional[UUID] = None
+    provider: Optional[str] = None
+    cost: Optional[float] = None
+    invoice_number: Optional[str] = None
+    attachment_urls: Optional[list[str]] = None
+    result: Optional[str] = None
+    notes: Optional[str] = None
+    next_maintenance_date: Optional[datetime] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class Floor:
+    number: str
+    office_id: UUID
+    description: Optional[str] = None
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class MaintenanceRequestTypeOption(StrEnum):
+    plumbing = "PLUMBING"
+    electrical = "ELECTRICAL"
+    hvac = "HVAC"
+    structural = "STRUCTURAL"
+    cleaning = "CLEANING"
+    painting = "PAINTING"
+    furniture = "FURNITURE"
+    security = "SECURITY"
+    networking = "NETWORKING"
+    other = "OTHER"
+
+class MaintenanceRequestPriorityOption(StrEnum):
+    low = "LOW"
+    medium = "MEDIUM"
+    high = "HIGH"
+    urgent = "URGENT"
+
+class MaintenanceRequestStatusOption(StrEnum):
+    pending = "PENDING"
+    approved = "APPROVED"
+    rejected = "REJECTED"
+    in_progress = "IN_PROGRESS"
+    on_hold = "ON_HOLD"
+    completed = "COMPLETED"
+    cancelled = "CANCELLED"
+    scheduled = "SCHEDULED"
+
+@dataclass
+class MaintenanceRequest:
+    type: MaintenanceRequestTypeOption
+    status: MaintenanceRequestStatusOption
+    priority: MaintenanceRequestPriorityOption
+    description: str
+    reporter_employee_id: UUID
+    office_id: UUID
+    issue_date: datetime = field(default_factory=datetime.now)
+    floor_id: Optional[UUID] = None
+    room_id: Optional[UUID] = None
+    assigned_to_employee_id: Optional[UUID] = None
+    external_contractor: Optional[str] = None
+    estimated_cost: Optional[float] = None
+    actual_cost: Optional[float] = None
+    scheduled_date: Optional[datetime] = None
+    due_date: Optional[datetime] = None
+    completion_date: Optional[datetime] = None
+    attachment_urls: Optional[list[str]] = None
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class NotificationTypeOption(StrEnum):
+    access_event = "ACCESS_EVENT"
+    maintenance = "MAINTENANCE"
+    equipment = "EQUIPMENT"
+    occupation_request = "OCCUPATION_REQUEST"
+    workspace = "WORKSPACE"
+    system = "SYSTEM"
+    security = "SECURITY"
+    announcement = "ANNOUNCEMENT"
+
+class NotificationPriorityOption(StrEnum):
+    low = "LOW"
+    medium = "MEDIUM"
+    high = "HIGH"
+    urgent = "URGENT"
+
+@dataclass
+class Notification:
+    employee_id: UUID
+    title: str
+    content: str
+    type: NotificationTypeOption
+    priority: NotificationPriorityOption = NotificationPriorityOption.medium
+    is_read: bool = False
+    entity_type: Optional[str] = None
+    entity_id: Optional[UUID] = None
+    read_at: Optional[datetime] = None
+    expiry_date: Optional[datetime] = None
+    action_url: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class OccupationRequestStatusOption(StrEnum):
+    in_progress = "IN_PROGRESS"
+    approved = "APPROVED"
+    rejected = "REJECTED"
+    delayed = "DELAYED"
+    canceled = "CANCELED"
+
+class OccupationRequestRequestTypeOption(StrEnum):
+    workspace = "WORKSPACE"
+    equipment = "EQUIPMENT"
+
+class OccupationRequestOccupationTypeOption(StrEnum):
+    temporal = "TEMPORAL"
+    permanent = "PERMANENT"
+
+@dataclass
+class OccupationRequest:
+    status: OccupationRequestStatusOption
+    request_type: OccupationRequestRequestTypeOption
+    occupation_type: OccupationRequestOccupationTypeOption
+    object_id: UUID
+    requester_employee_id: UUID
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    is_archived: bool = False
+    requester_comment: Optional[str] = None
+    approver_employee_id: Optional[UUID] = None
+    approver_comment: Optional[str] = None
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass
+class Office:
+    address_id: UUID
+    name: Optional[str] = None
+    description: Optional[str] = None
+    phone_number: Optional[str] = None
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class PersonalCardIdentifierTypeOption(StrEnum):
+    proximity = "PROXIMITY"
+    magnetic = "MAGNETIC_STRIPE"
+    smart_card = "SMART_CARD"
+    nfc = "NFC"
+    biometric = "BIOMETRIC"
+    qr_code = "QR_CODE"
+    barcode = "BARCODE"
+
+class PersonalCardIdentifierStatusOption(StrEnum):
+    active = "ACTIVE"
+    inactive = "INACTIVE"
+    lost = "LOST"
+    stolen = "STOLEN"
+    damaged = "DAMAGED"
+    expired = "EXPIRED"
+    temporary = "TEMPORARY"
+
+@dataclass
+class PersonalCardIdentifier:
+    number: str
+    type: PersonalCardIdentifierTypeOption
+    uid: str
+    status: PersonalCardIdentifierStatusOption = (
+        PersonalCardIdentifierStatusOption.active
+    )
+    employee_identifier_id: Optional[UUID] = None
+    bit_format: Optional[str] = None
+    manufacturer: Optional[str] = None
+    serial_number: Optional[str] = None
+    issue_date: Optional[datetime] = None
+    expiry_date: Optional[datetime] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class RoomTypeOption(StrEnum):
+    office = "OFFICE"
+    coworking = "COWORKING"
+    meeting = "MEETING"
+    kitchen = "KITCHEN"
+    storage = "STORAGE"
+    playroom = "PLAYROOM"
+    wc = "WC"
+    hall = "HALL"
+    other = "OTHER"
+
+@dataclass
+class Room:
+    number: str
+    type: RoomTypeOption
+    floor_id: UUID
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class WorkspaceStatusOption(StrEnum):
+    free = "FREE"
+    occupied = "OCCUPIED"
+    reserved = "RESERVED"
+    unavailable = "UNAVAILABLE"
+
+@dataclass
+class Workspace:
+    number: str
+    status: WorkspaceStatusOption
+    room_id: UUID
+    coordinates: tuple[Decimal]
+    rotate_degree: int
+    notes: Optional[str] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+class WorkspaceOccupationTypeOption(StrEnum):
+    temporal = "TEMPORAL"
+    permanent = "PERMANENT"
+
+@dataclass
+class WorkspaceOccupation:
+    type: WorkspaceOccupationTypeOption
+    workspace_id: UUID
+    employee_id: UUID
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None
+    is_archived: bool = False
+    created_at: datetime = field(default_factory=datetime.now)
+    modified_at: datetime = field(default_factory=datetime.now)
+    id: UUID = field(default_factory=uuid4)
+
+@dataclass(frozen=True)
+class TimeRestriction:
+    start_time: str
+    end_time: str
+    days_of_week: list[str]
+    is_active: bool = True
+\end{lstlisting}

@@ -1,0 +1,45 @@
+\noindent
+Определение абстрактных классов адаптеров системы:
+
+\begin{lstlisting}[style=pythonstyle]
+class EmployeeRepository(ABC):
+    @abstractmethod
+    async def get(self, **filters: Any) -> Employee | None:
+        pass
+
+    @abstractmethod
+    async def get_many(
+        self,
+        filters: dict | None = None,
+        or_filters: dict | None = None,
+        or_ilike_filters: dict | None = None,
+        sort_by: (
+            Literal[
+                "id",
+                "first_name",
+                "last_name",
+                "email",
+                "phone_number",
+                "created_at",
+                "modified_at",
+            ]
+            | None
+        ) = "id",
+        order_by: Literal["asc", "desc"] | None = "asc",
+        page: int = 1,
+        limit: int = 100,
+    ) -> tuple[int, list[Employee]]:
+        pass
+
+    @abstractmethod
+    async def create(self, employee: Employee) -> Employee:
+        pass
+
+    @abstractmethod
+    async def update(self, updated_user: Employee, **filters: Any) -> Employee | None:
+        pass
+
+    @abstractmethod
+    async def delete(self, **filters) -> None:
+        pass
+\end{lstlisting}

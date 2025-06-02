@@ -1,0 +1,82 @@
+\subsection{Тестирование компонентов системы}
+\label{sub:system-implementation:testing}
+
+Тестирование программного обеспечения~-- это ключевая часть процесса разработки, направленная на проверку качества кода, выявление ошибок и обеспечение соответствия системы заданным требованиям. Среди различных видов тестирования можно выделить юнит-тестирование, интеграционное тестирование, регрессионное тестирование и др.
+
+Подход \textit{Test Driven Development (TDD)}~-- это подход, повышающий качество и надежность кода за счет того, что тесты пишутся до написания самого кода, способствуя лучшему проектированию программного обеспечения. Следуя данной методологии, сосредоточимся на желаемом поведении системы, покрывая каждый элемент логики своими тестами.
+
+\textit{\textbf{Юнит-тестирование (Unit Testing)}} фокусируется на проверке отдельных модулей или компонентов системы в изоляции от других частей. Эти тесты предназначены для проверки конкретных функций, методов или классов, чтобы убедиться, что они работают корректно в рамках своих задач. В разрабатываемой системе юнит-тестирование покрывает каждый сценарий использования, проверяя их логику независимо от внешних зависимостей. В листинге ниже приведен пример реализованного \textit{Unit}-теста на языке \textit{Python} с использованием модуля \textit{pytest} для одного из сценариев использования системы.
+
+\begin{lstlisting}[style=pythonstyle]
+@pytest.mark.asyncio
+async def test_workspace_occupation_request_successfully_created(
+    workspace: Workspace,
+    user: User,
+    request_repository: PostgresWorkspaceOccupationRequestRepository,
+    create_request_use_case: CreateWorkspaceOccupationRequestUseCase,
+):
+    # Preparing request data
+    start_time = datetime.now() + timedelta(days=1)
+    end_time = start_time + timedelta(hours=2)
+    request_data = WorkspaceOccupationRequestData(
+        workspace_id=workspace.id,
+        user_id=user.id,
+        start_time=start_time,
+        end_time=end_time,
+        status=RequestStatus.PENDING,
+    )
+    # Creation of an occupation request
+    request = await create_request_use_case.execute(request_data)
+    # Check that the occupation request is saved in the database
+    created_request = await request_repository.get(request.id)
+    # Main checks
+    assert created_request is not None
+    assert created_request.workspace_id == workspace.id
+    assert created_request.user_id == user.id
+    assert created_request.start_time == start_time
+    assert created_request.end_time == end_time
+    assert created_request.status == RequestStatus.PENDING
+    # Extra checks
+    assert created_request.created_at is not None
+    assert created_request.updated_at is not None
+    assert created_request.updated_at >= created_request.created_at
+\end{lstlisting}
+
+\textit{\textbf{Интеграционное тестирование (Integration Testing)}} направлено на проверку взаимодействия между различными компонентами системы. Этот вид тестирования позволяет убедиться, что отдельные модули, уже протестированные на уровне юнит-тестов, корректно работают вместе. В разрабатываемой системе интеграционные тесты покрывают все адаптеры, включая репозитории (работу с \textit{PostgreSQL}) и драйверы (\textit{REST}-интерфейсы \textit{FastAPI}). Это позволяет проверить, как бизнес-логика приложения взаимодействует с базой данных и внешними \textit{API}, обеспечивая надёжность и правильность интеграции с этими компонентами.
+
+Процесс запуска тестов начинается с подготовки тестового окружения, включающего базу данных, фикстуры и зависимости. Тесты выполняются в асинхронном режиме с использованием \textit{\lstinline!pytest.mark.asyncio!}, имитируя реальное выполнение операций. Успешность теста определяется прохождением всех проверок \textit{\lstinline!assert!}, которые включают корректность сохранения данных и наличие обязательных меток времени. В случае неудачи тест завершается с ошибкой, указывающей на первый \textit{\lstinline!assertion!}, завершенный неуспешно. В таблице~\ref{table:system-implementation:testing:booking} представлено пошаговое описание процесса тестирования одного из сценариев использования системы.
+
+\begingroup
+\singlespacing
+\vspace{-\baselineskip}
+\begin{longtable}{|>{\raggedright}m{0.25\textwidth}
+                  |>{\raggedright}m{0.46\textwidth}
+                  |>{\raggedright\arraybackslash}p{0.2\textwidth}|}
+    \caption{Тестирование процесса создания запроса на бронирование рабочего места} \label{table:system-implementation:testing:booking} \\ \hline
+    Действие & Ожидаемый результат & Результат теста \\ \hline
+    \endfirsthead
+    \multicolumn{3}{@{}l}{\noindent Продолжение таблицы~\thetable} \\ \hline
+    Действие & Ожидаемый результат & Результат теста \\ \hline
+    \endhead
+    \multicolumn{3}{|l|}{\textbf{Предусловие}} \\
+    \hline
+    Переход на страницу, отображающую список офисов & Отображение главного меню с активным пунктом «Офисы», загрузка страницы без ошибок, вывод непустого списка офисов с корректными данными & пройден \\
+    \hline
+    \multicolumn{3}{|l|}{\textbf{Шаги теста}} \\
+    \hline
+    Выбор офиса из списка & Отображение страницы с подробной информацией о выбранном офисе, включая список доступных этажей & пройден \\
+    \hline
+    Выбор этажа & Отображение плана этажа, разметки помещений и расположения рабочих мест с информацией о доступности & пройден \\
+    \hline
+    Выбор занятого рабочего места & Отображение информации о сотруднике, занявшего выбранное рабочее место. Функционал бронирования скрыт. & пройден \\
+    \hline
+    Выбор свободного рабочего места & Отображение кнопки «Забронировать» и формы, запрашивающей данные бронирования & пройден \\
+    \hline
+    Заполнение формы бронирования рабочего места верными данными & Отображение сообщения о том, что запрос на бронирование успешно создан вместе со ссылкой на просмотр деталей запроса & пройден \\
+    \hline
+    Заполнение формы бронирования рабочего места неверными данными & Отображение сообщения о том, что данные в форме заполнены некорректно. Запрос на бронирование не был создан. & пройден \\
+    \hline
+\end{longtable}
+\endgroup
+
+Каждый вид тестирования имеет свою цель и применяется на определённом этапе разработки. Совместное использование различных видов тестирования обеспечивает качественную проверку как отдельных компонентов, так и их взаимодействия, что делает процесс тестирования неотъемлемой частью создания программного продукта для повышения его надёжности, поддерживаемости и стабильности.

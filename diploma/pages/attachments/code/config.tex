@@ -1,0 +1,99 @@
+\noindent
+Конфигурация проекта:
+
+\begin{lstlisting}[style=pythonstyle]
+class BaseAppSettings(BaseModel):
+    log_level: int = logging.INFO
+    jwt_access_token_secret_key: SecretStr = SecretStr("")
+    jwt_refresh_token_secret_key: SecretStr = SecretStr("")
+    jwt_reset_password_token_secret_key: SecretStr = SecretStr("")
+    jwt_access_token_expire_minutes: int = 60
+    jwt_refresh_token_expire_minutes: int = 1440
+    jwt_reset_password_token_expire_minutes: int = 30
+    backend_url: str = "http://localhost:8010"
+    frontend_url: str = "http://localhost:3010"
+    allow_origins: list[str] = ["*"]
+    database_hostname: str = "postgres"
+    database_port: int = "5432"
+    database_name: str = "office_management"
+    database_username: str = "postgres"
+    database_password: SecretStr = SecretStr("postgres")
+    redis_uri: str = "redis://default:redis@redis:6379/1"
+
+class TestAppSettings(BaseAppSettings):
+    log_level: int = logging.ERROR
+    jwt_access_token_secret_key: SecretStr = SecretStr("access-token-secret")
+    jwt_refresh_token_secret_key: SecretStr = SecretStr("refresh-token-secret")
+    jwt_reset_password_token_secret_key: SecretStr = SecretStr(
+        "reset-password-token-secret"
+    )
+    redis_uri: str = "redis://default:redis@redis:6379/11"
+
+class LocalAppSettings(BaseAppSettings):
+    jwt_access_token_secret_key: SecretStr = SecretStr(
+        "rpWV7qx8Bal7aSW5FM2FjaAjRJIc0yXVZuMNtiScgk"
+    )
+    jwt_refresh_token_secret_key: SecretStr = SecretStr(
+        "Yv71eBUXbDJaMNfW2QdsSeudCb7PPRYSdbBUe6gJjw"
+    )
+    jwt_reset_password_token_secret_key: SecretStr = SecretStr(
+        "6f3c5p66q2RdLxUDLpAhrBKVF1v4gXPIKjaFn7EJBo"
+    )
+
+class DevAppSettings(BaseAppSettings):
+    jwt_access_token_secret_key: SecretStr = SecretStr(
+        "rpWV7qx8Bal7aSW5FM2FjaAjRJIc0yXVZuMNtiScgk"
+    )
+    jwt_refresh_token_secret_key: SecretStr = SecretStr(
+        "Yv71eBUXbDJaMNfW2QdsSeudCb7PPRYSdbBUe6gJjw"
+    )
+    jwt_reset_password_token_secret_key: SecretStr = SecretStr(
+        "6f3c5p66q2RdLxUDLpAhrBKVF1v4gXPIKjaFn7EJBo"
+    )
+
+class ProdAppSettings(BaseAppSettings):
+    pass
+
+class EnvType(StrEnum):
+    test: str = "test"
+    local: str = "local"
+    dev: str = "dev"
+    prod: str = "prod"
+
+class BaseSettings(PydanticBaseSettings):
+    env: EnvType
+    app: BaseAppSettings = BaseAppSettings()
+
+    class Config:
+        env_file = Path(__file__).parent.parent / ".env"  # src/.env
+        env_nested_delimiter = "__"
+        extra = "ignore"
+
+class TestSettings(BaseSettings):
+    env: EnvType = EnvType.test
+    app: TestAppSettings = TestAppSettings()
+
+class LocalSettings(BaseSettings):
+    env: EnvType = EnvType.local
+    app: LocalAppSettings = LocalAppSettings()
+
+class DevSettings(BaseSettings):
+    env: EnvType = EnvType.dev
+    app: DevAppSettings = DevAppSettings()
+
+class ProdSettings(BaseSettings):
+    env: EnvType = EnvType.prod
+    app: ProdAppSettings = ProdAppSettings()
+
+settings_mapping = {
+    EnvType.dev: DevSettings,
+    EnvType.test: TestSettings,
+    EnvType.prod: ProdSettings,
+    EnvType.local: LocalSettings,
+}
+
+@lru_cache
+def get_settings() -> BaseSettings:
+    app_env = BaseSettings().env
+    return settings_mapping[app_env]()
+\end{lstlisting}
